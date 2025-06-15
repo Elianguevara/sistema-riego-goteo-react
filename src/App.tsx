@@ -18,7 +18,7 @@ function App() {
         </Route>
       </Route>
 
-      <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="/" element={<Navigate to="/Login" />} />
     </Routes>
   );
 }
