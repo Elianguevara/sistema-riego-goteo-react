@@ -1,0 +1,155 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Usa el 100% del padre (html, body) */
+  background-color: #0b1f3d;
+}
+
+.login-card {
+  background-color: white;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.logo-container {
+  margin-bottom: 30px;
+}
+
+.logo-icon {
+  font-size: 48px;
+  color: #2eaf7d;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 10px 0 0;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #666;
+  margin-top: 5px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background-color: #f7f7f7;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0 15px;
+}
+
+.input-group .icon {
+  color: #999;
+}
+
+.input-group input {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 15px 10px;
+  flex-grow: 1;
+  font-size: 16px;
+}
+
+.submit-button {
+  background-color: #2eaf7d;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #258a62;
+}
+
+.forgot-password {
+  display: inline-block;
+  margin-top: 20px;
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.error-message.server-error {
+  color: #e53935;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 0;
+  padding: 10px;
+  background-color: #ffebee;
+  border-radius: 5px;
+}
+
+/* --- Media Query para Responsividad --- */
+@media (max-width: 480px) {
+  .login-container {
+    background-color: #ffffff;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 20px;
+  }
+  
+}
+/* --- NUEVOS ESTILOS AÑADIDOS --- */
+
+.input-group {
+  position: relative; /* Necesario para posicionar el ícono del ojo */
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  cursor: pointer;
+}
+
+.submit-button:disabled {
+  background-color: #a5d8c3;
+  cursor: not-allowed;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
