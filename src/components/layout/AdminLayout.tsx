@@ -1,19 +1,17 @@
 //import React from 'react';
 import { useState } from 'react'; // Importar useState
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner'; // <-- Importar Toaster
+import ProfileMenu from './ProfileMenu'; // Añade esta línea
 import './AdminLayout.css';
-import authService from '../../services/authService';
+//import authService from '../../services/authService';
 
 const AdminLayout = () => {
     const location = useLocation();
-    const navigate = useNavigate();
+    
     const [isSidebarVisible, setIsSidebarVisible] = useState(false); // Estado para el menú móvil
 
-    const handleLogout = () => {
-        authService.logout();
-        navigate('/login');
-    };
+   
 
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
@@ -52,14 +50,7 @@ const AdminLayout = () => {
                         <i className="fas fa-bars"></i>
                     </button>
 
-                    <div className="user-profile" onClick={handleLogout} title="Cerrar sesión">
-                        <div className="avatar">EG</div>
-                        <div className="user-info">
-                            <span className="user-name">Elian Guevara</span>
-                            <span className="user-role">Administrador</span>
-                        </div>
-                        <i className="fas fa-chevron-down"></i>
-                    </div>
+                    <ProfileMenu />
                 </header>
                 <div className="content-area">
                     <Outlet />

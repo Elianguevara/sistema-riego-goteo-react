@@ -1,10 +1,9 @@
-//import React from 'react';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import dashboardService from '../services/dashboardService';
 import type { KpiResponse } from '../types/dashboard.types';
 import './Dashboard.css';
 
-// Placeholder para la tabla de usuarios
+// Placeholder para la tabla de usuarios (se mantiene igual)
 const UserTable = () => {
     const users = [
         { name: 'John Doe', role: 'Administrador', state: 'Inactivo' },
@@ -45,41 +44,24 @@ const UserTable = () => {
     );
 };
 
+
 const Dashboard = () => {
-  // 1. Estados para manejar los datos, la carga y los errores
-  const [kpis, setKpis] = useState<KpiResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // 1. Reemplazamos los 3 'useState' y el 'useEffect' por una sola llamada a 'useQuery'.
+  const { data: kpis, isLoading, isError, error } = useQuery<KpiResponse, Error>({
+    queryKey: ['dashboardKpis'], // Una clave única para esta consulta. React Query la usa para cachear.
+    queryFn: dashboardService.getKpis, // La función que se ejecutará para obtener los datos.
+  });
 
-  // 2. useEffect para cargar los datos cuando el componente se monta
-  useEffect(() => {
-    const fetchKpis = async () => {
-      try {
-        setIsLoading(true);
-        const data = await dashboardService.getKpis();
-        setKpis(data);
-        setError(null);
-      } catch (err) {
-        setError('No se pudieron cargar las estadísticas del dashboard.');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchKpis();
-  }, []); // El array vacío asegura que se ejecute solo una vez
-
-  // 3. Renderizado condicional para los estados de carga y error
+  // 2. El manejo de estados de carga y error ahora es más simple.
   if (isLoading) {
-    return <p>Cargando estadísticas...</p>;
+    return <div className="dashboard-page"><p>Cargando estadísticas...</p></div>;
   }
 
-  if (error) {
-    return <p className="error-text">{error}</p>;
+  if (isError) {
+    return <div className="dashboard-page"><p className="error-text">Error: {error.message}</p></div>;
   }
 
-// 4. Renderizado principal con los datos de la API
+  // 3. Renderizado principal con los datos de la API.
   return (
     <div>
       <div className="stats-cards-grid">

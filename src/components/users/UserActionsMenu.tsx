@@ -27,12 +27,12 @@ const UserActionsMenu = ({ onEdit, onChangePassword, onDelete }: UserActionsMenu
         <i className="fas fa-ellipsis-v"></i>
       </button>
       {isOpen && (
-        <div className="dropdown-content">
-          <a href="#" onClick={(e) => { e.preventDefault(); onEdit(); setIsOpen(false); }}>Editar Perfil</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); onChangePassword(); setIsOpen(false); }}>Cambiar Contraseña</a>
-          <a href="#" className="delete" onClick={(e) => { e.preventDefault(); onDelete(); setIsOpen(false); }}>Eliminar Usuario</a>
-        </div>
-      )}
+  <div className="dropdown-content">
+    <button onClick={() => { onEdit(); setIsOpen(false); }}>Editar Perfil</button>
+    <button onClick={() => { onChangePassword(); setIsOpen(false); }}>Cambiar Contraseña</button>
+    <button className="delete" onClick={() => { onDelete(); setIsOpen(false); }}>Eliminar Usuario</button>
+  </div>
+)}
     </div>
   );
 };

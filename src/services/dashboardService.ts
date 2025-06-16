@@ -3,7 +3,7 @@
 import authService from './authService';
 import type { KpiResponse } from '../types/dashboard.types';
 
-const API_URL = 'http://localhost:8080/api/dashboard';
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/dashboard`;
 
 /**
  * Obtiene las cabeceras de autenticación necesarias para las peticiones.

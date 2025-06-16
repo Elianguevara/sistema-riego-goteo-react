@@ -42,7 +42,7 @@ const Login = () => {
                 <div className="logo-container">
                     <i className="fas fa-leaf logo-icon"></i>
                     <h1 className="title">Hidra</h1>
-                    <h2 className="subtitle">Sistema de Riego</h2>
+                    <h2 className="subtitle">Gestión de Sistema de Riego</h2>
                 </div>
 
                 <form onSubmit={handleLogin}>

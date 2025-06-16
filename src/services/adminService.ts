@@ -4,8 +4,8 @@ import authService from './authService'; // Para obtener el token
 // Asumimos que tienes un tipo UserResponse definido, si no, lo crearemos
 import type { UserResponse, UserCreateData, UserUpdateData, UserStatusUpdateData, PasswordUpdateData } from '../types/user.types';
 // Este servicio maneja las operaciones administrativas relacionadas con los usuarios
-const API_URL = 'http://localhost:8080/api/admin';
-const AUTH_API_URL = 'http://localhost:8080/api/auth';
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/admin`;
+const AUTH_API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
 const getAuthHeader = (): Record<string, string> => {
     const token = authService.getToken();
