@@ -10,7 +10,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
 
-      <Route element={<ProtectedRoute />}>
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />} >
         <Route element={<AdminLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<UserManagement />} /> {/* <-- Añade la nueva ruta */}

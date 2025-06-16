@@ -6,9 +6,9 @@
 }
 
 .stat-card {
-    background-color: #fff;
+    background-color: var(--color-content-bg);
     padding: 20px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     display: flex;
     align-items: center;
     gap: 20px;
@@ -22,13 +22,13 @@
     justify-content: center;
     align-items: center;
     font-size: 24px;
-    color: #fff;
+    color: var(--color-primary-text);
 }
 
-.card-icon.blue { background-color: #3498db; }
-.card-icon.green { background-color: #2ecc71; }
-.card-icon.cyan { background-color: #1abc9c; }
-.card-icon.red { background-color: #e74c3c; }
+.card-icon.blue { background-color: var(--color-info); }
+.card-icon.green { background-color: var(--color-success); }
+.card-icon.cyan { background-color: #1abc9c; } /* Este color no estaba en la paleta, se puede añadir */
+.card-icon.red { background-color: var(--color-danger); }
 
 .card-info {
     display: flex;
@@ -38,18 +38,18 @@
 .card-value {
     font-size: 28px;
     font-weight: 700;
-    color: #333;
+    color: var(--color-text-dark);
 }
 
 .card-label {
     font-size: 14px;
-    color: #7f8c8d;
+    color: var(--color-text-light);
 }
 
 .user-table-container {
-    background-color: #fff;
+    background-color: var(--color-content-bg);
     padding: 20px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
 }
 
 .table-title {
@@ -65,18 +65,18 @@ table {
 th, td {
     text-align: left;
     padding: 12px 15px;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid var(--color-border);
 }
 
 th {
-    color: #7f8c8d;
+    color: var(--color-text-light);
     font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;
 }
 
 td {
-    color: #34495e;
+    color: var(--color-text-dark);
 }
 
 .status-badge {
@@ -87,8 +87,8 @@ td {
 }
 
 .status-badge.active {
-    background-color: #eafaf1;
-    color: #2ecc71;
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
 }
 
 td.actions {
@@ -98,5 +98,5 @@ td.actions {
 .action-icon {
     margin-left: 15px;
     cursor: pointer;
-    color: #95a5a6;
+    color: var(--color-text-disabled);
 }

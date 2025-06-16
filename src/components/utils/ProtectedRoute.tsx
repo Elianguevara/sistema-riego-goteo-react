@@ -5,7 +5,8 @@ import { jwtDecode } from 'jwt-decode'; // <-- 1. Importar la librería
 // Interface para el payload del token decodificado
 interface DecodedToken {
     exp: number; // 'exp' es el tiempo de expiración estándar en formato UNIX
-    // Aquí puedes añadir otras propiedades de tu token si las necesitas (sub, iat, roles, etc.)
+    sub: string;// Aquí puedes añadir otras propiedades de tu token si las necesitas (sub, iat, roles, etc.)
+    rol: string; // <-- Ajustado al nombre de tu claim
 }
 
 /**
@@ -26,24 +27,41 @@ const isTokenExpired = (token: string): boolean => {
         return true; 
     }
 };
+    // Props para nuestro componente
+interface ProtectedRouteProps {
+  allowedRoles: string[];
+}
 
-
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     const token = authService.getToken();
 
-    // Verificación 1: ¿Existe el token?
+    // 1. Verificación de existencia del token
     if (!token) {
         return <Navigate to="/login" />;
     }
 
-    // Verificación 2: ¿Ha expirado el token?
+    // 2. Verificación de expiración del token
     if (isTokenExpired(token)) {
-        console.warn("Token expirado. Se requiere un nuevo inicio de sesión.");
-        authService.logout(); // Limpiamos el token expirado del storage
+        authService.logout();
         return <Navigate to="/login" />;
     }
 
-    // Si el token existe Y es válido, permite el acceso.
+    // 3. Verificación de Rol (lógica simplificada y ajustada)
+    const decoded: DecodedToken = jwtDecode(token);
+    const userRole = decoded.rol; // Obtenemos el rol del usuario desde el token
+
+    // Verificamos si el rol del usuario está incluido en la lista de roles permitidos
+    const isAuthorized = allowedRoles.includes(userRole);
+
+    if (!isAuthorized) {
+        // Si el usuario está logueado pero no tiene el rol correcto,
+        // lo redirigimos. Una página "Acceso Denegado" sería ideal,
+        // pero por ahora lo mandamos al login para seguridad.
+        console.warn(`Acceso denegado. Rol requerido: ${allowedRoles}. Rol del usuario: ${userRole}`);
+        return <Navigate to="/login" />;
+    }
+
+    // ¡Acceso concedido!
     return <Outlet />;
 };
 

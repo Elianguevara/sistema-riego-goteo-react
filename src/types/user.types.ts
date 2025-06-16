@@ -25,3 +25,12 @@ export interface UserUpdateData {
   name: string;
   email: string;
 }
+// Interfaz para el cambio de estado (activo/inactivo)
+export interface UserStatusUpdateData {
+  active: boolean;
+}
+
+// Interfaz para el cambio de contraseña por parte del admin
+export interface PasswordUpdateData {
+  newPassword: string;
+}

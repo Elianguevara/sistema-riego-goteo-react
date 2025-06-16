@@ -2,8 +2,7 @@ import authService from './authService'; // Para obtener el token
 
 // Asumimos que tienes un tipo UserResponse definido, si no, lo crearemos
 // Asumimos que tienes un tipo UserResponse definido, si no, lo crearemos
-import type { UserResponse, UserCreateData, UserUpdateData } from '../types/user.types';
-
+import type { UserResponse, UserCreateData, UserUpdateData, UserStatusUpdateData, PasswordUpdateData } from '../types/user.types';
 // Este servicio maneja las operaciones administrativas relacionadas con los usuarios
 const API_URL = 'http://localhost:8080/api/admin';
 const AUTH_API_URL = 'http://localhost:8080/api/auth';
@@ -73,12 +72,40 @@ const deleteUser = async (id: number): Promise<void> => {
     });
     if (!response.ok) throw new Error('Error al eliminar el usuario.');
 };
+/**
+ * Actualiza el estado (activo/inactivo) de un usuario.
+ * Cita: Endpoint PUT /api/admin/users/{id}/status
+ */
+const updateUserStatus = async (id: number, statusData: UserStatusUpdateData): Promise<UserResponse> => {
+    const response = await fetch(`${API_URL}/users/${id}/status`, {
+        method: 'PUT',
+        headers: getAuthHeader(),
+        body: JSON.stringify(statusData),
+    });
+    if (!response.ok) throw new Error('Error al actualizar el estado del usuario.');
+    return await response.json();
+};
+/**
+ * Cambia la contraseña de un usuario.
+ * Cita: Endpoint PUT /api/admin/users/{id}/password
+ */
+const changeUserPassword = async (id: number, passwordData: PasswordUpdateData): Promise<string> => {
+    const response = await fetch(`${API_URL}/users/${id}/password`, {
+        method: 'PUT',
+        headers: getAuthHeader(),
+        body: JSON.stringify(passwordData),
+    });
+    if (!response.ok) throw new Error('Error al cambiar la contraseña.');
+    return await response.text();
+};
 
 
 const adminService = {
     getUsers,
     createUser,
     updateUser,
+    updateUserStatus, 
+    changeUserPassword, 
     deleteUser,
 };
 

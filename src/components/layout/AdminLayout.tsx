@@ -1,4 +1,5 @@
 //import React from 'react';
+import { useState } from 'react'; // Importar useState
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import './AdminLayout.css';
 import authService from '../../services/authService';
@@ -6,14 +7,22 @@ import authService from '../../services/authService';
 const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const [isSidebarVisible, setIsSidebarVisible] = useState(false); // Estado para el menú móvil
 
     const handleLogout = () => {
         authService.logout();
         navigate('/login');
     };
 
+    const toggleSidebar = () => {
+        setIsSidebarVisible(!isSidebarVisible);
+    };
+
     return (
-        <div className="admin-layout">
+        <div className={`admin-layout ${isSidebarVisible ? 'sidebar-visible' : ''}`}>
+            {/* Overlay para cerrar el menú al hacer clic fuera */}
+            {isSidebarVisible && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
+
             <aside className="sidebar">
                 <div className="sidebar-header">
                     <i className="fas fa-leaf logo-icon"></i>
@@ -36,8 +45,12 @@ const AdminLayout = () => {
             </aside>
             <main className="main-content">
                 <header className="main-header">
+                    {/* Botón de Hamburguesa para móvil */}
+                    <button className="mobile-menu-button" onClick={toggleSidebar}>
+                        <i className="fas fa-bars"></i>
+                    </button>
+
                     <div className="user-profile" onClick={handleLogout} title="Cerrar sesión">
-                        {/* Aquí podrías poner una imagen de avatar real */}
                         <div className="avatar">EG</div>
                         <div className="user-info">
                             <span className="user-name">Elian Guevara</span>
@@ -47,7 +60,7 @@ const AdminLayout = () => {
                     </div>
                 </header>
                 <div className="content-area">
-                    <Outlet /> {/* Aquí se renderizará el componente de la ruta hija (Dashboard) */}
+                    <Outlet />
                 </div>
             </main>
         </div>
