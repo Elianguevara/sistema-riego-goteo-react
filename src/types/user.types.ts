@@ -16,7 +16,7 @@ export interface UserCreateData {
   username: string;
   password?: string; // Es opcional en la UI si se genera, pero requerido en el backend
   email: string;
-  rol: 'ANALISTA' | 'OPERARIO';
+  rol: 'ADMIN' | 'ANALISTA' | 'OPERARIO';
 }
 
 // Interfaz para el formulario de ACTUALIZACIÓN

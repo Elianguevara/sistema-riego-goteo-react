@@ -1,6 +1,7 @@
 //import React from 'react';
 import { useState } from 'react'; // Importar useState
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Toaster } from 'sonner'; // <-- Importar Toaster
 import './AdminLayout.css';
 import authService from '../../services/authService';
 
@@ -44,6 +45,7 @@ const AdminLayout = () => {
                 </nav>
             </aside>
             <main className="main-content">
+                <Toaster richColors position="top-right" /> {/* <-- Añadir Toaster aquí */}
                 <header className="main-header">
                     {/* Botón de Hamburguesa para móvil */}
                     <button className="mobile-menu-button" onClick={toggleSidebar}>

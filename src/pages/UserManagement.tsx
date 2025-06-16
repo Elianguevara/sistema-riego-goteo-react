@@ -1,143 +1,227 @@
-import  { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import adminService from '../services/adminService';
-import type { UserResponse, UserCreateData, UserUpdateData } from '../types/user.types';
-import UserForm from '../components/users/UserForm'; // Importamos el formulario
+import type { UserResponse, UserCreateData, UserUpdateData, PasswordUpdateData } from '../types/user.types';
+import UserForm from '../components/users/UserForm';
+import StatusToggle from '../components/ui/StatusToggle';
+import UserActionsMenu from '../components/users/UserActionsMenu';
+import ChangePasswordModal from '../components/users/ChangePasswordModal';
 import './UserManagement.css';
 
+// Componente para el modal de confirmación de borrado
+const ConfirmationModal = ({ message, onConfirm, onCancel, isLoading }: { message: string, onConfirm: () => void, onCancel: () => void, isLoading: boolean }) => (
+    <div className="modal-overlay">
+        <div className="modal-container">
+            <h3>Confirmación Requerida</h3>
+            <p>{message}</p>
+            <div className="modal-actions">
+                <button className="btn-cancel" onClick={onCancel} disabled={isLoading}>Cancelar</button>
+                <button className="btn-delete" onClick={onConfirm} disabled={isLoading}>
+                    {isLoading ? 'Eliminando...' : 'Confirmar'}
+                </button>
+            </div>
+        </div>
+    </div>
+);
+
+
 const UserManagement = () => {
-    const [users, setUsers] = useState<UserResponse[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const queryClient = useQueryClient();
 
-    // Estado para manejar el formulario
-    const [isFormVisible, setIsFormVisible] = useState(false);
+    // --- ESTADOS PARA GESTIONAR MODALES Y USUARIOS SELECCIONADOS ---
+    const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [userForPasswordChange, setUserForPasswordChange] = useState<UserResponse | null>(null);
+    const [userToDelete, setUserToDelete] = useState<UserResponse | null>(null);
 
-    const fetchUsers = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const data = await adminService.getUsers();
-            setUsers(data);
-            setError(null);
-        } catch (err) {
-            setError('No se pudieron cargar los usuarios.');
-            console.error(err);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                setIsLoading(true);
-                const data = await adminService.getUsers();
-                setUsers(data);
-                setError(null);
-            } catch (err) {
-                setError('No se pudieron cargar los usuarios.');
-                console.error(err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    // --- OBTENCIÓN DE DATOS ---
+    const { data: users = [], isLoading, isError, error } = useQuery<UserResponse[]>({
+        queryKey: ['users'],
+        queryFn: adminService.getUsers,
+    });
 
-        fetchUsers();
-    }, []);
- useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+    // --- LÓGICA DE MUTACIONES (Crear, Editar, Borrar, etc.) ---
 
-    const handleCreate = () => {
-        setCurrentUser(null); // Aseguramos que no hay usuario actual
-        setIsFormVisible(true);
+    // Función genérica para manejar errores de mutación
+    const handleMutationError = (error: Error, defaultMessage: string) => {
+        console.error(error);
+        toast.error(error.message || defaultMessage);
     };
 
-    const handleEdit = (user: UserResponse) => {
+    const createUserMutation = useMutation({
+        mutationFn: adminService.createUser,
+        onSuccess: () => {
+            toast.success('Usuario creado exitosamente.');
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+            setIsFormModalOpen(false);
+        },
+        onError: (err) => handleMutationError(err, 'Error al crear el usuario.'),
+    });
+
+    const updateUserMutation = useMutation({
+        mutationFn: (variables: { id: number; data: UserUpdateData }) => adminService.updateUser(variables.id, variables.data),
+        onSuccess: () => {
+            toast.success('Usuario actualizado exitosamente.');
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+            setIsFormModalOpen(false);
+        },
+        onError: (err) => handleMutationError(err, 'Error al actualizar el usuario.'),
+    });
+
+    const deleteUserMutation = useMutation({
+        mutationFn: adminService.deleteUser,
+        onSuccess: () => {
+            toast.success('Usuario eliminado exitosamente.');
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+            setUserToDelete(null); // Cierra el modal de confirmación
+        },
+        onError: (err) => handleMutationError(err, 'Error al eliminar el usuario.'),
+    });
+
+    const updateUserStatusMutation = useMutation({
+        mutationFn: (variables: { id: number; data: { active: boolean } }) => adminService.updateUserStatus(variables.id, variables.data),
+        onSuccess: () => {
+            toast.success('Estado del usuario actualizado.');
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+        onError: (err) => handleMutationError(err, 'Error al cambiar el estado.'),
+    });
+
+    const changePasswordMutation = useMutation({
+        mutationFn: (variables: { id: number; data: PasswordUpdateData }) => adminService.changeUserPassword(variables.id, variables.data),
+        onSuccess: (successMessage) => {
+            toast.success(successMessage);
+            setIsPasswordModalOpen(false);
+        },
+        onError: (err) => handleMutationError(err, 'Error al cambiar la contraseña.'),
+    });
+
+
+    // --- MANEJADORES DE EVENTOS PARA ABRIR MODALES ---
+    const handleOpenCreateForm = () => {
+        setCurrentUser(null);
+        setIsFormModalOpen(true);
+    };
+
+    const handleOpenEditForm = (user: UserResponse) => {
         setCurrentUser(user);
-        setIsFormVisible(true);
+        setIsFormModalOpen(true);
     };
 
-    const handleDelete = async (userId: number) => {
-        if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-            try {
-                await adminService.deleteUser(userId);
-                fetchUsers(); // Recargar la lista de usuarios
-            } catch (error) {
-                console.error('Error al eliminar usuario:', error);
-                setError('No se pudo eliminar el usuario.');
-            }
+    const handleOpenPasswordModal = (user: UserResponse) => {
+        setUserForPasswordChange(user);
+        setIsPasswordModalOpen(true);
+    };
+    
+    const handleOpenDeleteModal = (user: UserResponse) => {
+        setUserToDelete(user);
+    };
+
+
+    // --- MANEJADORES DE ACCIONES ---
+    const handleSaveForm = (data: UserCreateData | UserUpdateData) => {
+        if (currentUser) {
+            updateUserMutation.mutate({ id: currentUser.id, data: data as UserUpdateData });
+        } else {
+            createUserMutation.mutate(data as UserCreateData);
+        }
+    };
+    
+    const handleConfirmDelete = () => {
+        if (userToDelete) {
+            deleteUserMutation.mutate(userToDelete.id);
         }
     };
 
-    const handleSave = async (userData: UserCreateData | UserUpdateData) => {
-        try {
-            if (currentUser) { // Modo edición
-                await adminService.updateUser(currentUser.id, userData as UserUpdateData);
-            } else { // Modo creación
-                await adminService.createUser(userData as UserCreateData);
-            }
-            setIsFormVisible(false);
-            fetchUsers(); // Recargar la lista
-        } catch (error) {
-            console.error('Error al guardar usuario:', error);
-            setError('No se pudo guardar el usuario.');
+    const handlePasswordSave = (passwordData: PasswordUpdateData) => {
+        if (userForPasswordChange) {
+            changePasswordMutation.mutate({ id: userForPasswordChange.id, data: passwordData });
         }
     };
+
+    // --- RENDERIZADO DEL COMPONENTE ---
+    if (isLoading) return <div className="user-management-page"><p>Cargando usuarios...</p></div>;
+    if (isError) return <div className="user-management-page"><p className="error-text">Error: {error.message}</p></div>;
 
     return (
         <div className="user-management-page">
             <div className="page-header">
                 <h1>Usuarios</h1>
-                <button className="create-user-btn" onClick={handleCreate}>
+                <button className="create-user-btn" onClick={handleOpenCreateForm}>
                     <i className="fas fa-plus"></i> Crear Usuario
                 </button>
             </div>
-            
-            {isFormVisible && (
-                <UserForm 
-                    currentUser={currentUser} 
-                    onSave={handleSave} 
-                    onCancel={() => setIsFormVisible(false)} 
+
+            <div className="user-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((user) => (
+                            <tr key={user.id}>
+                                <td>{user.name}</td>
+                                <td>{user.username}</td>
+                                <td>{user.email}</td>
+                                <td>{user.roleName}</td>
+                                <td>
+                                    <StatusToggle
+                                        isActive={user.active}
+                                        isLoading={updateUserStatusMutation.isPending && updateUserStatusMutation.variables?.id === user.id}
+                                        onChange={() => updateUserStatusMutation.mutate({ id: user.id, data: { active: !user.active } })}
+                                    />
+                                </td>
+                                <td className="actions">
+                                    <UserActionsMenu
+                                        onEdit={() => handleOpenEditForm(user)}
+                                        onChangePassword={() => handleOpenPasswordModal(user)}
+                                        onDelete={() => handleOpenDeleteModal(user)}
+                                    />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* --- RENDERIZADO CONDICIONAL DE MODALES --- */}
+            {isFormModalOpen && (
+                 <div className="modal-overlay">
+                    <UserForm
+                        currentUser={currentUser}
+                        onSave={handleSaveForm}
+                        onCancel={() => setIsFormModalOpen(false)}
+                        isLoading={createUserMutation.isPending || updateUserMutation.isPending}
+                    />
+                </div>
+            )}
+
+            {isPasswordModalOpen && userForPasswordChange && (
+                <ChangePasswordModal
+                    isOpen={isPasswordModalOpen}
+                    onClose={() => setIsPasswordModalOpen(false)}
+                    onSave={handlePasswordSave}
+                    isLoading={changePasswordMutation.isPending}
+                    userName={userForPasswordChange.name}
                 />
             )}
             
-            {isLoading && <p>Cargando usuarios...</p>}
-            {error && <p className="error-text">{error}</p>}
-            
-            {!isLoading && !error && (
-                 <div className="user-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Nombre de usuario</th>
-                                <th>Email</th>
-                                <th>Rol</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((user) => (
-                                <tr key={user.id}>
-                                    <td>{user.name}</td>
-                                    <td>{user.username}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.roleName}</td>
-                                    <td>
-                                        <span className={`status-badge ${user.active ? 'active' : 'inactive'}`}>
-                                            {user.active ? 'Activo' : 'Inactivo'}
-                                        </span>
-                                    </td>
-                                    <td className="actions">
-                                        <i className="fas fa-pencil-alt action-icon edit" onClick={() => handleEdit(user)}></i>
-                                        <i className="fas fa-trash-alt action-icon delete" onClick={() => handleDelete(user.id)}></i>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+            {userToDelete && (
+                <ConfirmationModal
+                    message={`¿Estás seguro de que quieres eliminar al usuario "${userToDelete.name}"? Esta acción no se puede deshacer.`}
+                    onConfirm={handleConfirmDelete}
+                    onCancel={() => setUserToDelete(null)}
+                    isLoading={deleteUserMutation.isPending}
+                />
             )}
         </div>
     );
