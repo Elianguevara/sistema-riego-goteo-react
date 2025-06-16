@@ -34,3 +34,8 @@ export interface UserStatusUpdateData {
 export interface PasswordUpdateData {
   newPassword: string;
 }
+export interface SelfPasswordUpdateData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}

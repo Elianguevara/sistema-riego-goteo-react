@@ -2,7 +2,7 @@
 import { useState } from 'react'; // Importar useState
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner'; // <-- Importar Toaster
-import ProfileMenu from './ProfileMenu'; // Añade esta línea
+import ProfileMenu from './ProfileMenu'; 
 import './AdminLayout.css';
 //import authService from '../../services/authService';
 

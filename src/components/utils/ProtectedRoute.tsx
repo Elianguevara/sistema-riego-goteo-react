@@ -1,13 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import authService from '../../services/authService';
 import { jwtDecode } from 'jwt-decode'; // <-- 1. Importar la librería
+import type { DecodedToken } from '../../types/auth.types';
 
-// Interface para el payload del token decodificado
-interface DecodedToken {
-    exp: number; // 'exp' es el tiempo de expiración estándar en formato UNIX
-    sub: string;// Aquí puedes añadir otras propiedades de tu token si las necesitas (sub, iat, roles, etc.)
-    rol: string; // <-- Ajustado al nombre de tu claim
-}
+
 
 /**
  * Verifica si un token JWT ha expirado.

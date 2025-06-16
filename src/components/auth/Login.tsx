@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
-import './Login.css';
+import './Login.css'; // Volvemos a la importación de CSS normal
 
 const Login = () => {
     const [username, setUsername] = useState<string>('');
@@ -42,7 +42,7 @@ const Login = () => {
                 <div className="logo-container">
                     <i className="fas fa-leaf logo-icon"></i>
                     <h1 className="title">Hidra</h1>
-                    <h2 className="subtitle">Gestión de Sistema de Riego</h2>
+                    <h2 className="subtitle">Sistema de Riego</h2>
                 </div>
 
                 <form onSubmit={handleLogin}>

@@ -1,19 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
-import './ProfileMenu.css'; // Crearemos este archivo a continuación
+import { useAuthData } from '../../hooks/useAuthData'; // <-- 1. Importa el hook
+import './ProfileMenu.css';
+
+// Función helper para obtener las iniciales del nombre de usuario
+const getInitials = (name: string = '') => {
+  return name.substring(0, 2).toUpperCase();
+};
 
 const ProfileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const authData = useAuthData(); // <-- 2. Usa el hook para obtener los datos
 
   const handleLogout = () => {
     authService.logout();
     navigate('/login');
   };
 
-  // Lógica para cerrar el menú si se hace clic fuera de él (igual que en UserActionsMenu)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -26,17 +32,17 @@ const ProfileMenu = () => {
 
   return (
     <div className="profile-menu-container" ref={menuRef}>
-      {/* Este es el botón que muestra la información del usuario y abre el menú */}
       <button className="profile-menu-trigger" onClick={() => setIsOpen(!isOpen)}>
-        <div className="avatar">EG</div>
+        {/* 3. Usa los datos del hook para el avatar */}
+        <div className="avatar">{getInitials(authData?.username)}</div>
         <div className="user-info">
-            <span className="user-name">Elian Guevara</span>
-            <span className="user-role">Administrador</span>
+            {/* 4. Usa los datos del hook para el nombre y el rol */}
+            <span className="user-name">{authData?.username ?? 'Usuario'}</span>
+            <span className="user-role">{authData?.role ?? 'Invitado'}</span>
         </div>
         <i className={`fas fa-chevron-down arrow-icon ${isOpen ? 'open' : ''}`}></i>
       </button>
 
-      {/* Menú desplegable que aparece y desaparece */}
       {isOpen && (
         <div className="profile-dropdown">
           <Link to="/profile" className="dropdown-item" onClick={() => setIsOpen(false)}>
