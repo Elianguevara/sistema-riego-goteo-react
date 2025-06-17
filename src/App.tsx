@@ -4,7 +4,9 @@ import ProtectedRoute from './components/utils/ProtectedRoute';
 import AdminLayout from './components/layout/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
-import UserProfile from './pages/UserProfile'; // <-- 1. Importa el nuevo componente
+import UserProfile from './pages/UserProfile';
+import FarmManagement from './pages/FarmManagement'; // <-- 1. IMPORTAR
+import FarmDetail from './pages/FarmDetail'; // <-- IMPORTAR
 
 function App() {
   return (
@@ -15,8 +17,9 @@ function App() {
         <Route element={<AdminLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<UserManagement />} />
-          {/* 2. Reemplaza el placeholder por el componente UserProfile */}
           <Route path="/profile" element={<UserProfile />} /> 
+          <Route path="/farms" element={<FarmManagement />} /> 
+          <Route path="/farms/:farmId" element={<FarmDetail />} /> 
         </Route>
       </Route>
 

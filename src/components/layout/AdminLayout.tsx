@@ -34,7 +34,8 @@ const AdminLayout = () => {
                     <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
                         <i className="fas fa-users"></i> Usuarios
                     </Link>
-                    <Link to="/farms" className={location.pathname === '/farms' ? 'active' : ''}>
+                    {/* LÍNEA MODIFICADA */}
+                    <Link to="/farms" className={location.pathname.startsWith('/farms') ? 'active' : ''}>
                         <i className="fas fa-seedling"></i> Fincas
                     </Link>
                     <Link to="/config" className={location.pathname === '/config' ? 'active' : ''}>
