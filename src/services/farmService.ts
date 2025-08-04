@@ -72,10 +72,11 @@ const deleteFarm = async (id: number): Promise<void> => {
 
 /**
  * Asigna un usuario a una finca.
- * Endpoint: POST /api/admin/farms/{farmId}/users/{userId}
+ * Endpoint: POST /api/admin/users/{userId}/farms/{farmId} (CORREGIDO)
  */
-const assignUserToFarm = async (farmId: number, userId: number): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/admin/farms/${farmId}/users/${userId}`, {
+const assignUserToFarm = async (userId: number, farmId: number): Promise<void> => {
+    // La URL ha sido corregida para coincidir con tu especificación.
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/farms/${farmId}`, {
         method: 'POST',
         headers: getAuthHeader(),
     });
