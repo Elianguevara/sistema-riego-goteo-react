@@ -1,0 +1,43 @@
+.configuration-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.config-card {
+  background-color: var(--color-content-bg);
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-main);
+}
+
+.config-card h3 {
+  margin-top: 0;
+  color: var(--color-text-dark);
+}
+
+.placeholder-content {
+  margin-top: 30px;
+  padding: 40px;
+  text-align: center;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-light);
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  display: block;
+}

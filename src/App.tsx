@@ -5,8 +5,9 @@ import AdminLayout from './components/layout/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import UserProfile from './pages/UserProfile';
-import FarmManagement from './pages/FarmManagement'; // <-- 1. IMPORTAR
-import FarmDetail from './pages/FarmDetail'; // <-- IMPORTAR
+import FarmManagement from './pages/FarmManagement';
+import FarmDetail from './pages/FarmDetail';
+import Configuration from './pages/Configuration'; // <-- 1. IMPORTAR
 
 function App() {
   return (
@@ -19,7 +20,8 @@ function App() {
           <Route path="/users" element={<UserManagement />} />
           <Route path="/profile" element={<UserProfile />} /> 
           <Route path="/farms" element={<FarmManagement />} /> 
-          <Route path="/farms/:farmId" element={<FarmDetail />} /> 
+          <Route path="/farms/:farmId" element={<FarmDetail />} />
+          <Route path="/config" element={<Configuration />} /> {/* <-- 2. AÑADIR RUTA */}
         </Route>
       </Route>
 

@@ -12,6 +12,18 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px rgba(46, 175, 125, 0.3);
 }
 
 .card-icon {
@@ -27,7 +39,7 @@
 
 .card-icon.blue { background-color: var(--color-info); }
 .card-icon.green { background-color: var(--color-success); }
-.card-icon.cyan { background-color: #1abc9c; } /* Este color no estaba en la paleta, se puede añadir */
+.card-icon.cyan { background-color: #1abc9c; }
 .card-icon.red { background-color: var(--color-danger); }
 
 .card-info {
@@ -36,25 +48,32 @@
 }
 
 .card-value {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     color: var(--color-text-dark);
+    line-height: 1.1;
 }
 
 .card-label {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text-light);
+    opacity: 0.9;
 }
 
-.user-table-container {
+.dashboard-table-container {
     background-color: var(--color-content-bg);
     padding: 20px;
     border-radius: var(--border-radius-lg);
 }
 
-.table-title {
-    margin-top: 0;
+.table-header {
+    display: flex;
+    align-items: center;
     margin-bottom: 20px;
+}
+
+.table-title {
+    margin: 0;
 }
 
 table {
@@ -99,4 +118,74 @@ td.actions {
     margin-left: 15px;
     cursor: pointer;
     color: var(--color-text-disabled);
+}
+
+.btn-secondary {
+    background-color: var(--color-border);
+    color: var(--color-text-dark);
+    border: none;
+    padding: 8px 15px;
+    border-radius: var(--border-radius-md);
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: auto;
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--color-text-light);
+}
+
+.search-input {
+  padding: 8px 12px 8px 35px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border);
+  width: 250px;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(46, 175, 125, 0.2);
+}
+
+/* --- ESTILOS PARA SKELETON LOADER --- */
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+.skeleton-container .skeleton {
+    animation: shimmer 1.5s linear infinite;
+    background: linear-gradient(to right, #f6f7f8 4%, #edeef1 25%, #f6f7f8 36%);
+    background-size: 1000px 100%;
+    border-radius: 4px;
+}
+
+.skeleton-container .skeleton-text {
+    height: 16px;
+    width: 80%;
+}
+
+.skeleton-container .skeleton-text-header {
+    height: 12px;
+    width: 60%;
 }
