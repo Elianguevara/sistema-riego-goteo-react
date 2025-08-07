@@ -1,17 +1,16 @@
-//import React from 'react';
-import { useState } from 'react'; // Importar useState
+// Archivo: src/components/layout/AdminLayout.tsx
+
+import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Toaster } from 'sonner'; // <-- Importar Toaster
-import ProfileMenu from './ProfileMenu'; 
+import { Toaster } from 'sonner';
+import ProfileMenu from './ProfileMenu';
 import './AdminLayout.css';
-//import authService from '../../services/authService';
+import { useAuthData } from '../../hooks/useAuthData'; // 1. IMPORTAR HOOK DE AUTH
 
 const AdminLayout = () => {
     const location = useLocation();
-    
-    const [isSidebarVisible, setIsSidebarVisible] = useState(false); // Estado para el menú móvil
-
-   
+    const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+    const authData = useAuthData(); // 2. OBTENER DATOS DEL USUARIO LOGUEADO
 
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
@@ -34,23 +33,28 @@ const AdminLayout = () => {
                     <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
                         <i className="fas fa-users"></i> Usuarios
                     </Link>
-                    {/* LÍNEA MODIFICADA */}
                     <Link to="/farms" className={location.pathname.startsWith('/farms') ? 'active' : ''}>
                         <i className="fas fa-seedling"></i> Fincas
                     </Link>
+                    
+                    {/* 3. AÑADIR ENLACE CONDICIONAL PARA AUDITORÍA */}
+                    {authData?.role === 'ADMIN' && (
+                         <Link to="/audit" className={location.pathname === '/audit' ? 'active' : ''}>
+                            <i className="fas fa-history"></i> Auditoría
+                        </Link>
+                    )}
+
                     <Link to="/config" className={location.pathname === '/config' ? 'active' : ''}>
                         <i className="fas fa-cog"></i> Configuración
                     </Link>
                 </nav>
             </aside>
             <main className="main-content">
-                <Toaster richColors position="top-right" /> {/* <-- Añadir Toaster aquí */}
+                <Toaster richColors position="top-right" />
                 <header className="main-header">
-                    {/* Botón de Hamburguesa para móvil */}
                     <button className="mobile-menu-button" onClick={toggleSidebar}>
                         <i className="fas fa-bars"></i>
                     </button>
-
                     <ProfileMenu />
                 </header>
                 <div className="content-area">

@@ -1,0 +1,67 @@
+/* Archivo: src/pages/AuditLog.css */
+
+.audit-log-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.filters-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    background-color: var(--color-content-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+}
+
+.filters-container input,
+.filters-container select {
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+}
+
+.audit-table-container {
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+}
+
+.action-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+}
+
+.action-badge.create { background-color: var(--color-success); }
+.action-badge.update { background-color: var(--color-info); }
+.action-badge.delete { background-color: var(--color-danger); }
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pagination-controls button {
+    background-color: var(--color-primary);
+    color: var(--color-primary-text);
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+    background-color: var(--color-border);
+    cursor: not-allowed;
+}

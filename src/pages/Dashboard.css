@@ -189,3 +189,82 @@ td.actions {
     height: 12px;
     width: 60%;
 }
+.card-icon.purple { 
+  background-color: #9b59b6; /* Un color distintivo */
+}
+
+/* Estilos para el contenedor de la visualización de estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: var(--border-radius-md);
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 13px;
+    color: var(--color-text-light);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-dark);
+}
+
+.stat-value.active {
+    color: var(--color-success);
+}
+
+.stat-value.inactive {
+    color: var(--color-danger);
+}
+
+.roles-stats h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 18px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.role-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.role-name {
+    width: 100px; /* Ancho fijo para alinear las barras */
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.role-bar-container {
+    flex-grow: 1;
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+}
+
+.role-bar {
+    height: 20px;
+    background-color: var(--color-primary);
+    border-radius: var(--border-radius-sm);
+    transition: width 0.5s ease-in-out;
+}
+
+.role-count {
+    font-weight: 700;
+}

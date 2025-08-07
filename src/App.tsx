@@ -7,12 +7,20 @@ import UserManagement from './pages/UserManagement';
 import UserProfile from './pages/UserProfile';
 import FarmManagement from './pages/FarmManagement';
 import FarmDetail from './pages/FarmDetail';
-import Configuration from './pages/Configuration'; // <-- 1. IMPORTAR
+import Configuration from './pages/Configuration'; 
+import AuditLog from './pages/AuditLog'; // Importar el componente AuditLog
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+
+      {/* 2. Modificar la ruta protegida para que solo el ADMIN pueda ver la auditoría */}
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />} >
+        <Route element={<AdminLayout />}>
+          <Route path="/audit" element={<AuditLog />} />
+        </Route>
+      </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']} />} >
         <Route element={<AdminLayout />}>
@@ -21,7 +29,7 @@ function App() {
           <Route path="/profile" element={<UserProfile />} /> 
           <Route path="/farms" element={<FarmManagement />} /> 
           <Route path="/farms/:farmId" element={<FarmDetail />} />
-          <Route path="/config" element={<Configuration />} /> {/* <-- 2. AÑADIR RUTA */}
+          <Route path="/config" element={<Configuration />} />
         </Route>
       </Route>
 

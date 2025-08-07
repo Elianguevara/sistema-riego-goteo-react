@@ -1,7 +1,7 @@
 // Archivo: src/services/dashboardService.ts
 
 import authService from './authService';
-import type { KpiResponse } from '../types/dashboard.types';
+import type { KpiResponse, UserStatsResponse } from '../types/dashboard.types';
 
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/dashboard`;
 
@@ -33,8 +33,33 @@ const getKpis = async (): Promise<KpiResponse> => {
     return await response.json();
 };
 
+/**
+ * NUEVA FUNCIÓN
+ * Obtiene las estadísticas de usuarios desde la API.
+ * Endpoint: GET /api/admin/dashboard/user-stats
+ */
+const getUserStats = async (): Promise<UserStatsResponse> => {
+    // Usamos la URL base del entorno y la ruta específica del endpoint
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard/user-stats`, {
+        method: 'GET',
+        headers: getAuthHeader(),
+    });
+
+    if (!response.ok) {
+        // Manejo específico para el error de autorización
+        if (response.status === 403) {
+            throw new Error('No tienes permiso para ver estas estadísticas.');
+        }
+        throw new Error('Error al obtener las estadísticas de usuarios.');
+    }
+
+    return await response.json();
+};
+
+
 const dashboardService = {
     getKpis,
+    getUserStats, // 2. Exporta la nueva función
 };
 
 export default dashboardService;
