@@ -19,9 +19,8 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      {/* RUTAS PROTEGIDAS DENTRO DE UN ÚNICO LAYOUT */}
+      {/* TODAS LAS RUTAS PROTEGIDAS VIVEN DENTRO DE UN ÚNICO LAYOUT */}
       <Route path="/" element={<AdminLayout />}>
-        {/* Cada página se envuelve individualmente en ProtectedRoute */}
         
         <Route 
           path="dashboard"
@@ -31,6 +30,7 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        
         <Route 
           path="users" 
           element={
@@ -39,14 +39,7 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="profile" 
-          element={
-            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
-              <UserProfile />
-            </ProtectedRoute>
-          } 
-        />
+
         <Route 
           path="farms" 
           element={
@@ -55,6 +48,7 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
         <Route 
           path="farms/:farmId" 
           element={
@@ -63,6 +57,26 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        
+        {/* LA RUTA DE AUDITORÍA SIGUE EXACTAMENTE LA MISMA LÓGICA QUE LAS DEMÁS */}
+        <Route 
+          path="audit" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AuditLog />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="profile" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
+              <UserProfile />
+            </ProtectedRoute>
+          } 
+        />
+
         <Route 
           path="config" 
           element={
@@ -71,16 +85,7 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        
-        {/* ESTA ES LA RUTA DE AUDITORÍA, SIGUIENDO LA MISMA LÓGICA */}
-        <Route 
-          path="audit" 
-          element={
-            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
-              <AuditLog />
-            </ProtectedRoute>
-          } 
-        />
+
       </Route>
     </Routes>
   );

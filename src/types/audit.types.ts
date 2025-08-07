@@ -4,17 +4,18 @@
 export interface ChangeHistoryResponse {
     id: number;
     changeDatetime: string;
-    actionType: 'CREATE' | 'UPDATE' | 'DELETE';
+    // La acción ahora incluye todos los tipos posibles de la API
+    actionType: 'CREATE' | 'UPDATE' | 'DELETE' | 'ASSIGN' | 'UNASSIGN';
     affectedTable: string;
     recordId: number;
-    fieldName: string | null;
+    changedField: string | null; // <-- CAMBIO: De 'fieldName' a 'changedField'
     oldValue: string | null;
     newValue: string | null;
     userId: number;
     username: string;
 }
 
-// Interface genérica para la respuesta paginada de la API
+// Interface genérica para la respuesta paginada de la API (esta ya estaba bien)
 export interface Page<T> {
     content: T[];
     pageable: {
@@ -44,7 +45,7 @@ export interface Page<T> {
     empty: boolean;
 }
 
-// Interface para los parámetros de la solicitud de historial
+// Interface para los parámetros de la solicitud de historial (esta ya estaba bien)
 export interface ChangeHistoryRequestParams {
     page?: number;
     size?: number;

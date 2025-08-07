@@ -1,11 +1,20 @@
 // Archivo: src/pages/AuditLog.tsx
 
 import { useState } from 'react';
-// 1. Importa 'keepPreviousData' desde la librería
-import { useQuery, keepPreviousData } from '@tanstack/react-query'; // ¡AQUÍ ESTÁ EL CAMBIO!
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import auditService from '../services/auditService';
 import type { ChangeHistoryRequestParams, ChangeHistoryResponse, Page } from '../types/audit.types';
 import './AuditLog.css';
+
+// Pequeña función de ayuda para formatear fechas de forma segura
+const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'N/A';
+    try {
+        return new Date(dateString).toLocaleString('es-AR');
+    } catch (e) {
+        return 'Fecha inválida';
+    }
+};
 
 const AuditLog = () => {
     const [filters, setFilters] = useState<ChangeHistoryRequestParams>({
@@ -23,7 +32,6 @@ const AuditLog = () => {
     const { data: historyPage, isLoading, isError, error, isFetching } = useQuery<Page<ChangeHistoryResponse>, Error>({
         queryKey: ['changeHistory', filters],
         queryFn: () => auditService.getChangeHistory(filters),
-        // 2. Usa 'placeholderData' con la función importada. ¡Esto ya estaba correcto!
         placeholderData: keepPreviousData,
     });
 
@@ -35,13 +43,74 @@ const AuditLog = () => {
         setFilters(prev => ({ ...prev, page: newPage }));
     };
 
+    const renderContent = () => {
+        if (isLoading) {
+            return <p>Cargando historial de auditoría...</p>;
+        }
+
+        if (isError) {
+            return <p className="error-text">Error al cargar: {error.message}</p>;
+        }
+
+        if (!historyPage || historyPage.content.length === 0) {
+            return (
+                <div className="empty-state">
+                    <i className="fas fa-file-alt empty-icon"></i>
+                    <h3>No se encontraron registros</h3>
+                    <p>No hay datos de auditoría que coincidan con los filtros actuales.</p>
+                </div>
+            );
+        }
+        
+        return (
+            <>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha y Hora</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th>Tabla</th>
+                            <th>ID Registro</th>
+                            <th>Campo</th>
+                            <th>Valor Antiguo</th>
+                            <th>Valor Nuevo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {historyPage.content.map(log => (
+                            <tr key={log.id}>
+                                <td>{formatDate(log.changeDatetime)}</td>
+                                <td>{log.username || 'N/A'} ({log.userId})</td>
+                                <td>
+                                    {/* Con el optional chaining (?.), si actionType es null, no se producirá un error */}
+                                    <span className={`action-badge ${log.actionType?.toLowerCase() || ''}`}>
+                                        {log.actionType || 'N/A'}
+                                    </span>
+                                </td>
+                                <td>{log.affectedTable || 'N/A'}</td>
+                                <td>{log.recordId}</td>
+                                <td>{log.changedField || 'N/A'}</td>
+                                <td>{log.oldValue || 'N/A'}</td>
+                                <td>{log.newValue || 'N/A'}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <div className="pagination-controls">
+                    <button onClick={() => handlePageChange(filters.page! - 1)} disabled={historyPage.first || isFetching}>Anterior</button>
+                    <span>Página {historyPage.number + 1} de {historyPage.totalPages || 1}</span>
+                    <button onClick={() => handlePageChange(filters.page! + 1)} disabled={historyPage.last || isFetching}>Siguiente</button>
+                </div>
+            </>
+        );
+    };
+
     return (
         <div className="audit-log-page">
             <div className="page-header">
                 <h1>Historial de Auditoría</h1>
             </div>
-
-            {/* Filtros */}
             <div className="filters-container">
                 <input type="text" name="searchTerm" placeholder="Buscar en cambios..." value={filters.searchTerm || ''} onChange={handleFilterChange} />
                 <input type="number" name="userId" placeholder="ID de Usuario" value={filters.userId || ''} onChange={handleFilterChange} />
@@ -51,53 +120,15 @@ const AuditLog = () => {
                     <option value="CREATE">CREAR</option>
                     <option value="UPDATE">ACTUALIZAR</option>
                     <option value="DELETE">ELIMINAR</option>
+                    <option value="ASSIGN">ASIGNAR</option>
+                    <option value="UNASSIGN">DESASIGNAR</option>
                 </select>
                 <input type="datetime-local" name="startDate" value={filters.startDate || ''} onChange={handleFilterChange} />
                 <input type="datetime-local" name="endDate" value={filters.endDate || ''} onChange={handleFilterChange} />
             </div>
-
-            {/* Contenedor de la tabla */}
             <div className="audit-table-container">
-                {isLoading ? <p>Cargando historial...</p> : isError ? <p className="error-text">Error: {error.message}</p> : (
-                    <>
-                        <table>
-                            {/* ... thead ... */}
-                            <thead>
-                                <tr>
-                                    <th>Fecha y Hora</th>
-                                    <th>Usuario</th>
-                                    <th>Acción</th>
-                                    <th>Tabla</th>
-                                    <th>ID Registro</th>
-                                    <th>Campo</th>
-                                    <th>Valor Antiguo</th>
-                                    <th>Valor Nuevo</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {historyPage?.content.map(log => (
-                                    <tr key={log.id}>
-                                        <td>{new Date(log.changeDatetime).toLocaleString('es-AR')}</td>
-                                        <td>{log.username} ({log.userId})</td>
-                                        <td><span className={`action-badge ${log.actionType.toLowerCase()}`}>{log.actionType}</span></td>
-                                        <td>{log.affectedTable}</td>
-                                        <td>{log.recordId}</td>
-                                        <td>{log.fieldName || 'N/A'}</td>
-                                        <td>{log.oldValue || 'N/A'}</td>
-                                        <td>{log.newValue || 'N/A'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {/* Paginación */}
-                        <div className="pagination-controls">
-                            <button onClick={() => handlePageChange(filters.page! - 1)} disabled={historyPage?.first || isFetching}>Anterior</button>
-                            <span>Página {historyPage ? historyPage.number + 1 : 1} de {historyPage?.totalPages || 1}</span>
-                            <button onClick={() => handlePageChange(filters.page! + 1)} disabled={historyPage?.last || isFetching}>Siguiente</button>
-                        </div>
-                    </>
-                )}
-                 {isFetching && <div className="loading-overlay">Cargando...</div>}
+                {renderContent()}
+                {isFetching && !isLoading && <div className="loading-overlay">Actualizando...</div>}
             </div>
         </div>
     );

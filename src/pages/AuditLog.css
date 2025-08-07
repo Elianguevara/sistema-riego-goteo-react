@@ -25,6 +25,7 @@
 }
 
 .audit-table-container {
+    position: relative;
     background-color: var(--color-content-bg);
     padding: 20px;
     border-radius: var(--border-radius-lg);
@@ -38,11 +39,17 @@
     font-weight: 700;
     color: white;
     text-transform: uppercase;
+    /* --- CAMBIO: Color de fondo por defecto --- */
+    background-color: var(--color-text-light); /* Gris para acciones desconocidas o N/A */
 }
 
+/* --- ESTILOS EXISTENTES Y NUEVOS --- */
 .action-badge.create { background-color: var(--color-success); }
 .action-badge.update { background-color: var(--color-info); }
 .action-badge.delete { background-color: var(--color-danger); }
+.action-badge.assign { background-color: #9b59b6; } /* Púrpura para asignar */
+.action-badge.unassign { background-color: #f39c12; } /* Naranja para desasignar */
+
 
 .pagination-controls {
     display: flex;
@@ -64,4 +71,29 @@
 .pagination-controls button:disabled {
     background-color: var(--color-border);
     cursor: not-allowed;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--color-text-light);
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  z-index: 10;
 }
