@@ -1,3 +1,5 @@
+// Archivo: src/App.tsx
+
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/auth/Login';
 import ProtectedRoute from './components/utils/ProtectedRoute';
@@ -7,33 +9,79 @@ import UserManagement from './pages/UserManagement';
 import UserProfile from './pages/UserProfile';
 import FarmManagement from './pages/FarmManagement';
 import FarmDetail from './pages/FarmDetail';
-import Configuration from './pages/Configuration'; 
-import AuditLog from './pages/AuditLog'; // Importar el componente AuditLog
+import Configuration from './pages/Configuration';
+import AuditLog from './pages/AuditLog';
 
 function App() {
   return (
     <Routes>
+      {/* RUTAS PÚBLICAS */}
       <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      {/* 2. Modificar la ruta protegida para que solo el ADMIN pueda ver la auditoría */}
-      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />} >
-        <Route element={<AdminLayout />}>
-          <Route path="/audit" element={<AuditLog />} />
-        </Route>
+      {/* RUTAS PROTEGIDAS DENTRO DE UN ÚNICO LAYOUT */}
+      <Route path="/" element={<AdminLayout />}>
+        {/* Cada página se envuelve individualmente en ProtectedRoute */}
+        
+        <Route 
+          path="dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="users" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA']}>
+              <UserManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="profile" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
+              <UserProfile />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="farms" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
+              <FarmManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="farms/:farmId" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
+              <FarmDetail />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="config" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
+              <Configuration />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* ESTA ES LA RUTA DE AUDITORÍA, SIGUIENDO LA MISMA LÓGICA */}
+        <Route 
+          path="audit" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']}>
+              <AuditLog />
+            </ProtectedRoute>
+          } 
+        />
       </Route>
-
-      <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA', 'OPERARIO']} />} >
-        <Route element={<AdminLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/users" element={<UserManagement />} />
-          <Route path="/profile" element={<UserProfile />} /> 
-          <Route path="/farms" element={<FarmManagement />} /> 
-          <Route path="/farms/:farmId" element={<FarmDetail />} />
-          <Route path="/config" element={<Configuration />} />
-        </Route>
-      </Route>
-
-      <Route path="/" element={<Navigate to="/login" />} />
     </Routes>
   );
 }

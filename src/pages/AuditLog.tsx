@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 // 1. Importa 'keepPreviousData' desde la librería
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query'; // ¡AQUÍ ESTÁ EL CAMBIO!
 import auditService from '../services/auditService';
 import type { ChangeHistoryRequestParams, ChangeHistoryResponse, Page } from '../types/audit.types';
 import './AuditLog.css';
@@ -23,7 +23,7 @@ const AuditLog = () => {
     const { data: historyPage, isLoading, isError, error, isFetching } = useQuery<Page<ChangeHistoryResponse>, Error>({
         queryKey: ['changeHistory', filters],
         queryFn: () => auditService.getChangeHistory(filters),
-        // 2. Reemplaza 'keepPreviousData' por 'placeholderData'
+        // 2. Usa 'placeholderData' con la función importada. ¡Esto ya estaba correcto!
         placeholderData: keepPreviousData,
     });
 
@@ -43,17 +43,17 @@ const AuditLog = () => {
 
             {/* Filtros */}
             <div className="filters-container">
-                <input type="text" name="searchTerm" placeholder="Buscar en cambios..." value={filters.searchTerm} onChange={handleFilterChange} />
-                <input type="number" name="userId" placeholder="ID de Usuario" value={filters.userId} onChange={handleFilterChange} />
-                <input type="text" name="affectedTable" placeholder="Tabla Afectada" value={filters.affectedTable} onChange={handleFilterChange} />
-                <select name="actionType" value={filters.actionType} onChange={handleFilterChange}>
+                <input type="text" name="searchTerm" placeholder="Buscar en cambios..." value={filters.searchTerm || ''} onChange={handleFilterChange} />
+                <input type="number" name="userId" placeholder="ID de Usuario" value={filters.userId || ''} onChange={handleFilterChange} />
+                <input type="text" name="affectedTable" placeholder="Tabla Afectada" value={filters.affectedTable || ''} onChange={handleFilterChange} />
+                <select name="actionType" value={filters.actionType || ''} onChange={handleFilterChange}>
                     <option value="">Todas las Acciones</option>
                     <option value="CREATE">CREAR</option>
                     <option value="UPDATE">ACTUALIZAR</option>
                     <option value="DELETE">ELIMINAR</option>
                 </select>
-                <input type="datetime-local" name="startDate" value={filters.startDate} onChange={handleFilterChange} />
-                <input type="datetime-local" name="endDate" value={filters.endDate} onChange={handleFilterChange} />
+                <input type="datetime-local" name="startDate" value={filters.startDate || ''} onChange={handleFilterChange} />
+                <input type="datetime-local" name="endDate" value={filters.endDate || ''} onChange={handleFilterChange} />
             </div>
 
             {/* Contenedor de la tabla */}

@@ -1,64 +1,50 @@
-import { Navigate, Outlet } from 'react-router-dom';
+// Archivo: src/components/utils/ProtectedRoute.tsx
+
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import authService from '../../services/authService';
-import { jwtDecode } from 'jwt-decode'; // <-- 1. Importar la librería
 import type { DecodedToken } from '../../types/auth.types';
 
-
-
-/**
- * Verifica si un token JWT ha expirado.
- * @param token El string del token JWT.
- * @returns `true` si el token ha expirado, `false` en caso contrario.
- */
 const isTokenExpired = (token: string): boolean => {
     try {
         const decoded: DecodedToken = jwtDecode(token);
-        const currentTime = Date.now() / 1000; // Tiempo actual en segundos
-
-        // Si el tiempo de expiración es menor que el tiempo actual, el token ha expirado.
+        const currentTime = Date.now() / 1000;
         return decoded.exp < currentTime;
     } catch (error) {
-        // Si hay un error al decodificar, el token es inválido o malformado.
         console.error("Error al decodificar el token:", error);
         return true; 
     }
 };
-    // Props para nuestro componente
+
 interface ProtectedRouteProps {
   allowedRoles: string[];
+  children: React.ReactNode;
 }
 
-const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
     const token = authService.getToken();
 
-    // 1. Verificación de existencia del token
-    if (!token) {
-        return <Navigate to="/login" />;
-    }
-
-    // 2. Verificación de expiración del token
-    if (isTokenExpired(token)) {
+    // 1. Si no hay token o ha expirado, redirige al login.
+    if (!token || isTokenExpired(token)) {
         authService.logout();
-        return <Navigate to="/login" />;
+        return <Navigate to="/login" replace />;
     }
 
-    // 3. Verificación de Rol (lógica simplificada y ajustada)
+    // 2. Decodifica el token para verificar el rol.
     const decoded: DecodedToken = jwtDecode(token);
-    const userRole = decoded.rol; // Obtenemos el rol del usuario desde el token
-
-    // Verificamos si el rol del usuario está incluido en la lista de roles permitidos
+    const userRole = decoded.rol;
     const isAuthorized = allowedRoles.includes(userRole);
 
     if (!isAuthorized) {
-        // Si el usuario está logueado pero no tiene el rol correcto,
-        // lo redirigimos. Una página "Acceso Denegado" sería ideal,
-        // pero por ahora lo mandamos al login para seguridad.
-        console.warn(`Acceso denegado. Rol requerido: ${allowedRoles}. Rol del usuario: ${userRole}`);
-        return <Navigate to="/login" />;
+        // 3. Si el rol no está permitido, redirige a una página segura (el dashboard).
+        //    Esto previene que se quede en una página en blanco si intenta acceder a una URL no permitida.
+        console.warn(`Acceso denegado a la ruta. Rol requerido: ${allowedRoles}. Rol del usuario: ${userRole}`);
+        return <Navigate to="/dashboard" replace />;
     }
 
-    // ¡Acceso concedido!
-    return <Outlet />;
+    // 4. ¡Acceso concedido! Renderiza el componente hijo que se le pasó.
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;
