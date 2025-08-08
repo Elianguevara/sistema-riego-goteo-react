@@ -9,7 +9,8 @@ import SectorForm from '../components/farms/SectorForm';
 import EquipmentForm from '../components/farms/EquipmentForm';
 import WaterSourceForm from '../components/farms/WaterSourceForm';
 import AssignUserForm from '../components/farms/AssignUserForm';
-import UserActionsMenu from '../components/users/UserActionsMenu';
+// PASO 1: Importar el nuevo ActionsMenu genérico y su tipo
+import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
 import type { 
     Farm, 
     Sector, SectorCreateData, SectorUpdateData, 
@@ -20,7 +21,7 @@ import type { UserResponse } from '../types/user.types';
 
 import './FarmDetail.css';
 
-// Reutilizamos el modal de confirmación
+// El modal de confirmación sigue siendo reutilizable
 const ConfirmationModal = ({ message, onConfirm, onCancel, isLoading }: { message: string, onConfirm: () => void, onCancel: () => void, isLoading: boolean }) => (
     <div className="modal-overlay">
         <div className="modal-container">
@@ -42,7 +43,7 @@ const FarmDetail = () => {
     const queryClient = useQueryClient();
     const farmIdNum = Number(farmId);
 
-    // --- Estados para Modales ---
+    // --- Estados para Modales (sin cambios) ---
     const [isSectorModalOpen, setIsSectorModalOpen] = useState(false);
     const [currentSector, setCurrentSector] = useState<Sector | null>(null);
     const [sectorToDelete, setSectorToDelete] = useState<Sector | null>(null);
@@ -58,7 +59,7 @@ const FarmDetail = () => {
     const [isAssignUserModalOpen, setIsAssignUserModalOpen] = useState(false);
     const [userToUnassign, setUserToUnassign] = useState<UserResponse | null>(null);
 
-    // --- Obtención de Datos ---
+    // --- Obtención de Datos (sin cambios) ---
     const { data: farm, isLoading: isLoadingFarm, isError, error } = useQuery<Farm, Error>({ queryKey: ['farmDetails', farmId], queryFn: () => farmService.getFarmById(farmIdNum), enabled: !!farmIdNum });
     const { data: sectors = [], isLoading: isLoadingSectors } = useQuery<Sector[], Error>({ queryKey: ['sectors', farmId], queryFn: () => farmService.getSectorsByFarm(farmIdNum), enabled: !!farmIdNum });
     const { data: equipments = [], isLoading: isLoadingEquipments } = useQuery<IrrigationEquipment[], Error>({ queryKey: ['equipments', farmId], queryFn: () => farmService.getEquipmentsByFarm(farmIdNum), enabled: !!farmIdNum });
@@ -66,7 +67,7 @@ const FarmDetail = () => {
     const { data: assignedUsers = [], isLoading: isLoadingAssignedUsers } = useQuery<UserResponse[], Error>({ queryKey: ['assignedUsers', farmId], queryFn: () => farmService.getAssignedUsers(farmIdNum), enabled: !!farmIdNum });
     const { data: allUsers = [] } = useQuery<UserResponse[], Error>({ queryKey: ['users'], queryFn: adminService.getUsers });
 
-    // --- Mutaciones ---
+    // --- Mutaciones (sin cambios) ---
     const createSectorMutation = useMutation({ mutationFn: (data: SectorCreateData) => farmService.createSector(farmIdNum, data), onSuccess: () => { toast.success("Sector creado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const updateSectorMutation = useMutation({ mutationFn: (data: SectorUpdateData) => farmService.updateSector(farmIdNum, currentSector!.id, data), onSuccess: () => { toast.success("Sector actualizado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const deleteSectorMutation = useMutation({ mutationFn: (sectorId: number) => farmService.deleteSector(farmIdNum, sectorId), onSuccess: () => { toast.success("Sector eliminado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setSectorToDelete(null); }, onError: (err: Error) => toast.error(err.message) });
@@ -82,7 +83,7 @@ const FarmDetail = () => {
     const assignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.assignUserToFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario asignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setIsAssignUserModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const unassignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.unassignUserFromFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario desasignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setUserToUnassign(null); }, onError: (err: Error) => toast.error(err.message) });
 
-    // --- Manejadores de Eventos ---
+    // --- Manejadores de Eventos (sin cambios) ---
     const handleOpenCreateSectorForm = () => { setCurrentSector(null); setIsSectorModalOpen(true); };
     const handleOpenEditSectorForm = (sector: Sector) => { setCurrentSector(sector); setIsSectorModalOpen(true); };
     const handleSaveSector = (data: SectorCreateData | SectorUpdateData) => { if (currentSector) { updateSectorMutation.mutate(data as SectorUpdateData); } else { createSectorMutation.mutate(data as SectorCreateData); } };
@@ -103,6 +104,22 @@ const FarmDetail = () => {
 
     const availableUsersToAssign = useMemo(() => { const assignedUserIds = new Set(assignedUsers.map(u => u.id)); return allUsers.filter(u => !assignedUserIds.has(u.id)); }, [allUsers, assignedUsers]);
 
+    // PASO 2: Definir las acciones para cada tipo de entidad
+    const getSectorActions = (sector: Sector): ActionMenuItem[] => ([
+        { label: 'Editar', action: () => handleOpenEditSectorForm(sector) },
+        { label: 'Eliminar', action: () => setSectorToDelete(sector), className: 'delete' }
+    ]);
+
+    const getEquipmentActions = (equipment: IrrigationEquipment): ActionMenuItem[] => ([
+        { label: 'Editar', action: () => handleOpenEditEquipmentForm(equipment) },
+        { label: 'Eliminar', action: () => setEquipmentToDelete(equipment), className: 'delete' }
+    ]);
+
+    const getWaterSourceActions = (ws: WaterSource): ActionMenuItem[] => ([
+        { label: 'Editar', action: () => handleOpenEditWaterSourceForm(ws) },
+        { label: 'Eliminar', action: () => setWaterSourceToDelete(ws), className: 'delete' }
+    ]);
+
     if (isLoadingFarm) return <div>Cargando...</div>;
     if (isError) return <div className="error-text">Error: {error.message}</div>;
 
@@ -110,9 +127,9 @@ const FarmDetail = () => {
         <div className="farm-detail-page">
             <div className="detail-header"> <i className="fas fa-seedling header-icon"></i> <div><h1>{farm?.name}</h1><p>{farm?.location}</p></div> </div>
             <div className="detail-grid">
-                <div className="detail-card"> <div className="card-header"><h3>Sectores</h3><button className="btn-add" onClick={handleOpenCreateSectorForm}><i className="fas fa-plus"></i> Añadir Sector</button></div> {isLoadingSectors ? <p>Cargando...</p> : (<table className="detail-table"><thead><tr><th>Nombre</th><th>Equipo Asignado</th><th>Acciones</th></tr></thead><tbody>{sectors.map(s=>(<tr key={s.id}><td>{s.name}</td><td>{s.equipmentName||'N/A'}</td><td className='actions'><UserActionsMenu onEdit={()=>handleOpenEditSectorForm(s)} onChangePassword={()=>{}} onDelete={()=>setSectorToDelete(s)}/></td></tr>))}</tbody></table>)}</div>
-                <div className="detail-card"> <div className="card-header"><h3>Equipos de Riego</h3><button className="btn-add" onClick={handleOpenCreateEquipmentForm}><i className="fas fa-plus"></i> Añadir Equipo</button></div> {isLoadingEquipments ? <p>Cargando...</p> : (<table className="detail-table"><thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{equipments.map(eq=>(<tr key={eq.id}><td>{eq.name}</td><td>{eq.equipmentType}</td><td>{eq.equipmentStatus}</td><td className='actions'><UserActionsMenu onEdit={()=>handleOpenEditEquipmentForm(eq)} onChangePassword={()=>{}} onDelete={()=>setEquipmentToDelete(eq)}/></td></tr>))}</tbody></table>)}</div>
-                <div className="detail-card"> <div className="card-header"><h3>Fuentes de Agua</h3><button className="btn-add" onClick={handleOpenCreateWaterSourceForm}><i className="fas fa-plus"></i> Añadir Fuente</button></div> {isLoadingWaterSources ? <p>Cargando...</p> : (<table className="detail-table"><thead><tr><th>Tipo</th><th>Acciones</th></tr></thead><tbody>{waterSources.map(ws=>(<tr key={ws.id}><td>{ws.type}</td><td className='actions'><UserActionsMenu onEdit={()=>handleOpenEditWaterSourceForm(ws)} onChangePassword={()=>{}} onDelete={()=>setWaterSourceToDelete(ws)}/></td></tr>))}</tbody></table>)}</div>
+                <div className="detail-card"> <div className="card-header"><h3>Sectores</h3><button className="btn-add" onClick={handleOpenCreateSectorForm}><i className="fas fa-plus"></i> Añadir Sector</button></div> {isLoadingSectors ? <p>Cargando...</p> : (<table className="detail-table"><thead><tr><th>Nombre</th><th>Equipo Asignado</th><th>Acciones</th></tr></thead><tbody>{sectors.map(s=>(<tr key={s.id}><td>{s.name}</td><td>{s.equipmentName||'N/A'}</td><td className='actions'><ActionsMenu items={getSectorActions(s)} /></td></tr>))}</tbody></table>)}</div>
+                <div className="detail-card"> <div className="card-header"><h3>Equipos de Riego</h3><button className="btn-add" onClick={handleOpenCreateEquipmentForm}><i className="fas fa-plus"></i> Añadir Equipo</button></div> {isLoadingEquipments ? <p>Cargando...</p> : (<table className="detail-table"><thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{equipments.map(eq=>(<tr key={eq.id}><td>{eq.name}</td><td>{eq.equipmentType}</td><td>{eq.equipmentStatus}</td><td className='actions'><ActionsMenu items={getEquipmentActions(eq)} /></td></tr>))}</tbody></table>)}</div>
+                <div className="detail-card"> <div className="card-header"><h3>Fuentes de Agua</h3><button className="btn-add" onClick={handleOpenCreateWaterSourceForm}><i className="fas fa-plus"></i> Añadir Fuente</button></div> {isLoadingWaterSources ? <p>Cargando...</p> : (<table className="detail-table"><thead><tr><th>Tipo</th><th>Acciones</th></tr></thead><tbody>{waterSources.map(ws=>(<tr key={ws.id}><td>{ws.type}</td><td className='actions'><ActionsMenu items={getWaterSourceActions(ws)} /></td></tr>))}</tbody></table>)}</div>
                 <div className="detail-card">
                     <div className="card-header"><h3>Usuarios Asignados</h3><button className="btn-add" onClick={() => setIsAssignUserModalOpen(true)}><i className="fas fa-plus"></i> Asignar Usuario</button></div>
                     {isLoadingAssignedUsers ? <p>Cargando...</p> : (<table className="detail-table"><thead><tr><th>Nombre</th><th>Username</th><th>Rol</th><th>Acciones</th></tr></thead>

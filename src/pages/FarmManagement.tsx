@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import farmService from '../services/farmService';
 import type { Farm, FarmCreateData, FarmUpdateData } from '../types/farm.types';
 import FarmForm from '../components/farms/FarmForm';
-import UserActionsMenu from '../components/users/UserActionsMenu'; // Reutilizamos el menú de acciones
+// PASO 1: Importar el nuevo ActionsMenu genérico y su tipo
+import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
 
-// Reutilizamos el modal de confirmación de UserManagement
+// El modal de confirmación sigue siendo reutilizable y está bien como está
 const ConfirmationModal = ({ message, onConfirm, onCancel, isLoading }: { message: string, onConfirm: () => void, onCancel: () => void, isLoading: boolean }) => (
     <div className="modal-overlay">
         <div className="modal-container">
@@ -27,12 +28,12 @@ const FarmManagement = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     
-    // --- Estados para modales ---
+    // --- Estados para modales (sin cambios) ---
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [currentFarm, setCurrentFarm] = useState<Farm | null>(null);
     const [farmToDelete, setFarmToDelete] = useState<Farm | null>(null);
 
-    // --- Obtención y Mutaciones ---
+    // --- Obtención y Mutaciones (sin cambios) ---
     const { data: farms = [], isLoading, isError, error } = useQuery<Farm[], Error>({
         queryKey: ['farms'],
         queryFn: farmService.getFarms,
@@ -68,7 +69,7 @@ const FarmManagement = () => {
         onError: (err: Error) => toast.error(err.message || 'Error al eliminar la finca.'),
     });
 
-    // --- Manejadores de eventos ---
+    // --- Manejadores de eventos (sin cambios) ---
     const handleOpenCreateForm = () => {
         setCurrentFarm(null);
         setIsFormModalOpen(true);
@@ -92,6 +93,19 @@ const FarmManagement = () => {
             deleteFarmMutation.mutate(farmToDelete.id);
         }
     };
+
+    // PASO 2: Definir las acciones específicas para las fincas
+    const getFarmActions = (farm: Farm): ActionMenuItem[] => [
+        {
+            label: 'Editar Finca',
+            action: () => handleOpenEditForm(farm),
+        },
+        {
+            label: 'Eliminar Finca',
+            action: () => setFarmToDelete(farm),
+            className: 'delete', // Clase para estilizar el botón de eliminar
+        }
+    ];
 
     // --- Renderizado ---
     if (isLoading) return <div className="user-management-page"><p>Cargando fincas...</p></div>;
@@ -128,11 +142,8 @@ const FarmManagement = () => {
                                     <button className="btn-secondary" onClick={() => navigate(`/farms/${farm.id}`)}>
                                         Ver Detalles
                                     </button>
-                                    <UserActionsMenu
-                                        onEdit={() => handleOpenEditForm(farm)}
-                                        onChangePassword={() => toast.info('Esta acción no aplica para fincas.')}
-                                        onDelete={() => setFarmToDelete(farm)}
-                                    />
+                                    {/* PASO 3: Usar el nuevo componente ActionsMenu */}
+                                    <ActionsMenu items={getFarmActions(farm)} />
                                 </td>
                             </tr>
                         ))}

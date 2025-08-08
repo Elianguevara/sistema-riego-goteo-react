@@ -1,3 +1,5 @@
+/* src/components/ui/ActionsMenu.css */
+
 .actions-menu {
   position: relative;
   display: inline-block;
@@ -34,19 +36,19 @@
   text-decoration: none;
   display: block;
   font-size: 14px;
-  /* --- Estilos para resetear el botón --- */
   width: 100%;
   text-align: left;
   background: none;
   border: none;
   cursor: pointer;
-  font-family: inherit; /* Usa la misma fuente que el resto de la app */
+  font-family: inherit;
 }
 
 .dropdown-content button:hover {
   background-color: #f1f1f1;
 }
 
+/* Clase opcional para items peligrosos */
 .dropdown-content button.delete {
   color: var(--color-danger);
 }

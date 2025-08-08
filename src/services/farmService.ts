@@ -274,7 +274,7 @@ const deleteWaterSource = async (waterSourceId: number): Promise<void> => {
  * Endpoint: GET /api/admin/farms/{farmId}/users (ASUMIDO)
  */
 const getAssignedUsers = async (farmId: number): Promise<UserResponse[]> => {
-    const response = await fetch(`${API_BASE_URL}/admin/farms/${farmId}/users`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users/farms/${farmId}/users`, {
         method: 'GET',
         headers: getAuthHeader(),
     });
