@@ -11,6 +11,7 @@ import FarmManagement from './pages/FarmManagement';
 import FarmDetail from './pages/FarmDetail';
 import Configuration from './pages/Configuration';
 import AuditLog from './pages/AuditLog';
+import NotificationHistory from './pages/NotificationHistory'; // Nueva página
 
 function App() {
   return (
@@ -58,12 +59,21 @@ function App() {
           } 
         />
         
-        {/* LA RUTA DE AUDITORÍA SIGUE EXACTAMENTE LA MISMA LÓGICA QUE LAS DEMÁS */}
         <Route 
           path="audit" 
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <AuditLog />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* NUEVA RUTA DE NOTIFICACIONES */}
+        <Route 
+          path="notifications" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <NotificationHistory />
             </ProtectedRoute>
           } 
         />

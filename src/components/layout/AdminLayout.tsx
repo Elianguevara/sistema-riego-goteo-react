@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ProfileMenu from './ProfileMenu';
+import NotificationBell from './NotificationBell'; // Componente de campana de notificaciones
 import './AdminLayout.css';
-import { useAuthData } from '../../hooks/useAuthData'; // 1. IMPORTAR HOOK DE AUTH
+import { useAuthData } from '../../hooks/useAuthData';
 
 const AdminLayout = () => {
     const location = useLocation();
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-    const authData = useAuthData(); // 2. OBTENER DATOS DEL USUARIO LOGUEADO
+    const authData = useAuthData();
 
     const toggleSidebar = () => {
         setIsSidebarVisible(!isSidebarVisible);
@@ -30,6 +31,14 @@ const AdminLayout = () => {
                     <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
                         <i className="fas fa-home"></i> Principal
                     </Link>
+
+                    {/* Nuevo enlace a Notificaciones solo para ADMIN */}
+                    {authData?.role === 'ADMIN' && (
+                        <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
+                            <i className="fas fa-bell"></i> Notificaciones
+                        </Link>
+                    )}
+
                     <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
                         <i className="fas fa-users"></i> Usuarios
                     </Link>
@@ -37,9 +46,8 @@ const AdminLayout = () => {
                         <i className="fas fa-seedling"></i> Fincas
                     </Link>
                     
-                    {/* 3. AÑADIR ENLACE CONDICIONAL PARA AUDITORÍA */}
                     {authData?.role === 'ADMIN' && (
-                         <Link to="/audit" className={location.pathname === '/audit' ? 'active' : ''}>
+                        <Link to="/audit" className={location.pathname === '/audit' ? 'active' : ''}>
                             <i className="fas fa-history"></i> Auditoría
                         </Link>
                     )}
@@ -55,7 +63,10 @@ const AdminLayout = () => {
                     <button className="mobile-menu-button" onClick={toggleSidebar}>
                         <i className="fas fa-bars"></i>
                     </button>
-                    <ProfileMenu />
+                    <div className="header-actions"> 
+                        <NotificationBell /> {/* Campana de notificaciones en el header */}
+                        <ProfileMenu />
+                    </div>
                 </header>
                 <div className="content-area">
                     <Outlet />
