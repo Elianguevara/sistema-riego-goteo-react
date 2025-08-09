@@ -5,8 +5,7 @@ import adminService from '../services/adminService';
 import type { UserResponse, UserCreateData, UserUpdateData, PasswordUpdateData } from '../types/user.types';
 import UserForm from '../components/users/UserForm';
 import StatusToggle from '../components/ui/StatusToggle';
-import UserActionsMenu from '../components/users/UserActionsMenu';
-import ChangePasswordModal from '../components/users/ChangePasswordModal';
+import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';import ChangePasswordModal from '../components/users/ChangePasswordModal';
 import './UserManagement.css';
 
 // Componente para el modal de confirmación de borrado
@@ -181,12 +180,14 @@ const UserManagement = () => {
                                     />
                                 </td>
                                 <td className="actions">
-                                    <UserActionsMenu
-                                        onEdit={() => handleOpenEditForm(user)}
-                                        onChangePassword={() => handleOpenPasswordModal(user)}
-                                        onDelete={() => handleOpenDeleteModal(user)}
-                                    />
-                                </td>
+                                     <ActionsMenu
+                                             items={[
+                                                { label: 'Editar', action: () => handleOpenEditForm(user) },
+                                                { label: 'Cambiar Contraseña', action: () => handleOpenPasswordModal(user) },
+                                                { label: 'Eliminar', action: () => handleOpenDeleteModal(user), className: 'delete' }
+                                        ]}
+    />
+</td>
                             </tr>
                         ))}
                     </tbody>
