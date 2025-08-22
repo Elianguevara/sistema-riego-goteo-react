@@ -1,0 +1,68 @@
+/* Archivo: src/components/irrigation/IrrigationScheduler.css */
+
+.scheduler-container {
+    overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+}
+
+.scheduler-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Asegura que las columnas tengan el mismo ancho */
+}
+
+.scheduler-table th, 
+.scheduler-table td {
+    border: 1px solid var(--color-border);
+    padding: 12px 8px;
+    text-align: center;
+    min-width: 70px; /* Ancho mínimo para cada día */
+    font-size: 14px;
+}
+
+.scheduler-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.scheduler-table td {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Celda vacía, lista para registrar un riego */
+.scheduler-table td.empty {
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.scheduler-table td.empty:hover {
+    background-color: #f0fff9;
+}
+
+/* Celda con un riego ya registrado */
+.scheduler-table td.filled {
+    background-color: #eafaf1;
+    font-weight: bold;
+    color: var(--color-success);
+}
+
+.scheduler-table td.filled:hover {
+    background-color: #d4f4e3;
+}
+
+/* Estilo para la primera columna (nombres de sectores) */
+.scheduler-table tbody td:first-child {
+    font-weight: 600;
+    text-align: left;
+    background-color: #f8f9fa;
+    position: sticky; /* Fija la columna de sectores al hacer scroll horizontal */
+    left: 0;
+    z-index: 1;
+    /* Añadimos una pequeña sombra para dar efecto de profundidad al hacer scroll */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}

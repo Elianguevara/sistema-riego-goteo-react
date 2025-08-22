@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import taskService from '../../services/taskService';
 import type { Task, TaskStatus } from '../../types/task.types';
-import './MyTasks.css'; // Crearemos este archivo a continuación
+import './MyTasks.css';
 
 // Componente para una tarjeta de tarea individual
 const TaskCard = ({ task, onUpdateStatus }: { task: Task, onUpdateStatus: (taskId: number, status: TaskStatus) => void }) => {
@@ -24,12 +24,19 @@ const TaskCard = ({ task, onUpdateStatus }: { task: Task, onUpdateStatus: (taskI
         }
     };
 
+    // --- INICIO DE LA MODIFICACIÓN: Comprobación de seguridad ---
+    // Si por alguna razón una tarea no tiene estado, no la renderizamos para evitar un crash.
+    if (!task || !task.status) {
+        return null;
+    }
+    // --- FIN DE LA MODIFICACIÓN ---
+
     return (
         <div className={`task-card status-${task.status.toLowerCase()}`}>
             <div className="task-card-header">
                 <i className={`${getIconClass(task.taskType)} task-icon`}></i>
                 <div className="task-header-info">
-                    <span className="task-type">{task.taskType.replace('_', ' ')}</span>
+                    <span className="task-type">{task.taskType?.replace('_', ' ') || 'Tarea'}</span>
                     <span className="task-location">{task.farmName} {task.sectorName && `> ${task.sectorName}`}</span>
                 </div>
                 <div className={`task-status-badge status-${task.status.toLowerCase()}`}>
@@ -61,7 +68,7 @@ const MyTasks = () => {
     const queryClient = useQueryClient();
     const queryKey = ['myTasks'];
 
-    const { data: tasks = [], isLoading, isError, error } = useQuery<Task[], Error>({
+    const { data: tasks, isLoading, isError, error } = useQuery<Task[], Error>({
         queryKey,
         queryFn: taskService.getMyTasks,
     });
@@ -82,6 +89,18 @@ const MyTasks = () => {
 
     if (isLoading) return <div className="tasks-page"><p>Cargando tareas...</p></div>;
     if (isError) return <div className="tasks-page"><p className="error-text">Error: {error.message}</p></div>;
+
+    // --- INICIO DE LA MODIFICACIÓN: Comprobación de seguridad ---
+    // Nos aseguramos de que 'tasks' sea un array antes de intentar usarlo.
+    if (!Array.isArray(tasks)) {
+        return (
+            <div className="tasks-page">
+                <h1>Mis Tareas Asignadas</h1>
+                <p>No se pudieron cargar las tareas o no tienes tareas asignadas en este momento.</p>
+            </div>
+        );
+    }
+    // --- FIN DE LA MODIFICACIÓN ---
 
     const pendingTasks = tasks.filter(t => t.status === 'PENDIENTE');
     const inProgressTasks = tasks.filter(t => t.status === 'EN_PROGRESO');

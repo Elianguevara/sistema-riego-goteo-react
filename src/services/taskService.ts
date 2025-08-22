@@ -21,9 +21,30 @@ const getMyTasks = async (): Promise<Task[]> => {
     const response = await fetch(`${API_BASE_URL}/assigned-to-me`, {
         headers: getAuthHeader(),
     });
-    if (!response.ok) throw new Error('Error al obtener las tareas asignadas.');
-    const data: TaskPage | Task[] = await response.json();
-    return 'content' in data ? data.content : data;
+    if (!response.ok) {
+        throw new Error('Error al obtener las tareas asignadas.');
+    }
+    
+    // --- INICIO DE LA MODIFICACIÓN: Lógica robusta de parseo ---
+    try {
+        const data = await response.json();
+        // Verificamos si la respuesta es un objeto de paginación y tiene contenido
+        if (data && Array.isArray(data.content)) {
+            return data.content;
+        }
+        // Verificamos si la respuesta ya es un array
+        if (data && Array.isArray(data)) {
+            return data;
+        }
+        // Si la estructura no es la esperada, devolvemos un array vacío para evitar errores.
+        console.warn("La respuesta de getMyTasks no tiene el formato esperado:", data);
+        return [];
+    } catch (error) {
+        console.error("Error al parsear la respuesta de getMyTasks:", error);
+        // Si hay un error de parseo (ej. respuesta vacía), devolvemos un array vacío.
+        return [];
+    }
+    // --- FIN DE LA MODIFICACIÓN ---
 };
 
 /**

@@ -27,6 +27,22 @@ const AdminLayout = () => {
                         <Link to="/tasks" className={location.pathname.startsWith('/tasks') ? 'active' : ''}>
                             <i className="fas fa-clipboard-list"></i> Mis Tareas
                         </Link>
+                        
+                        {/* --- INICIO DE LA MODIFICACIÓN: Nuevos enlaces para futuras funcionalidades --- */}
+                        <Link to="/operator/irrigation" className={location.pathname === '/operator/irrigation' ? 'active' : ''}>
+                            <i className="fas fa-tint"></i> Registrar Riego
+                        </Link>
+                        <Link to="/operator/fertilization" className={location.pathname === '/operator/fertilization' ? 'active' : ''}>
+                            <i className="fas fa-vial"></i> Registrar Fertilización
+                        </Link>
+                        <Link to="/operator/maintenance" className={location.pathname === '/operator/maintenance' ? 'active' : ''}>
+                            <i className="fas fa-tools"></i> Registrar Mantenimiento
+                        </Link>
+                        <Link to="/operator/logbook" className={location.pathname === '/operator/logbook' ? 'active' : ''}>
+                            <i className="fas fa-book"></i> Bitácora
+                        </Link>
+                        {/* --- FIN DE LA MODIFICACIÓN --- */}
+
                         <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
                             <i className="fas fa-bell"></i> Notificaciones
                         </Link>

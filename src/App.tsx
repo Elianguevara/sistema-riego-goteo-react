@@ -13,17 +13,23 @@ import Configuration from './pages/Configuration';
 import AuditLog from './pages/AuditLog';
 import NotificationHistory from './pages/NotificationHistory';
 import MyTasks from './pages/operator/MyTasks';
-// --- 1. Importar la nueva página de gestión de tareas del analista ---
+// 1. Importar la nueva página de gestión de tareas del analista
 import TaskManagement from './pages/analyst/TaskManagement';
 import { useAuthData } from './hooks/useAuthData';
 
 // Componente de redirección para la página de inicio según el rol
 const DashboardRedirect = () => {
     const authData = useAuthData();
-    if (authData?.role === 'OPERARIO') {
+
+    // Mientras el hook determina el rol, no renderizamos nada para evitar errores.
+    if (!authData) {
+        return null; 
+    }
+    
+    if (authData.role === 'OPERARIO') {
         return <Navigate to="/tasks" replace />;
     }
-    // Los administradores y analistas son redirigidos al Dashboard principal
+    // Los administradores y analistas son redirigidos al Dashboard principal.
     return <Dashboard />;
 };
 
@@ -44,7 +50,7 @@ function App() {
           } 
         />
         
-        {/* --- Ruta exclusiva para el Operario --- */}
+        {/* Ruta exclusiva para el Operario */}
         <Route 
           path="tasks"
           element={
@@ -54,7 +60,7 @@ function App() {
           } 
         />
 
-        {/* --- 2. Nueva ruta exclusiva para el Analista --- */}
+        {/* 2. Nueva ruta exclusiva para el Analista */}
         <Route 
           path="analyst/tasks"
           element={
@@ -64,7 +70,7 @@ function App() {
           } 
         />
         
-        {/* --- El resto de las rutas con permisos actualizados --- */}
+        {/* El resto de las rutas con permisos actualizados */}
         <Route 
           path="users" 
           element={
@@ -101,7 +107,7 @@ function App() {
           } 
         />
 
-        {/* --- 3. Ruta de notificaciones ahora incluye al Analista --- */}
+        {/* 3. Ruta de notificaciones ahora incluye a todos los roles con acceso */}
         <Route 
           path="notifications" 
           element={
