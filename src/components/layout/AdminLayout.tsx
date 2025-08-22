@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ProfileMenu from './ProfileMenu';
-import NotificationBell from './NotificationBell'; // Componente de campana de notificaciones
+import NotificationBell from './NotificationBell';
 import './AdminLayout.css';
 import { useAuthData } from '../../hooks/useAuthData';
 
@@ -17,45 +17,77 @@ const AdminLayout = () => {
         setIsSidebarVisible(!isSidebarVisible);
     };
 
+    const userRole = authData?.role;
+
+    const getNavLinks = () => {
+        switch (userRole) {
+            case 'OPERARIO':
+                return (
+                    <>
+                        <Link to="/tasks" className={location.pathname.startsWith('/tasks') ? 'active' : ''}>
+                            <i className="fas fa-clipboard-list"></i> Mis Tareas
+                        </Link>
+                        <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
+                            <i className="fas fa-bell"></i> Notificaciones
+                        </Link>
+                    </>
+                );
+            case 'ANALISTA':
+                return (
+                    <>
+                        <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
+                            <i className="fas fa-home"></i> Principal
+                        </Link>
+                        <Link to="/analyst/tasks" className={location.pathname.startsWith('/analyst/tasks') ? 'active' : ''}>
+                            <i className="fas fa-tasks"></i> Gestión de Tareas
+                        </Link>
+                        <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
+                            <i className="fas fa-users"></i> Usuarios
+                        </Link>
+                        <Link to="/farms" className={location.pathname.startsWith('/farms') ? 'active' : ''}>
+                            <i className="fas fa-seedling"></i> Fincas
+                        </Link>
+                         <Link to="/config" className={location.pathname === '/config' ? 'active' : ''}>
+                            <i className="fas fa-cog"></i> Configuración
+                        </Link>
+                    </>
+                );
+            case 'ADMIN':
+            default:
+                return (
+                     <>
+                        <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
+                            <i className="fas fa-home"></i> Principal
+                        </Link>
+                        <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
+                            <i className="fas fa-bell"></i> Notificaciones
+                        </Link>
+                        <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
+                            <i className="fas fa-users"></i> Usuarios
+                        </Link>
+                        <Link to="/farms" className={location.pathname.startsWith('/farms') ? 'active' : ''}>
+                            <i className="fas fa-seedling"></i> Fincas
+                        </Link>
+                        <Link to="/audit" className={location.pathname === '/audit' ? 'active' : ''}>
+                            <i className="fas fa-history"></i> Auditoría
+                        </Link>
+                        <Link to="/config" className={location.pathname === '/config' ? 'active' : ''}>
+                            <i className="fas fa-cog"></i> Configuración
+                        </Link>
+                    </>
+                );
+        }
+    };
+
     return (
         <div className={`admin-layout ${isSidebarVisible ? 'sidebar-visible' : ''}`}>
-            {/* Overlay para cerrar el menú al hacer clic fuera */}
             {isSidebarVisible && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
-
             <aside className="sidebar">
                 <div className="sidebar-header">
                     <i className="fas fa-leaf logo-icon"></i>
                     <h1 className="title">Hidra</h1>
                 </div>
-                <nav className="sidebar-nav">
-                    <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
-                        <i className="fas fa-home"></i> Principal
-                    </Link>
-
-                    {/* Nuevo enlace a Notificaciones solo para ADMIN */}
-                    {authData?.role === 'ADMIN' && (
-                        <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
-                            <i className="fas fa-bell"></i> Notificaciones
-                        </Link>
-                    )}
-
-                    <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
-                        <i className="fas fa-users"></i> Usuarios
-                    </Link>
-                    <Link to="/farms" className={location.pathname.startsWith('/farms') ? 'active' : ''}>
-                        <i className="fas fa-seedling"></i> Fincas
-                    </Link>
-                    
-                    {authData?.role === 'ADMIN' && (
-                        <Link to="/audit" className={location.pathname === '/audit' ? 'active' : ''}>
-                            <i className="fas fa-history"></i> Auditoría
-                        </Link>
-                    )}
-
-                    <Link to="/config" className={location.pathname === '/config' ? 'active' : ''}>
-                        <i className="fas fa-cog"></i> Configuración
-                    </Link>
-                </nav>
+                <nav className="sidebar-nav">{getNavLinks()}</nav>
             </aside>
             <main className="main-content">
                 <Toaster richColors position="top-right" />
@@ -63,8 +95,8 @@ const AdminLayout = () => {
                     <button className="mobile-menu-button" onClick={toggleSidebar}>
                         <i className="fas fa-bars"></i>
                     </button>
-                    <div className="header-actions"> 
-                        <NotificationBell /> {/* Campana de notificaciones en el header */}
+                    <div className="header-actions">
+                        <NotificationBell />
                         <ProfileMenu />
                     </div>
                 </header>

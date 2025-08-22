@@ -3,10 +3,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import notificationService from '../services/notificationService';
-import type { Notification } from '../types/notification.types';
-import './NotificationHistory.css'; // Crearemos este archivo a continuación
+import type { Notification, NotificationPage } from '../types/notification.types';
+import './NotificationHistory.css';
 
-// Reutilizamos la función de tiempo relativo
+// ... (la función timeAgo no cambia)
 const timeAgo = (dateString: string): string => {
     const date = new Date(dateString);
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -23,22 +23,56 @@ const timeAgo = (dateString: string): string => {
     return "Hace un momento";
 };
 
+
 const NotificationHistory = () => {
     const queryClient = useQueryClient();
-    // Podríamos añadir un estado para la paginación si quisiéramos
-    // const [page, setPage] = useState(0);
+    const historyQueryKey = ['notifications', 'history'];
+    const bellQueryKey = ['notifications'];
 
-    const { data: notificationPage, isLoading } = useQuery({
-        queryKey: ['notifications', 'history'], // Usamos una key diferente para no colisionar con la campana
-        queryFn: () => notificationService.getNotifications(0, 20), // Traemos más items para la página de historial
+    const { data: notificationPage, isLoading } = useQuery<NotificationPage, Error>({
+        queryKey: historyQueryKey,
+        queryFn: () => notificationService.getNotifications(0, 20),
     });
 
     const markAsReadMutation = useMutation({
         mutationFn: notificationService.markAsRead,
-        onSuccess: () => {
-            // Invalida ambas queries de notificaciones para que se actualicen
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        // --- INICIO DE LA MODIFICACIÓN: Lógica optimista y onSuccess ---
+        onMutate: async (notificationId: number) => {
+            // Cancelamos queries de ambas vistas (historial y campana)
+            await queryClient.cancelQueries({ queryKey: historyQueryKey });
+            await queryClient.cancelQueries({ queryKey: bellQueryKey });
+
+            const previousHistory = queryClient.getQueryData<NotificationPage>(historyQueryKey);
+            const previousBell = queryClient.getQueryData<NotificationPage>(bellQueryKey);
+
+            // Actualización optimista para la página de historial
+            queryClient.setQueryData<NotificationPage>(historyQueryKey, oldData => {
+                if (!oldData) return oldData;
+                return { ...oldData, content: oldData.content.map(n => n.id === notificationId ? { ...n, isRead: true } : n) };
+            });
+
+            // Actualización optimista para la campana
+            queryClient.setQueryData<NotificationPage>(bellQueryKey, oldData => {
+                if (!oldData) return oldData;
+                return { ...oldData, content: oldData.content.map(n => n.id === notificationId ? { ...n, isRead: true } : n) };
+            });
+
+            return { previousHistory, previousBell };
         },
+        onSuccess: () => {
+            // Invalidamos ambas queries en caso de éxito para sincronizar con el servidor
+            queryClient.invalidateQueries({ queryKey: historyQueryKey });
+            queryClient.invalidateQueries({ queryKey: bellQueryKey });
+        },
+        onError: (_err, _vars, context) => {
+            if (context?.previousHistory) {
+                queryClient.setQueryData(historyQueryKey, context.previousHistory);
+            }
+            if (context?.previousBell) {
+                queryClient.setQueryData(bellQueryKey, context.previousBell);
+            }
+        },
+        // --- FIN DE LA MODIFICACIÓN ---
     });
 
     const handleMarkAsRead = (notification: Notification) => {
@@ -55,6 +89,7 @@ const NotificationHistory = () => {
 
     return (
         <div className="notification-history-page">
+            {/* ... (el resto del JSX no cambia) ... */}
             <div className="page-header">
                 <h1>Historial de Notificaciones</h1>
             </div>
@@ -88,7 +123,6 @@ const NotificationHistory = () => {
                     </div>
                 )}
             </div>
-            {/* Aquí irían los controles de paginación en una implementación más avanzada */}
         </div>
     );
 };

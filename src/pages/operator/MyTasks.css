@@ -1,0 +1,117 @@
+/* Archivo: src/pages/operator/MyTasks.css */
+
+.tasks-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tasks-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.task-column h2 {
+  font-size: 18px;
+  color: var(--color-text-dark);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-card {
+  background-color: var(--color-content-bg);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-main);
+  padding: 15px;
+  margin-bottom: 15px;
+  border-left: 5px solid;
+}
+
+.task-card.status-pendiente { border-color: var(--color-info); }
+.task-card.status-en_progreso { border-color: #f39c12; } /* Naranja */
+.task-card.status-completada { border-color: var(--color-success); }
+.task-card.status-cancelada { border-color: var(--color-danger); }
+
+
+.task-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.task-icon {
+  font-size: 24px;
+  color: var(--color-primary);
+}
+
+.task-header-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.task-type {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.task-location {
+  font-size: 13px;
+  color: var(--color-text-light);
+}
+
+.task-status-badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: white;
+}
+.status-pendiente { background-color: var(--color-info); }
+.status-en_progreso { background-color: #f39c12; }
+.status-completada { background-color: var(--color-success); }
+.status-cancelada { background-color: var(--color-danger); }
+
+.task-description {
+  font-size: 14px;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: var(--border-radius-sm);
+}
+
+.task-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.task-date {
+  font-size: 12px;
+  color: var(--color-text-light);
+}
+
+.task-actions button {
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-start {
+    background-color: var(--color-primary);
+    color: white;
+}
+.btn-complete {
+    background-color: var(--color-success);
+    color: white;
+}

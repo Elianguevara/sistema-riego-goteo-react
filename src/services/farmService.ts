@@ -1,5 +1,7 @@
+// Archivo: src/services/farmService.ts
+
 import authService from './authService';
-import type { Farm, FarmCreateData, FarmUpdateData, Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment,EquipmentCreateData,EquipmentUpdateData,WaterSource,WaterSourceCreateData,WaterSourceUpdateData} from '../types/farm.types';// Importa los otros tipos que necesites aquí
+import type { Farm, FarmCreateData, FarmUpdateData, Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment,EquipmentCreateData,EquipmentUpdateData,WaterSource,WaterSourceCreateData,WaterSourceUpdateData} from '../types/farm.types';
 import type { UserResponse } from '../types/user.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -13,12 +15,7 @@ const getAuthHeader = (): Record<string, string> => {
     return headers;
 };
 
-// --- Operaciones CRUD para Fincas ---
-
-/**
- * Obtiene una lista de todas las fincas.
- * Endpoint: GET /api/farms
- */
+// --- Operaciones CRUD para Fincas (sin cambios) ---
 const getFarms = async (): Promise<Farm[]> => {
     const response = await fetch(`${API_BASE_URL}/farms`, {
         method: 'GET',
@@ -28,10 +25,6 @@ const getFarms = async (): Promise<Farm[]> => {
     return response.json();
 };
 
-/**
- * Crea una nueva finca.
- * Endpoint: POST /api/farms
- */
 const createFarm = async (data: FarmCreateData): Promise<Farm> => {
     const response = await fetch(`${API_BASE_URL}/farms`, {
         method: 'POST',
@@ -42,10 +35,6 @@ const createFarm = async (data: FarmCreateData): Promise<Farm> => {
     return response.json();
 };
 
-/**
- * Actualiza una finca existente.
- * Endpoint: PUT /api/farms/{farmId}
- */
 const updateFarm = async (id: number, data: FarmUpdateData): Promise<Farm> => {
     const response = await fetch(`${API_BASE_URL}/farms/${id}`, {
         method: 'PUT',
@@ -56,10 +45,6 @@ const updateFarm = async (id: number, data: FarmUpdateData): Promise<Farm> => {
     return response.json();
 };
 
-/**
- * Elimina una finca.
- * Endpoint: DELETE /api/farms/{farmId}
- */
 const deleteFarm = async (id: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/farms/${id}`, {
         method: 'DELETE',
@@ -68,14 +53,7 @@ const deleteFarm = async (id: number): Promise<void> => {
     if (!response.ok) throw new Error('Error al eliminar la finca.');
 };
 
-// --- Operaciones de Asignación de Usuarios ---
-
-/**
- * Asigna un usuario a una finca.
- * Endpoint: POST /api/admin/users/{userId}/farms/{farmId} (CORREGIDO)
- */
 const assignUserToFarm = async (userId: number, farmId: number): Promise<void> => {
-    // La URL ha sido corregida para coincidir con tu especificación.
     const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/farms/${farmId}`, {
         method: 'POST',
         headers: getAuthHeader(),
@@ -83,10 +61,6 @@ const assignUserToFarm = async (userId: number, farmId: number): Promise<void> =
     if (!response.ok) throw new Error('Error al asignar el usuario a la finca.');
 };
 
-/**
- * Desasigna un usuario de una finca.
- * Endpoint: DELETE /api/admin/users/{userId}/farms/{farmId}
- */
 const unassignUserFromFarm = async (userId: number, farmId: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/farms/${farmId}`, {
         method: 'DELETE',
@@ -94,10 +68,7 @@ const unassignUserFromFarm = async (userId: number, farmId: number): Promise<voi
     });
     if (!response.ok) throw new Error('Error al desasignar el usuario de la finca.');
 };
-/**
- * Obtiene los detalles de una finca específica.
- * Endpoint: GET /api/farms/{farmId}
- */
+
 const getFarmById = async (id: number): Promise<Farm> => {
     const response = await fetch(`${API_BASE_URL}/farms/${id}`, {
         method: 'GET',
@@ -107,12 +78,7 @@ const getFarmById = async (id: number): Promise<Farm> => {
     return response.json();
 };
 
-// --- Operaciones CRUD para Sectores ---
-
-/**
- * Obtiene la lista de sectores de una finca.
- * Endpoint: GET /api/farms/{farmId}/sectors
- */
+// --- Operaciones de Sectores, Equipos, etc. (sin cambios) ---
 const getSectorsByFarm = async (farmId: number): Promise<Sector[]> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/sectors`, {
         method: 'GET',
@@ -122,10 +88,6 @@ const getSectorsByFarm = async (farmId: number): Promise<Sector[]> => {
     return response.json();
 };
 
-/**
- * Crea un nuevo sector en una finca.
- * Endpoint: POST /api/farms/{farmId}/sectors
- */
 const createSector = async (farmId: number, data: SectorCreateData): Promise<Sector> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/sectors`, {
         method: 'POST',
@@ -136,10 +98,6 @@ const createSector = async (farmId: number, data: SectorCreateData): Promise<Sec
     return response.json();
 };
 
-/**
- * Actualiza un sector existente.
- * Endpoint: PUT /api/farms/{farmId}/sectors/{sectorId}
- */
 const updateSector = async (farmId: number, sectorId: number, data: SectorUpdateData): Promise<Sector> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/sectors/${sectorId}`, {
         method: 'PUT',
@@ -150,10 +108,6 @@ const updateSector = async (farmId: number, sectorId: number, data: SectorUpdate
     return response.json();
 };
 
-/**
- * Elimina un sector.
- * Endpoint: DELETE /api/farms/{farmId}/sectors/{sectorId}
- */
 const deleteSector = async (farmId: number, sectorId: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/sectors/${sectorId}`, {
         method: 'DELETE',
@@ -162,12 +116,6 @@ const deleteSector = async (farmId: number, sectorId: number): Promise<void> => 
     if (!response.ok) throw new Error('Error al eliminar el sector.');
 };
 
-// --- Operaciones para Equipos (lo necesitaremos para el formulario de Sectores) ---
-
-/**
- * Obtiene la lista de equipos de una finca.
- * Endpoint: GET /api/farms/{farmId}/equipments
- */
 const getEquipmentsByFarm = async (farmId: number): Promise<IrrigationEquipment[]> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/equipments`, {
         method: 'GET',
@@ -176,10 +124,7 @@ const getEquipmentsByFarm = async (farmId: number): Promise<IrrigationEquipment[
     if (!response.ok) throw new Error('Error al obtener los equipos de la finca.');
     return response.json();
 };
-/**
- * Crea un nuevo equipo en una finca.
- * Endpoint: POST /api/farms/{farmId}/equipments
- */
+
 const createEquipment = async (farmId: number, data: EquipmentCreateData): Promise<IrrigationEquipment> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/equipments`, {
         method: 'POST',
@@ -190,10 +135,6 @@ const createEquipment = async (farmId: number, data: EquipmentCreateData): Promi
     return response.json();
 };
 
-/**
- * Actualiza un equipo existente.
- * Endpoint: PUT /api/farms/{farmId}/equipments/{equipmentId}
- */
 const updateEquipment = async (farmId: number, equipmentId: number, data: EquipmentUpdateData): Promise<IrrigationEquipment> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/equipments/${equipmentId}`, {
         method: 'PUT',
@@ -204,10 +145,6 @@ const updateEquipment = async (farmId: number, equipmentId: number, data: Equipm
     return response.json();
 };
 
-/**
- * Elimina un equipo de una finca.
- * Endpoint: DELETE /api/farms/{farmId}/equipments/{equipmentId}
- */
 const deleteEquipment = async (farmId: number, equipmentId: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/equipments/${equipmentId}`, {
         method: 'DELETE',
@@ -216,10 +153,6 @@ const deleteEquipment = async (farmId: number, equipmentId: number): Promise<voi
     if (!response.ok) throw new Error('Error al eliminar el equipo.');
 };
 
-/**
- * Obtiene la lista de fuentes de agua de una finca.
- * Endpoint: GET /api/farms/{farmId}/watersources
- */
 const getWaterSourcesByFarm = async (farmId: number): Promise<WaterSource[]> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/watersources`, {
         method: 'GET',
@@ -229,10 +162,6 @@ const getWaterSourcesByFarm = async (farmId: number): Promise<WaterSource[]> => 
     return response.json();
 };
 
-/**
- * Crea una nueva fuente de agua en una finca.
- * Endpoint: POST /api/farms/{farmId}/watersources
- */
 const createWaterSource = async (farmId: number, data: WaterSourceCreateData): Promise<WaterSource> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/watersources`, {
         method: 'POST',
@@ -243,10 +172,6 @@ const createWaterSource = async (farmId: number, data: WaterSourceCreateData): P
     return response.json();
 };
 
-/**
- * Actualiza una fuente de agua.
- * Endpoint: PUT /api/watersources/{waterSourceId}
- */
 const updateWaterSource = async (waterSourceId: number, data: WaterSourceUpdateData): Promise<WaterSource> => {
     const response = await fetch(`${API_BASE_URL}/watersources/${waterSourceId}`, {
         method: 'PUT',
@@ -257,10 +182,6 @@ const updateWaterSource = async (waterSourceId: number, data: WaterSourceUpdateD
     return response.json();
 };
 
-/**
- * Elimina una fuente de agua.
- * Endpoint: DELETE /api/watersources/{waterSourceId}
- */
 const deleteWaterSource = async (waterSourceId: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/watersources/${waterSourceId}`, {
         method: 'DELETE',
@@ -269,25 +190,29 @@ const deleteWaterSource = async (waterSourceId: number): Promise<void> => {
     if (!response.ok) throw new Error('Error al eliminar la fuente de agua.');
 };
 
+// --- INICIO DE LA MODIFICACIÓN ---
 /**
  * Obtiene la lista de usuarios asignados a una finca.
- * Endpoint: GET /api/admin/farms/{farmId}/users (ASUMIDO)
+ * Usa el endpoint de admin ahora accesible por el rol ANALISTA.
  */
 const getAssignedUsers = async (farmId: number): Promise<UserResponse[]> => {
+    // Se cambia la URL al endpoint correcto confirmado por el backend
     const response = await fetch(`${API_BASE_URL}/admin/users/farms/${farmId}/users`, {
         method: 'GET',
         headers: getAuthHeader(),
     });
-    if (!response.ok) throw new Error('Error al obtener los usuarios asignados.');
+    if (!response.ok) {
+        if (response.status === 403) {
+            throw new Error('No tienes permiso para ver los usuarios de esta finca.');
+        }
+        throw new Error('Error al obtener los usuarios asignados.');
+    }
     return response.json();
 };
+// --- FIN DE LA MODIFICACIÓN ---
 
-
-// Aquí podrías añadir las funciones para Sectores, Equipos, etc.
-// Por ahora, nos enfocamos en el CRUD de Fincas.
 
 const farmService = {
-    // ... (métodos existentes de fincas y usuarios)
     getFarms,
     createFarm,
     updateFarm,
@@ -307,8 +232,7 @@ const farmService = {
     createWaterSource,
     updateWaterSource,
     deleteWaterSource,
-    getAssignedUsers, // <-- Añadir
-    
+    getAssignedUsers,
 };
 
 export default farmService;

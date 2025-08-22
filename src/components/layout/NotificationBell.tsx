@@ -4,10 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import notificationService from '../../services/notificationService';
-import type { Notification } from '../../types/notification.types';
+import type { Notification, NotificationPage } from '../../types/notification.types';
 import './NotificationBell.css';
 
-// Función para dar formato legible a las fechas
+// ... (la función timeAgo no cambia)
 const timeAgo = (dateString: string): string => {
     const date = new Date(dateString);
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -29,17 +29,42 @@ const NotificationBell = () => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const { data: notificationPage } = useQuery({
-        queryKey: ['notifications'],
+    const queryKey = ['notifications'];
+
+    const { data: notificationPage } = useQuery<NotificationPage, Error>({
+        queryKey,
         queryFn: () => notificationService.getNotifications(0, 5),
         refetchInterval: 60000,
     });
 
     const markAsReadMutation = useMutation({
         mutationFn: notificationService.markAsRead,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        onMutate: async (notificationId: number) => {
+            await queryClient.cancelQueries({ queryKey });
+            const previousNotifications = queryClient.getQueryData<NotificationPage>(queryKey);
+            queryClient.setQueryData<NotificationPage>(queryKey, oldData => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    content: oldData.content.map(n =>
+                        n.id === notificationId ? { ...n, isRead: true } : n
+                    ),
+                };
+            });
+            return { previousNotifications };
         },
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // La invalidación ahora solo ocurre en caso de éxito
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey });
+        },
+        // --- FIN DE LA MODIFICACIÓN ---
+        onError: (_err, _vars, context) => {
+            if (context?.previousNotifications) {
+                queryClient.setQueryData(queryKey, context.previousNotifications);
+            }
+        },
+        // Se elimina onSettled para evitar la recarga prematura
     });
 
     const handleNotificationClick = (notification: Notification) => {
@@ -59,8 +84,8 @@ const NotificationBell = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const unreadCount = notificationPage?.content?.filter(n => !n.isRead).length ?? 0;
     const notifications = notificationPage?.content ?? [];
+    const unreadCount = notifications.filter(n => !n.isRead).length;
 
     return (
         <div className="notification-bell" ref={menuRef}>
@@ -68,9 +93,9 @@ const NotificationBell = () => {
                 <i className="fas fa-bell"></i>
                 {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
             </button>
-
             {isOpen && (
                 <div className="notification-dropdown">
+                    {/* ... (el resto del JSX no cambia) ... */}
                     <div className="dropdown-header">
                         <h3>Notificaciones</h3>
                     </div>
@@ -78,7 +103,7 @@ const NotificationBell = () => {
                         {notifications.length > 0 ? (
                             notifications.map(n => (
                                 <Link
-                                    to={n.link || '#'}
+                                    to="/notifications"
                                     key={n.id}
                                     className={`notification-item ${n.isRead ? 'read' : ''}`}
                                     onClick={() => handleNotificationClick(n)}
@@ -93,7 +118,6 @@ const NotificationBell = () => {
                             </div>
                         )}
                     </div>
-                    {/* Pie de página con enlace a todas las notificaciones */}
                     <div className="dropdown-footer">
                         <Link to="/notifications" onClick={() => setIsOpen(false)}>
                             Ver todas las notificaciones

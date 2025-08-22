@@ -1,0 +1,24 @@
+.task-management-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.create-task-btn {
+  background-color: var(--color-primary);
+  color: var(--color-primary-text);
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--border-radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.task-table-container {
+  background-color: var(--color-content-bg);
+  padding: 20px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-main);
+}

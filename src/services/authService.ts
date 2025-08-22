@@ -15,7 +15,18 @@ const login = async (username: string, password: string): Promise<AuthResponse> 
     });
 
     if (!response.ok) {
+        // --- INICIO DE LA MODIFICACIÓN ---
+        try {
+            const errorText = await response.text();
+            // Verificamos si el error específico del backend está presente
+            if (errorText.includes("User is disabled")) {
+                throw new Error("USER_DISABLED"); // Lanzamos un error específico
+            }
+        } catch (e) {
+            // Si no podemos leer el texto, o es otro tipo de error, continuamos con el error general
+        }
         throw new Error(`Error HTTP: ${response.status}`);
+        // --- FIN DE LA MODIFICACIÓN ---
     }
 
     const data: AuthResponse = await response.json();
