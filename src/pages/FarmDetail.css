@@ -93,3 +93,105 @@
     font-weight: 600;
     color: var(--color-text-light);
 }
+
+/* Nuevos estilos para layout de dos columnas */
+.detail-grid-main {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Columna principal más ancha */
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.main-column, .side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Estilos para tabla seleccionable */
+.detail-table.selectable tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.detail-table.selectable tbody tr:hover {
+    background-color: var(--color-content-bg-alt, #f9f9f9);
+}
+
+.detail-table.selectable tbody tr.selected {
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    border-left: 3px solid var(--color-primary);
+}
+
+.detail-table.selectable tbody tr.selected td {
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+
+.btn-delete-link {
+    background: none;
+    border: none;
+    color: var(--color-danger);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    font-size: 14px;
+}
+
+.btn-delete-link:hover {
+    color: var(--color-danger-hover);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    background: var(--color-content-bg);
+    padding: 30px;
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: var(--shadow-main);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Re-usar estilos de botones del formulario para el modal */
+.modal-actions .btn-cancel {
+    background-color: #bdc3c7;
+    color: #fff;
+}
+.modal-actions .btn-cancel:hover {
+    background-color: #95a5a6;
+}
+
+.modal-actions .btn-delete {
+    background-color: var(--color-danger);
+    color: #fff;
+}
+.modal-actions .btn-delete:hover {
+    background-color: var(--color-danger-hover);
+}
+.modal-actions button {
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+}

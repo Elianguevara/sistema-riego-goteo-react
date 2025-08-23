@@ -1,0 +1,78 @@
+/* src/components/fertilization/FertilizationList.css */
+.list-container {
+    margin-top: 20px;
+}
+
+.list-container h4 {
+    margin-bottom: 15px;
+    color: var(--color-text-dark);
+}
+
+.fertilization-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-content-bg);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+}
+
+.fertilization-table th, .fertilization-table td {
+    border-bottom: 1px solid var(--color-border);
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.fertilization-table th {
+    background-color: var(--color-content-bg-alt);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text-dark);
+}
+
+.fertilization-table td {
+    font-size: 14px;
+    color: var(--color-text-regular);
+}
+
+.fertilization-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-edit, .btn-delete {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+}
+
+.btn-delete:hover {
+    background-color: rgba(var(--color-danger-rgb), 0.1);
+}
+
+
+.btn-edit {
+    color: var(--color-primary);
+}
+
+.btn-delete {
+    color: var(--color-danger);
+}
