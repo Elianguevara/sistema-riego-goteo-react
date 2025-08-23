@@ -13,15 +13,24 @@ import Configuration from './pages/Configuration';
 import AuditLog from './pages/AuditLog';
 import NotificationHistory from './pages/NotificationHistory';
 import MyTasks from './pages/operator/MyTasks';
-// 1. Importar la nueva página de gestión de tareas del analista
 import TaskManagement from './pages/analyst/TaskManagement';
 import { useAuthData } from './hooks/useAuthData';
+
+// --- INICIO DE LA MODIFICACIÓN ---
+// 1. Importamos el componente que ya existe
+import RegisterIrrigation from './pages/operator/RegisterIrrigation';
+
+// 2. Creamos componentes temporales para las rutas que aún no tienen una página designada
+const RegisterFertilization = () => <div>Página de Registro de Fertilización (en construcción)</div>;
+const RegisterMaintenance = () => <div>Página de Registro de Mantenimiento (en construcción)</div>;
+const Logbook = () => <div>Página de Bitácora (en construcción)</div>;
+// --- FIN DE LA MODIFICACIÓN ---
+
 
 // Componente de redirección para la página de inicio según el rol
 const DashboardRedirect = () => {
     const authData = useAuthData();
 
-    // Mientras el hook determina el rol, no renderizamos nada para evitar errores.
     if (!authData) {
         return null; 
     }
@@ -29,7 +38,6 @@ const DashboardRedirect = () => {
     if (authData.role === 'OPERARIO') {
         return <Navigate to="/tasks" replace />;
     }
-    // Los administradores y analistas son redirigidos al Dashboard principal.
     return <Dashboard />;
 };
 
@@ -50,7 +58,7 @@ function App() {
           } 
         />
         
-        {/* Ruta exclusiva para el Operario */}
+        {/* --- INICIO DE LA MODIFICACIÓN: Agrupamos todas las rutas del Operario --- */}
         <Route 
           path="tasks"
           element={
@@ -59,8 +67,41 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        <Route 
+          path="operator/irrigation"
+          element={
+            <ProtectedRoute allowedRoles={['OPERARIO']}>
+              <RegisterIrrigation />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="operator/fertilization"
+          element={
+            <ProtectedRoute allowedRoles={['OPERARIO']}>
+              <RegisterFertilization />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="operator/maintenance"
+          element={
+            <ProtectedRoute allowedRoles={['OPERARIO']}>
+              <RegisterMaintenance />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="operator/logbook"
+          element={
+            <ProtectedRoute allowedRoles={['OPERARIO']}>
+              <Logbook />
+            </ProtectedRoute>
+          } 
+        />
+        {/* --- FIN DE LA MODIFICACIÓN --- */}
 
-        {/* 2. Nueva ruta exclusiva para el Analista */}
+        {/* Ruta exclusiva para el Analista */}
         <Route 
           path="analyst/tasks"
           element={
@@ -107,7 +148,6 @@ function App() {
           } 
         />
 
-        {/* 3. Ruta de notificaciones ahora incluye a todos los roles con acceso */}
         <Route 
           path="notifications" 
           element={
