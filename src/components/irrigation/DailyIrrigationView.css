@@ -1,0 +1,102 @@
+/* Archivo: src/components/irrigation/DailyIrrigationView.css */
+
+.daily-view-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.day-card {
+    background-color: var(--color-content-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+    overflow: hidden;
+    border-left: 5px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.day-card.today {
+    border-left-color: var(--color-primary);
+    box-shadow: 0 6px 20px rgba(46, 175, 125, 0.2);
+}
+
+.day-card-header {
+    background-color: #f8f9fa;
+    padding: 12px 15px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.day-card.today .day-card-header {
+    background-color: #eafaf1;
+}
+
+.today-badge {
+    background-color: var(--color-primary);
+    color: var(--color-primary-text);
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: 12px;
+}
+
+.sector-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.sector-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sector-row:last-child {
+    border-bottom: none;
+}
+
+.sector-name {
+    font-weight: 500;
+}
+
+.irrigation-data {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--color-success);
+}
+
+.btn-view {
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-light);
+    padding: 6px 10px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-add-irrigation {
+    background-color: #eafaf1;
+    color: var(--color-primary);
+    border: none;
+    padding: 8px 12px;
+    border-radius: var(--border-radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+}
+
+.btn-add-irrigation:hover {
+    background-color: #d4f4e3;
+}

@@ -7,15 +7,22 @@ export interface Task {
   id: number;
   description: string;
   status: TaskStatus;
-  taskType: TaskType;
+  taskType: TaskType; // Este campo no está en tu nuevo JSON, pero lo mantenemos por si se usa en otros lados.
   createdAt: string;
+  updatedAt: string | null;
   dueDate: string | null;
+
+  // --- CAMPOS AÑADIDOS/ACTUALIZADOS ---
   farmId: number;
   farmName: string;
-  sectorId?: number;
-  sectorName?: string;
+  sectorId?: number; // Opcional por si una tarea es a nivel de finca
+  sectorName?: string; // Opcional
   equipmentId?: number;
   equipmentName?: string;
+  
+  // Nuevos campos de la respuesta del backend
+  createdByUsername: string;
+  assignedToUsername: string;
 }
 
 export interface TaskPage {
@@ -26,7 +33,6 @@ export interface TaskStatusUpdateData {
   status: TaskStatus;
 }
 
-// NUEVA INTERFAZ para crear una tarea
 export interface TaskCreateData {
     description: string;
     taskType: TaskType;

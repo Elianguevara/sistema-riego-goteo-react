@@ -1,7 +1,8 @@
 // Archivo: src/components/irrigation/IrrigationScheduler.tsx
 
 import { useState } from 'react';
-import type { MonthlyIrrigationSectorView, DailyIrrigationDetail } from '../../types/irrigation.types';
+// CORRECCIÓN: Se elimina 'DailyIrrigationDetail' de la importación porque ya no se usa aquí.
+import type { MonthlyIrrigationSectorView } from '../../types/irrigation.types';
 import IrrigationForm from './IrrigationForm';
 import './IrrigationScheduler.css';
 
@@ -13,24 +14,25 @@ interface SchedulerProps {
 }
 
 const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProps) => {
-    const [modalInfo, setModalInfo] = useState<{ sectorId: number; date: string; record: DailyIrrigationDetail | null } | null>(null);
+    // El resto del código permanece exactamente igual...
+    const [modalInfo, setModalInfo] = useState<{ sectorId: number; date: string; } | null>(null);
 
     const daysInMonth = new Date(year, month, 0).getDate();
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-    const handleCellClick = (sectorId: number, day: number, records: DailyIrrigationDetail[] | undefined) => {
+    const handleCellClick = (sectorId: number, day: number) => {
         const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const recordToEdit = records && records.length > 0 ? records[0] : null;
-        setModalInfo({ sectorId, date, record: recordToEdit });
+        setModalInfo({ sectorId, date });
     };
 
-    // --- INICIO DE LA MODIFICACIÓN: Manejo de nulos ---
-    // 1. Filtramos el array `monthlyData` para asegurarnos de que no contenga elementos nulos
-    //    o elementos sin las propiedades esenciales que necesitamos para renderizar una fila.
-    const validMonthlyData = monthlyData?.filter(sectorData => 
+    const validMonthlyData = monthlyData?.filter(sectorData =>
         sectorData && sectorData.sectorId && sectorData.sectorName && sectorData.dailyIrrigations
     ) || [];
-    // --- FIN DE LA MODIFICACIÓN ---
+
+    const now = new Date();
+    const today = now.getDate();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
 
     return (
         <>
@@ -39,26 +41,39 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                     <thead>
                         <tr>
                             <th>Sector</th>
-                            {daysArray.map(day => <th key={day}>{day}</th>)}
+                            {daysArray.map(day => {
+                                const isToday = day === today && month === currentMonth && year === currentYear;
+                                return <th key={day} className={isToday ? 'today' : ''}>{day}</th>;
+                            })}
                         </tr>
                     </thead>
                     <tbody>
-                        {/* 2. Ahora usamos el nuevo array `validMonthlyData` que ya está "limpio" */}
                         {validMonthlyData.map(sectorData => (
                             <tr key={sectorData.sectorId}>
                                 <td>{sectorData.sectorName}</td>
                                 {daysArray.map(day => {
-                                    // Usamos optional chaining `?` por si `dailyIrrigations` fuera nulo (aunque ya lo filtramos)
                                     const dailyRecords = sectorData.dailyIrrigations?.[day];
-                                    const totalWater = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0);
+                                    const totalWater = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
+                                    const isToday = day === today && month === currentMonth && year === currentYear;
+
+                                    let intensityClass = '';
+                                    if (totalWater > 0) intensityClass = 'intensity-1';
+                                    if (totalWater > 50) intensityClass = 'intensity-2';
+                                    if (totalWater > 100) intensityClass = 'intensity-3';
+
+                                    const cellClassName = `
+                                        ${totalWater > 0 ? 'filled' : 'empty'}
+                                        ${isToday ? 'today' : ''}
+                                        ${intensityClass}
+                                    `.trim();
 
                                     return (
-                                        <td 
-                                            key={day} 
-                                            onClick={() => handleCellClick(sectorData.sectorId, day, dailyRecords)} 
-                                            className={dailyRecords ? 'filled' : 'empty'}
+                                        <td
+                                            key={day}
+                                            onClick={() => handleCellClick(sectorData.sectorId, day)}
+                                            className={cellClassName}
                                         >
-                                            {totalWater ? `${totalWater.toFixed(1)} m³` : '+'}
+                                            {totalWater > 0 ? `${totalWater.toFixed(1)} m³` : '+'}
                                         </td>
                                     );
                                 })}
@@ -66,7 +81,6 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                         ))}
                     </tbody>
                 </table>
-                 {/* 3. Si después de filtrar no queda nada, mostramos un mensaje útil */}
                  {validMonthlyData.length === 0 && (
                     <div className="empty-state" style={{marginTop: '20px'}}>
                         <p>No se encontraron sectores con datos de riego para esta finca.</p>
@@ -79,7 +93,6 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                     farmId={farmId}
                     sectorId={modalInfo.sectorId}
                     date={modalInfo.date}
-                    existingRecord={null} 
                     onClose={() => setModalInfo(null)}
                 />
             )}

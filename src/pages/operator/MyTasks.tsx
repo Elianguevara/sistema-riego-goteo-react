@@ -6,7 +6,7 @@ import taskService from '../../services/taskService';
 import type { Task, TaskStatus } from '../../types/task.types';
 import './MyTasks.css';
 
-// Componente para una tarjeta de tarea individual
+// --- VERSIÓN MEJORADA Y FINAL DEL COMPONENTE TaskCard ---
 const TaskCard = ({ task, onUpdateStatus }: { task: Task, onUpdateStatus: (taskId: number, status: TaskStatus) => void }) => {
 
     const getIconClass = (taskType: string) => {
@@ -24,26 +24,35 @@ const TaskCard = ({ task, onUpdateStatus }: { task: Task, onUpdateStatus: (taskI
         }
     };
 
-    // --- INICIO DE LA MODIFICACIÓN: Comprobación de seguridad ---
-    // Si por alguna razón una tarea no tiene estado, no la renderizamos para evitar un crash.
     if (!task || !task.status) {
         return null;
     }
-    // --- FIN DE LA MODIFICACIÓN ---
 
     return (
         <div className={`task-card status-${task.status.toLowerCase()}`}>
             <div className="task-card-header">
-                <i className={`${getIconClass(task.taskType)} task-icon`}></i>
-                <div className="task-header-info">
+                <div className="task-title">
+                    <i className={`${getIconClass(task.taskType)} task-icon`}></i>
                     <span className="task-type">{task.taskType?.replace('_', ' ') || 'Tarea'}</span>
-                    <span className="task-location">{task.farmName} {task.sectorName && `> ${task.sectorName}`}</span>
                 </div>
                 <div className={`task-status-badge status-${task.status.toLowerCase()}`}>
                     {task.status.replace('_', ' ')}
                 </div>
             </div>
-            <p className="task-description">{task.description}</p>
+
+            <div className="task-details">
+                <div className="task-location">
+                    <i className="fas fa-map-marker-alt"></i>
+                    <span>
+                        {task.farmName
+                            ? `${task.farmName} ${task.sectorName ? `> ${task.sectorName}` : ''}`
+                            : 'Ubicación no especificada'
+                        }
+                    </span>
+                </div>
+                <p className="task-description">{task.description}</p>
+            </div>
+
             <div className="task-card-footer">
                 <div className="task-actions">
                     {task.status === 'PENDIENTE' && (
@@ -62,6 +71,7 @@ const TaskCard = ({ task, onUpdateStatus }: { task: Task, onUpdateStatus: (taskI
         </div>
     );
 };
+// --- FIN DEL COMPONENTE TaskCard ---
 
 
 const MyTasks = () => {
@@ -72,7 +82,7 @@ const MyTasks = () => {
         queryKey,
         queryFn: taskService.getMyTasks,
     });
-    
+
     const updateStatusMutation = useMutation({
         mutationFn: ({ taskId, status }: { taskId: number, status: TaskStatus }) =>
             taskService.updateTaskStatus(taskId, { status }),
@@ -90,8 +100,6 @@ const MyTasks = () => {
     if (isLoading) return <div className="tasks-page"><p>Cargando tareas...</p></div>;
     if (isError) return <div className="tasks-page"><p className="error-text">Error: {error.message}</p></div>;
 
-    // --- INICIO DE LA MODIFICACIÓN: Comprobación de seguridad ---
-    // Nos aseguramos de que 'tasks' sea un array antes de intentar usarlo.
     if (!Array.isArray(tasks)) {
         return (
             <div className="tasks-page">
@@ -100,7 +108,6 @@ const MyTasks = () => {
             </div>
         );
     }
-    // --- FIN DE LA MODIFICACIÓN ---
 
     const pendingTasks = tasks.filter(t => t.status === 'PENDIENTE');
     const inProgressTasks = tasks.filter(t => t.status === 'EN_PROGRESO');
