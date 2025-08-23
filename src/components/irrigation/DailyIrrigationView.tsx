@@ -1,7 +1,6 @@
 // Archivo: src/components/irrigation/DailyIrrigationView.tsx
 
 import { useState, useEffect, useRef } from 'react';
-// CORRECCIÓN: Se importa 'Sector' desde farm.types y el resto desde irrigation.types
 import type { MonthlyIrrigationSectorView, DailyIrrigationDetail } from '../../types/irrigation.types';
 import type { Sector } from '../../types/farm.types';
 import IrrigationForm from './IrrigationForm';
@@ -45,33 +44,46 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
     });
 
     const now = new Date();
-    const isCurrentMonth = now.getFullYear() === year && now.getMonth() + 1 === month;
+    // Normalizamos 'now' a la medianoche para una comparación de fecha precisa
+    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     return (
         <>
             <div className="daily-view-container">
                 {daysArray.map(day => {
                     const date = new Date(year, month - 1, day);
-                    const isToday = isCurrentMonth && date.getDate() === now.getDate();
+                    
+                    // --- LÓGICA DE CLASES CORREGIDA Y MEJORADA ---
+                    let dayClass = '';
+                    if (date < todayDate) {
+                        dayClass = 'past';
+                    } else if (date.getTime() === todayDate.getTime()) {
+                        dayClass = 'today';
+                    } else {
+                        dayClass = 'future';
+                    }
+                    // --- FIN DE LA LÓGICA DE CLASES ---
                     
                     return (
-                        <div key={day} className={`day-card ${isToday ? 'today' : ''}`} ref={isToday ? todayRef : null}>
+                        <div key={day} className={`day-card ${dayClass}`} ref={dayClass === 'today' ? todayRef : null}>
                             <div className="day-card-header">
                                 <span>{date.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-                                {isToday && <span className="today-badge">HOY</span>}
+                                {dayClass === 'today' && <span className="today-badge">HOY</span>}
                             </div>
                             <div className="sector-list">
                                 {sectors.map(sector => {
                                     const recordKey = `${sector.id}-${day}`;
                                     const dailyRecords = irrigationMap.get(recordKey);
                                     const totalWater = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
+                                    const totalHours = dailyRecords?.reduce((sum, rec) => sum + (rec?.irrigationHours || 0), 0) || 0;
 
                                     return (
                                         <div key={sector.id} className="sector-row">
                                             <span className="sector-name">{sector.name}</span>
                                             {totalWater > 0 ? (
                                                 <div className="irrigation-data">
-                                                    <span>{totalWater.toFixed(1)} m³</span>
+                                                    <span className="water-amount" title="Volumen de agua">{totalWater.toFixed(1)} m³</span>
+                                                    <span className="hours" title="Horas de riego">({totalHours.toFixed(1)} hs)</span>
                                                     <button className="btn-view" onClick={() => handleOpenModal(sector.id, day)}>
                                                         Ver/Editar
                                                     </button>

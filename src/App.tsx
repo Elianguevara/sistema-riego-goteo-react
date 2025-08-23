@@ -15,16 +15,14 @@ import NotificationHistory from './pages/NotificationHistory';
 import MyTasks from './pages/operator/MyTasks';
 import TaskManagement from './pages/analyst/TaskManagement';
 import { useAuthData } from './hooks/useAuthData';
-
-// --- INICIO DE LA MODIFICACIÓN ---
-// 1. Importamos el componente que ya existe
 import RegisterIrrigation from './pages/operator/RegisterIrrigation';
+// --- ¡MODIFICACIÓN CLAVE! ---
+// Se importa el componente de página real que creamos.
+import RegisterFertilization from './pages/operator/RegisterFertilization';
 
-// 2. Creamos componentes temporales para las rutas que aún no tienen una página designada
-const RegisterFertilization = () => <div>Página de Registro de Fertilización (en construcción)</div>;
+// Componentes temporales para las rutas que aún no tienen una página designada
 const RegisterMaintenance = () => <div>Página de Registro de Mantenimiento (en construcción)</div>;
 const Logbook = () => <div>Página de Bitácora (en construcción)</div>;
-// --- FIN DE LA MODIFICACIÓN ---
 
 
 // Componente de redirección para la página de inicio según el rol
@@ -58,7 +56,7 @@ function App() {
           } 
         />
         
-        {/* --- INICIO DE LA MODIFICACIÓN: Agrupamos todas las rutas del Operario --- */}
+        {/* --- Rutas del Operario --- */}
         <Route 
           path="tasks"
           element={
@@ -79,6 +77,7 @@ function App() {
           path="operator/fertilization"
           element={
             <ProtectedRoute allowedRoles={['OPERARIO']}>
+              {/* Se utiliza el componente de página real */}
               <RegisterFertilization />
             </ProtectedRoute>
           } 
@@ -99,7 +98,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        {/* --- FIN DE LA MODIFICACIÓN --- */}
 
         {/* Ruta exclusiva para el Analista */}
         <Route 

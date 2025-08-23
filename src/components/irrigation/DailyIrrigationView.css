@@ -7,18 +7,39 @@
 }
 
 .day-card {
-    background-color: var(--color-content-bg);
+    background-color: #ffffff;
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-main);
     overflow: hidden;
     border-left: 5px solid transparent;
     transition: all 0.2s ease-in-out;
+    border: 1px solid #eee;
 }
 
+/* --- ESTILOS CON LA NUEVA PALETA DE COLORES --- */
+
+/* Verde para el día actual (se mantiene) */
 .day-card.today {
     border-left-color: var(--color-primary);
-    box-shadow: 0 6px 20px rgba(46, 175, 125, 0.2);
+    background-color: #e8f5e9;
+    border-color: #dcedc8;
 }
+
+/* Ámbar suave para días pasados (nuevo color) */
+.day-card.past {
+    background-color: #fff8e1; /* Un ámbar muy suave y cálido */
+    border-left-color: #ffc107; /* Borde ámbar */
+    border-color: #ffecb3;
+}
+
+/* Azul suave para días futuros (se mantiene) */
+.day-card.future {
+    background-color: #e3f2fd; 
+    border-left-color: #90caf9;
+    border-color: #bbdefb;
+}
+/* --- FIN DE ESTILOS NUEVOS --- */
+
 
 .day-card-header {
     background-color: #f8f9fa;
@@ -32,7 +53,16 @@
 }
 
 .day-card.today .day-card-header {
-    background-color: #eafaf1;
+    background-color: #dcedc8;
+}
+
+/* --- ESTILO CORREGIDO PARA EL HEADER DE DÍAS PASADOS --- */
+.day-card.past .day-card-header {
+    background-color: #ffecb3; /* Header ámbar, a juego con la tarjeta */
+}
+
+.day-card.future .day-card-header {
+    background-color: #bbdefb;
 }
 
 .today-badge {
@@ -67,9 +97,18 @@
 .irrigation-data {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+}
+
+.irrigation-data .water-amount {
     font-weight: 600;
     color: var(--color-success);
+}
+
+.irrigation-data .hours {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-light);
 }
 
 .btn-view {

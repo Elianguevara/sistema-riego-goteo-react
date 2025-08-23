@@ -1,7 +1,7 @@
 // Archivo: src/services/irrigationService.ts
 
 import authService from './authService';
-import type { MonthlyIrrigationSectorView, IrrigationRecord, IrrigationCreateData, IrrigationUpdateData } from '../types/irrigation.types';
+import type { MonthlyIrrigationSectorView, IrrigationRecord, IrrigationCreateData } from '../types/irrigation.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -28,41 +28,29 @@ const getMonthlyIrrigationView = async (farmId: number, year: number, month: num
 };
 
 /**
- * Registra un nuevo evento de riego en un sector.
- * Endpoint: POST /api/farms/{farmId}/sectors/{sectorId}/irrigations
+ * ¡MODIFICADO!
+ * Registra un nuevo evento de riego.
+ * Endpoint: POST /api/irrigation
  */
-const createIrrigation = async (farmId: number, sectorId: number, data: IrrigationCreateData): Promise<IrrigationRecord> => {
-    const response = await fetch(`${API_BASE_URL}/farms/${farmId}/sectors/${sectorId}/irrigations`, {
+const createIrrigation = async (data: IrrigationCreateData): Promise<IrrigationRecord> => {
+    const response = await fetch(`${API_BASE_URL}/irrigation`, { // Apunta al nuevo endpoint
         method: 'POST',
         headers: getAuthHeader(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(data), // Envía la nueva estructura de datos
     });
+
     if (!response.ok) {
-        throw new Error('Error al registrar el riego.');
+        // Mejor manejo de errores para dar más contexto
+        const errorData = await response.json().catch(() => ({ message: 'Error desconocido al registrar el riego.' }));
+        throw new Error(errorData.message || 'Error al registrar el riego.');
     }
     return response.json();
 };
 
-/**
- * Actualiza un registro de riego existente.
- * Endpoint: PUT /api/irrigations/{irrigationId}
- */
-const updateIrrigation = async (irrigationId: number, data: IrrigationUpdateData): Promise<IrrigationRecord> => {
-    const response = await fetch(`${API_BASE_URL}/irrigations/${irrigationId}`, {
-        method: 'PUT',
-        headers: getAuthHeader(),
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        throw new Error('Error al actualizar el riego.');
-    }
-    return response.json();
-};
 
 const irrigationService = {
     getMonthlyIrrigationView,
     createIrrigation,
-    updateIrrigation,
 };
 
 export default irrigationService;
