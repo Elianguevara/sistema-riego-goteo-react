@@ -7,20 +7,16 @@ export interface Task {
   id: number;
   description: string;
   status: TaskStatus;
-  taskType: TaskType; // Este campo no está en tu nuevo JSON, pero lo mantenemos por si se usa en otros lados.
+  taskType: TaskType;
   createdAt: string;
   updatedAt: string | null;
   dueDate: string | null;
-
-  // --- CAMPOS AÑADIDOS/ACTUALIZADOS ---
   farmId: number;
   farmName: string;
-  sectorId?: number; // Opcional por si una tarea es a nivel de finca
-  sectorName?: string; // Opcional
+  sectorId?: number;
+  sectorName?: string;
   equipmentId?: number;
   equipmentName?: string;
-  
-  // Nuevos campos de la respuesta del backend
   createdByUsername: string;
   assignedToUsername: string;
 }
@@ -33,12 +29,13 @@ export interface TaskStatusUpdateData {
   status: TaskStatus;
 }
 
+// --- INTERFAZ CORREGIDA ---
+// Ahora solo contiene los campos que el backend necesita para la creación.
 export interface TaskCreateData {
     description: string;
-    taskType: TaskType;
     assignedToUserId: number;
-    farmId: number;
-    sectorId?: number;
-    equipmentId?: number;
-    dueDate?: string;
+    sectorId: number;
+    // Campos que el formulario usa pero no se envían directamente en el body
+    farmId?: number; 
+    taskType?: TaskType;
 }

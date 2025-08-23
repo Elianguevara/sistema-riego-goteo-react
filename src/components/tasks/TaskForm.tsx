@@ -16,9 +16,7 @@ interface TaskFormProps {
 
 const TaskForm = ({ onClose }: TaskFormProps) => {
     const queryClient = useQueryClient();
-    const [formData, setFormData] = useState<Partial<TaskCreateData>>({
-        taskType: 'RIEGO'
-    });
+    const [formData, setFormData] = useState<Partial<TaskCreateData>>({});
     const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
 
     const { data: farms = [], isLoading: isLoadingFarms } = useQuery<Farm[], Error>({
@@ -44,7 +42,13 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
         mutationFn: taskService.createTask,
         onSuccess: () => {
             toast.success("Tarea creada y asignada exitosamente.");
+            // Invalida la lista de tareas del analista (para que vea su nueva tarea creada)
             queryClient.invalidateQueries({ queryKey: ['tasksCreatedByMe'] });
+            
+            // --- ¡ESTA ES LA LÍNEA CLAVE DE LA SOLUCIÓN! ---
+            // También invalida la lista de tareas del operario.
+            queryClient.invalidateQueries({ queryKey: ['myTasks'] });
+
             onClose();
         },
         onError: (err: Error) => toast.error(err.message),
@@ -52,7 +56,8 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const parsedValue = ['farmId', 'sectorId', 'assignedToUserId'].includes(name) ? parseInt(value) : value;
+        setFormData(prev => ({ ...prev, [name]: parsedValue }));
     };
 
     const handleFarmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -68,8 +73,8 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.assignedToUserId || !formData.farmId) {
-            toast.error("Por favor, asigna un operario y selecciona una finca.");
+        if (!formData.description || !formData.assignedToUserId || !formData.sectorId) {
+            toast.error("Por favor, completa la descripción y selecciona finca, operario y sector.");
             return;
         }
         createTaskMutation.mutate(formData as TaskCreateData);
@@ -80,54 +85,32 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
             <div className="modal-container task-form-container">
                 <h3>Crear Nueva Tarea</h3>
                 <form onSubmit={handleSubmit}>
-                    {/* --- INICIO DE LA MODIFICACIÓN: Nuevo flujo del formulario --- */}
                     <div className="form-group">
-                        <label htmlFor="farmId">Paso 1: Seleccionar Finca</label>
-                        <select name="farmId" onChange={handleFarmChange} required disabled={isLoadingFarms}>
-                            <option value="">{isLoadingFarms ? 'Cargando...' : 'Seleccionar finca...'}</option>
-                            {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
-                        </select>
+                        <label>Paso 1: Seleccionar Ubicación y Responsable</label>
+                        <div className='form-grid'>
+                            <select name="farmId" onChange={handleFarmChange} required>
+                                <option value="">{isLoadingFarms ? 'Cargando fincas...' : 'Seleccionar finca...'}</option>
+                                {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
+                            </select>
+                            <select name="sectorId" onChange={handleChange} required disabled={!selectedFarmId || isLoadingSectors}>
+                                <option value="">{isLoadingSectors ? 'Cargando...' : 'Seleccionar sector...'}</option>
+                                {sectors.map(sector => <option key={sector.id} value={sector.id}>{sector.name}</option>)}
+                            </select>
+                            <select name="assignedToUserId" onChange={handleChange} required disabled={!selectedFarmId || isLoadingUsers}>
+                                <option value="">{isLoadingUsers ? 'Cargando...' : 'Asignar a operario...'}</option>
+                                {availableOperators.map(op => <option key={op.id} value={op.id}>{op.name}</option>)}
+                            </select>
+                        </div>
                     </div>
-
-                    {/* El resto del formulario solo aparece si se ha seleccionado una finca */}
-                    {selectedFarmId && (
-                        <>
-                            <div className="form-grid">
-                                <div className="form-group">
-                                    <label htmlFor="taskType">Tipo de Tarea</label>
-                                    <select name="taskType" value={formData.taskType} onChange={handleChange}>
-                                        <option value="RIEGO">Riego</option>
-                                        <option value="FERTILIZACION">Fertilización</option>
-                                        <option value="MANTENIMIENTO">Mantenimiento</option>
-                                        <option value="OTRO">Otro</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="assignedToUserId">Asignar a Operario</label>
-                                    <select name="assignedToUserId" onChange={handleChange} required disabled={isLoadingUsers}>
-                                        <option value="">{isLoadingUsers ? 'Cargando...' : 'Seleccionar operario...'}</option>
-                                        {availableOperators.map(op => <option key={op.id} value={op.id}>{op.name}</option>)}
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="sectorId">Sector (Opcional)</label>
-                                    <select name="sectorId" onChange={handleChange} disabled={isLoadingSectors}>
-                                        <option value="">{isLoadingSectors ? 'Cargando...' : 'Seleccionar sector...'}</option>
-                                        {sectors.map(sector => <option key={sector.id} value={sector.id}>{sector.name}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="description">Paso 2: Descripción de la Tarea</label>
-                                <textarea id="description" name="description" onChange={handleChange} required />
-                            </div>
-                        </>
-                    )}
-                    {/* --- FIN DE LA MODIFICACIÓN --- */}
+                    
+                    <div className="form-group">
+                        <label htmlFor="description">Paso 2: Descripción de la Tarea</label>
+                        <textarea id="description" name="description" onChange={handleChange} required placeholder='Ej: Revisar el sistema de goteo y limpiar filtros...' />
+                    </div>
 
                     <div className="modal-actions">
                         <button type="button" className="btn-cancel" onClick={onClose} disabled={createTaskMutation.isPending}>Cancelar</button>
-                        <button type="submit" className="btn-save" disabled={createTaskMutation.isPending || !selectedFarmId}>
+                        <button type="submit" className="btn-save" disabled={createTaskMutation.isPending}>
                             {createTaskMutation.isPending ? 'Creando...' : 'Crear Tarea'}
                         </button>
                     </div>

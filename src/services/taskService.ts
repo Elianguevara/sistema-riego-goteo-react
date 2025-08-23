@@ -15,41 +15,24 @@ const getAuthHeader = (): Record<string, string> => {
 
 /**
  * (OPERARIO) Obtiene las tareas asignadas al operario autenticado.
- * Endpoint: GET /api/tasks/assigned-to-me
  */
 const getMyTasks = async (): Promise<Task[]> => {
-    const response = await fetch(`${API_BASE_URL}/assigned-to-me`, {
-        headers: getAuthHeader(),
-    });
-    if (!response.ok) {
-        throw new Error('Error al obtener las tareas asignadas.');
-    }
+    const response = await fetch(`${API_BASE_URL}/assigned-to-me`, { headers: getAuthHeader() });
+    if (!response.ok) throw new Error('Error al obtener las tareas asignadas.');
     
-    // --- INICIO DE LA MODIFICACIÓN: Lógica robusta de parseo ---
-    try {
-        const data = await response.json();
-        // Verificamos si la respuesta es un objeto de paginación y tiene contenido
-        if (data && Array.isArray(data.content)) {
-            return data.content;
-        }
-        // Verificamos si la respuesta ya es un array
-        if (data && Array.isArray(data)) {
-            return data;
-        }
-        // Si la estructura no es la esperada, devolvemos un array vacío para evitar errores.
-        console.warn("La respuesta de getMyTasks no tiene el formato esperado:", data);
-        return [];
-    } catch (error) {
-        console.error("Error al parsear la respuesta de getMyTasks:", error);
-        // Si hay un error de parseo (ej. respuesta vacía), devolvemos un array vacío.
-        return [];
+    // Manejo robusto de la respuesta por si viene paginada o como array directo
+    const data = await response.json();
+    if (data && Array.isArray(data.content)) {
+        return data.content;
     }
-    // --- FIN DE LA MODIFICACIÓN ---
+    if (data && Array.isArray(data)) {
+        return data;
+    }
+    return [];
 };
 
 /**
  * (OPERARIO) Actualiza el estado de una tarea específica.
- * Endpoint: PUT /api/tasks/{taskId}/status
  */
 const updateTaskStatus = async (taskId: number, data: TaskStatusUpdateData): Promise<Task> => {
     const response = await fetch(`${API_BASE_URL}/${taskId}/status`, {
@@ -63,7 +46,6 @@ const updateTaskStatus = async (taskId: number, data: TaskStatusUpdateData): Pro
 
 /**
  * (ANALISTA) Obtiene las tareas creadas por el analista autenticado.
- * Endpoint: GET /api/tasks/created-by-me
  */
 const getTasksCreatedByMe = async (): Promise<Task[]> => {
     const response = await fetch(`${API_BASE_URL}/created-by-me`, {
@@ -76,15 +58,29 @@ const getTasksCreatedByMe = async (): Promise<Task[]> => {
 
 /**
  * (ANALISTA) Crea una nueva tarea.
- * Endpoint: POST /api/tasks
  */
 const createTask = async (data: TaskCreateData): Promise<Task> => {
+    const requestBody = {
+        description: data.description,
+        assignedToUserId: data.assignedToUserId,
+        sectorId: data.sectorId
+    };
+
     const response = await fetch(API_BASE_URL, {
         method: 'POST',
         headers: getAuthHeader(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestBody),
     });
-    if (!response.ok) throw new Error('Error al crear la tarea.');
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        try {
+            const errorData = JSON.parse(errorText);
+            throw new Error(errorData.message || 'Error al crear la tarea.');
+        } catch (e) {
+            throw new Error('El servidor tuvo un problema. Contacta al administrador.');
+        }
+    }
     return response.json();
 };
 
