@@ -64,18 +64,21 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
                         <div key={day} className={`day-card ${dayClass}`} ref={dayClass === 'today' ? todayRef : null}>
                             <div className="day-card-header">
                                 <span>{date.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric' })}</span>
-                                <button className="btn-add-precipitation" onClick={() => setPrecipitationModalDate(dateString)}>
-                                    <i className="fas fa-cloud-rain"></i> Añadir Lluvia
-                                </button>
+                                {/* --- INICIO DE LA MODIFICACIÓN --- */}
+                                <div className="header-actions">
+                                    {totalRain > 0 && (
+                                        <div className="daily-precipitation-display">
+                                            <i className="fas fa-cloud-showers-heavy"></i>
+                                            <span>{totalRain.toFixed(1)} mm</span>
+                                        </div>
+                                    )}
+                                    <button className="btn-add-precipitation" onClick={() => setPrecipitationModalDate(dateString)}>
+                                        <i className="fas fa-cloud-rain"></i> Añadir Lluvia
+                                    </button>
+                                </div>
+                                {/* --- FIN DE LA MODIFICACIÓN --- */}
                             </div>
                             
-                            {totalRain > 0 && (
-                                <div className="precipitation-row">
-                                    <i className="fas fa-cloud-showers-heavy"></i>
-                                    <span>Precipitación: <strong>{totalRain.toFixed(1)} mm</strong></span>
-                                </div>
-                            )}
-
                             <div className="sector-list">
                                 {sectors.map(sector => {
                                     const dailyRecords = irrigationMap.get(`${sector.id}-${day}`);
