@@ -1,32 +1,32 @@
-import { useState, useMemo } from 'react';
+// Archivo: src/pages/FarmDetail.tsx
+
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+// Services
 import farmService from '../services/farmService';
 import adminService from '../services/adminService';
+import fertilizationService from '../services/fertilizationService';
+
+// Components
 import SectorForm from '../components/farms/SectorForm';
 import EquipmentForm from '../components/farms/EquipmentForm';
 import WaterSourceForm from '../components/farms/WaterSourceForm';
 import AssignUserForm from '../components/farms/AssignUserForm';
-// PASO 1: Importar el nuevo ActionsMenu genérico y su tipo
 import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
-import fertilizationService from '../services/fertilizationService';
-import FertilizationList from '../components/fertilization/FertilizationList';
 import FertilizationForm from '../components/fertilization/FertilizationForm';
-import type { 
-    Farm, 
-    Sector, SectorCreateData, SectorUpdateData, 
-    IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData,
-    WaterSource, WaterSourceCreateData, WaterSourceUpdateData
-} from '../types/farm.types';
-import type { FertilizationRequest, FertilizationResponse } from '../types/fertilization.types';
+
+// Types
+import type { Farm, Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData, WaterSource, WaterSourceCreateData, WaterSourceUpdateData } from '../types/farm.types';
 import type { UserResponse } from '../types/user.types';
+import type { FertilizationRecord, FertilizationCreateData } from '../types/fertilization.types';
 import { useAuthData } from '../hooks/useAuthData';
 
 import './FarmDetail.css';
 
-// El modal de confirmación sigue siendo reutilizable
+// --- Componente Reutilizable para Confirmación ---
 const ConfirmationModal = ({ message, onConfirm, onCancel, isLoading }: { message: string, onConfirm: () => void, onCancel: () => void, isLoading: boolean }) => (
     <div className="modal-overlay">
         <div className="modal-container">
@@ -35,26 +35,52 @@ const ConfirmationModal = ({ message, onConfirm, onCancel, isLoading }: { messag
             <div className="modal-actions">
                 <button className="btn-cancel" onClick={onCancel} disabled={isLoading}>Cancelar</button>
                 <button className="btn-delete" onClick={onConfirm} disabled={isLoading}>
-                    {isLoading ? 'Eliminando...' : 'Confirmar'}
+                    {isLoading ? 'Confirmando...' : 'Confirmar'}
                 </button>
             </div>
         </div>
     </div>
 );
 
+// --- Componente Interno para la Lista de Fertilizaciones ---
+const FertilizationList = ({ fertilizations, onEdit, onDelete, canEdit, canDelete }: { fertilizations: FertilizationRecord[], onEdit: (f: FertilizationRecord) => void, onDelete: (id: number) => void, canEdit: boolean, canDelete: boolean }) => {
+    const getActions = (fertilization: FertilizationRecord): ActionMenuItem[] => {
+        const items: ActionMenuItem[] = [];
+        if (canEdit) items.push({ label: 'Editar', action: () => onEdit(fertilization) });
+        if (canDelete) items.push({ label: 'Eliminar', action: () => onDelete(fertilization.id), className: 'delete' });
+        return items;
+    };
+
+    return (
+        <table className="detail-table">
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Cantidad</th><th>Acciones</th></tr></thead>
+            <tbody>
+                {fertilizations.map(f => (
+                    <tr key={f.id}>
+                        <td>{new Date(f.date + 'T00:00:00').toLocaleDateString()}</td>
+                        <td>{f.fertilizerType}</td>
+                        <td>{f.quantity} {f.quantityUnit}</td>
+                        <td className='actions'><ActionsMenu items={getActions(f)} /></td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
+
 
 const FarmDetail = () => {
     const { farmId } = useParams<{ farmId: string }>();
     const queryClient = useQueryClient();
-    const { role } = useAuthData() || {};
+    const authData = useAuthData();
     const farmIdNum = Number(farmId);
 
-    // --- Permisos para Fertilización ---
-    const canCreateFertilization = role === 'ADMIN' || role === 'ANALISTA' || role === 'OPERARIO';
-    const canEditFertilization = role === 'ADMIN' || role === 'OPERARIO';
-    const canDeleteFertilization = role === 'ADMIN';
+    // --- Permisos basados en Rol ---
+    const canCreateFertilization = authData?.role === 'ADMIN' || authData?.role === 'ANALISTA' || authData?.role === 'OPERARIO';
+    const canEditFertilization = authData?.role === 'ADMIN' || authData?.role === 'OPERARIO';
+    const canDeleteFertilization = authData?.role === 'ADMIN';
 
-    // --- Estados para Modales (sin cambios) ---
+    // --- Estados para Modales y Selección ---
     const [isSectorModalOpen, setIsSectorModalOpen] = useState(false);
     const [currentSector, setCurrentSector] = useState<Sector | null>(null);
     const [sectorToDelete, setSectorToDelete] = useState<Sector | null>(null);
@@ -70,13 +96,12 @@ const FarmDetail = () => {
     const [isAssignUserModalOpen, setIsAssignUserModalOpen] = useState(false);
     const [userToUnassign, setUserToUnassign] = useState<UserResponse | null>(null);
 
-    // --- Estados para Fertilización ---
     const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
     const [isFertilizationModalOpen, setIsFertilizationModalOpen] = useState(false);
-    const [currentFertilization, setCurrentFertilization] = useState<FertilizationResponse | null>(null);
-    const [fertilizationToDelete, setFertilizationToDelete] = useState<FertilizationResponse | null>(null);
+    const [currentFertilization, setCurrentFertilization] = useState<FertilizationRecord | null>(null);
+    const [fertilizationToDelete, setFertilizationToDelete] = useState<FertilizationRecord | null>(null);
 
-    // --- Obtención de Datos (sin cambios) ---
+    // --- Obtención de Datos ---
     const { data: farm, isLoading: isLoadingFarm, isError, error } = useQuery<Farm, Error>({ queryKey: ['farmDetails', farmId], queryFn: () => farmService.getFarmById(farmIdNum), enabled: !!farmIdNum });
     const { data: sectors = [], isLoading: isLoadingSectors } = useQuery<Sector[], Error>({ queryKey: ['sectors', farmId], queryFn: () => farmService.getSectorsByFarm(farmIdNum), enabled: !!farmIdNum });
     const { data: equipments = [], isLoading: isLoadingEquipments } = useQuery<IrrigationEquipment[], Error>({ queryKey: ['equipments', farmId], queryFn: () => farmService.getEquipmentsByFarm(farmIdNum), enabled: !!farmIdNum });
@@ -84,13 +109,19 @@ const FarmDetail = () => {
     const { data: assignedUsers = [], isLoading: isLoadingAssignedUsers } = useQuery<UserResponse[], Error>({ queryKey: ['assignedUsers', farmId], queryFn: () => farmService.getAssignedUsers(farmIdNum), enabled: !!farmIdNum });
     const { data: allUsers = [] } = useQuery<UserResponse[], Error>({ queryKey: ['users'], queryFn: adminService.getUsers });
 
-    const { data: fertilizations = [], isLoading: isLoadingFertilizations } = useQuery<FertilizationResponse[], Error>({
+    const { data: fertilizations = [], isLoading: isLoadingFertilizations } = useQuery<FertilizationRecord[], Error>({
         queryKey: ['fertilizations', selectedSector?.id],
         queryFn: () => fertilizationService.getFertilizationsBySector(selectedSector!.id),
-        enabled: !!selectedSector, // Solo ejecutar si hay un sector seleccionado
+        enabled: !!selectedSector,
     });
+    
+    useEffect(() => {
+        if (!selectedSector && sectors.length > 0) {
+            setSelectedSector(sectors[0]);
+        }
+    }, [sectors, selectedSector]);
 
-    // --- Mutaciones (sin cambios) ---
+    // --- Mutaciones ---
     const createSectorMutation = useMutation({ mutationFn: (data: SectorCreateData) => farmService.createSector(farmIdNum, data), onSuccess: () => { toast.success("Sector creado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const updateSectorMutation = useMutation({ mutationFn: (data: SectorUpdateData) => farmService.updateSector(farmIdNum, currentSector!.id, data), onSuccess: () => { toast.success("Sector actualizado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const deleteSectorMutation = useMutation({ mutationFn: (sectorId: number) => farmService.deleteSector(farmIdNum, sectorId), onSuccess: () => { toast.success("Sector eliminado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setSectorToDelete(null); }, onError: (err: Error) => toast.error(err.message) });
@@ -106,9 +137,8 @@ const FarmDetail = () => {
     const assignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.assignUserToFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario asignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setIsAssignUserModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const unassignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.unassignUserFromFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario desasignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setUserToUnassign(null); }, onError: (err: Error) => toast.error(err.message) });
 
-    // --- Mutaciones para Fertilización ---
     const createFertilizationMutation = useMutation({
-        mutationFn: (data: FertilizationRequest) => fertilizationService.createFertilization(data),
+        mutationFn: fertilizationService.createFertilizationRecord,
         onSuccess: () => {
             toast.success("Registro de fertilización creado.");
             queryClient.invalidateQueries({ queryKey: ['fertilizations', selectedSector?.id] });
@@ -118,7 +148,7 @@ const FarmDetail = () => {
     });
 
     const updateFertilizationMutation = useMutation({
-        mutationFn: (data: Partial<FertilizationRequest>) => fertilizationService.updateFertilization(currentFertilization!.id, data),
+        mutationFn: (variables: { id: number, data: Partial<FertilizationCreateData>}) => fertilizationService.updateFertilization(variables.id, variables.data),
         onSuccess: () => {
             toast.success("Registro de fertilización actualizado.");
             queryClient.invalidateQueries({ queryKey: ['fertilizations', selectedSector?.id] });
@@ -137,7 +167,7 @@ const FarmDetail = () => {
         onError: (err: Error) => toast.error(err.message),
     });
 
-    // --- Manejadores de Eventos (sin cambios) ---
+    // --- Manejadores de Eventos ---
     const handleOpenCreateSectorForm = () => { setCurrentSector(null); setIsSectorModalOpen(true); };
     const handleOpenEditSectorForm = (sector: Sector) => { setCurrentSector(sector); setIsSectorModalOpen(true); };
     const handleSaveSector = (data: SectorCreateData | SectorUpdateData) => { if (currentSector) { updateSectorMutation.mutate(data as SectorUpdateData); } else { createSectorMutation.mutate(data as SectorCreateData); } };
@@ -156,26 +186,21 @@ const FarmDetail = () => {
     const handleSaveUserAssignment = (userId: number) => { assignUserMutation.mutate(userId); };
     const handleConfirmUnassignUser = () => { if(userToUnassign) { unassignUserMutation.mutate(userToUnassign.id); }};
 
-    // --- Manejadores para Fertilización ---
-    const handleSelectSector = (sector: Sector) => {
-        setSelectedSector(sector);
-    };
-
     const handleOpenCreateFertilizationForm = () => {
         setCurrentFertilization(null);
         setIsFertilizationModalOpen(true);
     };
 
-    const handleOpenEditFertilizationForm = (fertilization: FertilizationResponse) => {
+    const handleOpenEditFertilizationForm = (fertilization: FertilizationRecord) => {
         setCurrentFertilization(fertilization);
         setIsFertilizationModalOpen(true);
     };
 
-    const handleSaveFertilization = (data: FertilizationRequest | Partial<FertilizationRequest>) => {
+    const handleSaveFertilization = (data: FertilizationCreateData | Partial<FertilizationCreateData>) => {
         if (currentFertilization) {
-            updateFertilizationMutation.mutate(data);
+            updateFertilizationMutation.mutate({ id: currentFertilization.id, data });
         } else {
-            createFertilizationMutation.mutate(data as FertilizationRequest);
+            createFertilizationMutation.mutate(data as FertilizationCreateData);
         }
     };
 
@@ -187,7 +212,6 @@ const FarmDetail = () => {
 
     const availableUsersToAssign = useMemo(() => { const assignedUserIds = new Set(assignedUsers.map(u => u.id)); return allUsers.filter(u => !assignedUserIds.has(u.id)); }, [allUsers, assignedUsers]);
 
-    // PASO 2: Definir las acciones para cada tipo de entidad
     const getSectorActions = (sector: Sector): ActionMenuItem[] => ([
         { label: 'Editar', action: () => handleOpenEditSectorForm(sector) },
         { label: 'Eliminar', action: () => setSectorToDelete(sector), className: 'delete' }
@@ -211,7 +235,6 @@ const FarmDetail = () => {
             <div className="detail-header"> <i className="fas fa-seedling header-icon"></i> <div><h1>{farm?.name}</h1><p>{farm?.location}</p></div> </div>
             
             <div className="detail-grid-main">
-                {/* Columna Izquierda con las tarjetas principales */}
                 <div className="main-column">
                     <div className="detail-card">
                         <div className="card-header"><h3>Sectores</h3><button className="btn-add" onClick={handleOpenCreateSectorForm}><i className="fas fa-plus"></i> Añadir Sector</button></div>
@@ -219,7 +242,7 @@ const FarmDetail = () => {
                             <table className="detail-table selectable">
                                 <thead><tr><th>Nombre</th><th>Equipo Asignado</th><th>Acciones</th></tr></thead>
                                 <tbody>{sectors.map(s => (
-                                    <tr key={s.id} onClick={() => handleSelectSector(s)} className={selectedSector?.id === s.id ? 'selected' : ''}>
+                                    <tr key={s.id} onClick={() => setSelectedSector(s)} className={selectedSector?.id === s.id ? 'selected' : ''}>
                                         <td>{s.name}</td>
                                         <td>{s.equipmentName || 'N/A'}</td>
                                         <td className='actions'><ActionsMenu items={getSectorActions(s)} /></td>
@@ -239,7 +262,6 @@ const FarmDetail = () => {
                     </div>
                 </div>
 
-                {/* Columna Derecha para detalles del sector y otras tarjetas */}
                 <div className="side-column">
                     {selectedSector && (
                         <div className="detail-card">
@@ -253,7 +275,7 @@ const FarmDetail = () => {
                                 <FertilizationList
                                     fertilizations={fertilizations}
                                     onEdit={handleOpenEditFertilizationForm}
-                                    onDelete={(id) => setFertilizationToDelete(fertilizations.find(f => f.id === id) || null)}
+                                    onDelete={(id: number) => setFertilizationToDelete(fertilizations.find(f => f.id === id) || null)}
                                     canEdit={canEditFertilization}
                                     canDelete={canDeleteFertilization}
                                 />
@@ -287,9 +309,10 @@ const FarmDetail = () => {
             {isFertilizationModalOpen && selectedSector && (
                 <FertilizationForm
                     currentFertilization={currentFertilization}
-                    sectorId={selectedSector.id}
+                    farmId={farmIdNum}
+                    sectors={[selectedSector]}
                     onSave={handleSaveFertilization}
-                    onCancel={() => setIsFertilizationModalOpen(false)}
+                    onClose={() => setIsFertilizationModalOpen(false)}
                     isLoading={createFertilizationMutation.isPending || updateFertilizationMutation.isPending}
                 />
             )}

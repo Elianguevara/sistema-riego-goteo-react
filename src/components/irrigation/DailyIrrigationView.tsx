@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import type { MonthlyIrrigationSectorView } from '../../types/irrigation.types';
 import type { Sector } from '../../types/farm.types';
 import IrrigationForm from './IrrigationForm';
-// --- INICIO DE CAMBIOS ---
-import PrecipitationForm from '../precipitation/PrecipitationForm'; // Importar el nuevo formulario
+// --- RUTA CORREGIDA ---
+// Asegúrate de que el archivo PrecipitationForm.tsx exista en la carpeta src/components/precipitation/
+import PrecipitationForm from '../precipitation/PrecipitationForm';
 import './DailyIrrigationView.css';
 
 interface DailyViewProps {
@@ -18,7 +19,6 @@ interface DailyViewProps {
 
 const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: DailyViewProps) => {
     const [irrigationModal, setIrrigationModal] = useState<{ sectorId: number; date: string; } | null>(null);
-    // --- NUEVO ESTADO PARA EL MODAL DE PRECIPITACIÓN ---
     const [precipitationModalDate, setPrecipitationModalDate] = useState<string | null>(null);
     const todayRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +31,6 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
         }, 100);
     }, []);
 
-    // --- MAPAS SEPARADOS PARA RIEGO Y PRECIPITACIÓN ---
     const irrigationMap = new Map<string, any[]>();
     const precipitationMap = new Map<string, any[]>();
 
@@ -39,7 +38,6 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
         Object.entries(sectorView.dailyIrrigations).forEach(([day, details]) => {
             irrigationMap.set(`${sectorView.sectorId}-${day}`, details);
         });
-        // Asumimos que la precipitación viene por finca, no por sector
         if (sectorView.dailyPrecipitations) {
              Object.entries(sectorView.dailyPrecipitations).forEach(([day, details]) => {
                 precipitationMap.set(String(day), details);
@@ -66,13 +64,11 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
                         <div key={day} className={`day-card ${dayClass}`} ref={dayClass === 'today' ? todayRef : null}>
                             <div className="day-card-header">
                                 <span>{date.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric' })}</span>
-                                {/* --- NUEVO BOTÓN PARA AÑADIR LLUVIA --- */}
                                 <button className="btn-add-precipitation" onClick={() => setPrecipitationModalDate(dateString)}>
                                     <i className="fas fa-cloud-rain"></i> Añadir Lluvia
                                 </button>
                             </div>
                             
-                            {/* --- MOSTRAR REGISTRO DE LLUVIA --- */}
                             {totalRain > 0 && (
                                 <div className="precipitation-row">
                                     <i className="fas fa-cloud-showers-heavy"></i>
@@ -120,7 +116,6 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
                 />
             )}
             
-            {/* --- RENDERIZADO DEL NUEVO MODAL --- */}
             {precipitationModalDate && (
                 <PrecipitationForm
                     farmId={farmId}

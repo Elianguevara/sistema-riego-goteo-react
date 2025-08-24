@@ -37,3 +37,35 @@
   margin-bottom: 20px;
   display: block;
 }
+/* ... estilos existentes ... */
+
+.month-navigator {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto; /* Empuja el navegador a la derecha */
+}
+
+.month-navigator button {
+    background-color: var(--color-primary-text);
+    border: 1px solid var(--color-border);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--color-primary);
+}
+
+.month-navigator button:hover {
+    background-color: #f0f0f0;
+}
+
+.month-display {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--color-text-dark);
+    width: 150px; /* Ancho fijo para evitar que el layout salte */
+    text-align: center;
+}
+
