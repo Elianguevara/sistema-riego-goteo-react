@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import fertilizationService from '../../services/fertilizationService';
 import type { FertilizationCreateData } from '../../types/fertilization.types';
 import type { Sector } from '../../types/farm.types';
-import '../users/UserForm.css';
+import '../users/UserForm.css'; // Reutilizamos los estilos
 
 interface Props {
     farmId: number;
@@ -16,20 +16,21 @@ interface Props {
 
 const FertilizationForm = ({ farmId, sectors, onClose }: Props) => {
     const queryClient = useQueryClient();
-    const [formData, setFormData] = useState<Omit<FertilizationCreateData, 'fertilizationDate'>>({
-        fertilizerType: '',
-        quantityKg: 25,
+
+    // Estado unificado que coincide con la estructura de la API
+    const [formData, setFormData] = useState<FertilizationCreateData>({
         sectorId: 0,
+        date: new Date().toISOString().split('T')[0], // Fecha de hoy por defecto
+        fertilizerType: '',
+        quantity: 25, // Cantidad por defecto
+        quantityUnit: 'KG', // Unidad por defecto
     });
-    
-    // Establece la fecha de hoy por defecto
-    const [fertilizationDate, setFertilizationDate] = useState(new Date().toISOString().split('T')[0]);
 
     const mutation = useMutation({
         mutationFn: fertilizationService.createFertilizationRecord,
         onSuccess: () => {
             toast.success('Aplicación de fertilizante registrada correctamente.');
-            queryClient.invalidateQueries({ queryKey: ['fertilizationRecords', farmId] }); // Opcional, para futuras vistas
+            queryClient.invalidateQueries({ queryKey: ['fertilizationRecords', farmId] });
             onClose();
         },
         onError: (err: Error) => toast.error(err.message),
@@ -49,12 +50,8 @@ const FertilizationForm = ({ farmId, sectors, onClose }: Props) => {
             toast.error("Por favor, seleccione un sector y especifique el tipo de fertilizante.");
             return;
         }
-        const recordData: FertilizationCreateData = {
-            ...formData,
-            sectorId: Number(formData.sectorId),
-            fertilizationDate,
-        };
-        mutation.mutate(recordData);
+        // El formData ya tiene la estructura correcta, lo enviamos directamente
+        mutation.mutate(formData);
     };
 
     return (
@@ -70,13 +67,13 @@ const FertilizationForm = ({ farmId, sectors, onClose }: Props) => {
                         </select>
                     </div>
                      <div className="form-group">
-                        <label htmlFor="fertilizationDate">Fecha de Aplicación</label>
+                        <label htmlFor="date">Fecha de Aplicación</label>
                         <input
                             type="date"
-                            id="fertilizationDate"
-                            name="fertilizationDate"
-                            value={fertilizationDate}
-                            onChange={(e) => setFertilizationDate(e.target.value)}
+                            id="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleChange}
                             required
                         />
                     </div>
@@ -93,17 +90,26 @@ const FertilizationForm = ({ farmId, sectors, onClose }: Props) => {
                         required
                     />
                 </div>
-                 <div className="form-group">
-                    <label htmlFor="quantityKg">Cantidad (Kg)</label>
-                    <input
-                        type="number"
-                        id="quantityKg"
-                        name="quantityKg"
-                        value={formData.quantityKg}
-                        onChange={handleChange}
-                        step="0.5"
-                        required
-                    />
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label htmlFor="quantity">Cantidad</label>
+                        <input
+                            type="number"
+                            id="quantity"
+                            name="quantity"
+                            value={formData.quantity}
+                            onChange={handleChange}
+                            step="0.5"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="quantityUnit">Unidad</label>
+                        <select id="quantityUnit" name="quantityUnit" value={formData.quantityUnit} onChange={handleChange}>
+                            <option value="KG">Kilogramos (KG)</option>
+                            <option value="LITERS">Litros (L)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div className="form-actions">

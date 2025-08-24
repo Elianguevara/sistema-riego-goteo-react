@@ -1,0 +1,48 @@
+/* Archivo: src/components/fertilization/FertilizationList.css */
+
+.fertilization-list-container {
+    margin-top: 30px;
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+}
+
+.fertilization-list-container h3 {
+    margin-top: 0;
+}
+
+/* Reutilizamos los estilos de tabla de otros componentes */
+.fertilization-list-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.fertilization-list-container th,
+.fertilization-list-container td {
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.fertilization-list-container th {
+    color: var(--color-text-light);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.fertilization-list-container td.actions {
+    text-align: right;
+}
+
+.fertilization-list-container td.actions button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+    cursor: not-allowed; /* Cambiar a 'pointer' cuando se implementen */
+    opacity: 0.6;
+}

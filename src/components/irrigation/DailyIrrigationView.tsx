@@ -1,9 +1,11 @@
 // Archivo: src/components/irrigation/DailyIrrigationView.tsx
 
 import { useState, useEffect, useRef } from 'react';
-import type { MonthlyIrrigationSectorView, DailyIrrigationDetail } from '../../types/irrigation.types';
+import type { MonthlyIrrigationSectorView } from '../../types/irrigation.types';
 import type { Sector } from '../../types/farm.types';
 import IrrigationForm from './IrrigationForm';
+// --- INICIO DE CAMBIOS ---
+import PrecipitationForm from '../precipitation/PrecipitationForm'; // Importar el nuevo formulario
 import './DailyIrrigationView.css';
 
 interface DailyViewProps {
@@ -15,36 +17,37 @@ interface DailyViewProps {
 }
 
 const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: DailyViewProps) => {
-    const [modalInfo, setModalInfo] = useState<{ sectorId: number; date: string; } | null>(null);
+    const [irrigationModal, setIrrigationModal] = useState<{ sectorId: number; date: string; } | null>(null);
+    // --- NUEVO ESTADO PARA EL MODAL DE PRECIPITACIÓN ---
+    const [precipitationModalDate, setPrecipitationModalDate] = useState<string | null>(null);
     const todayRef = useRef<HTMLDivElement>(null);
 
     const daysInMonth = new Date(year, month, 0).getDate();
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-    const handleOpenModal = (sectorId: number, day: number) => {
-        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        setModalInfo({ sectorId, date });
-    };
-
     useEffect(() => {
         setTimeout(() => {
-            todayRef.current?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-            });
+            todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
     }, []);
 
-    const irrigationMap = new Map<string, DailyIrrigationDetail[]>();
+    // --- MAPAS SEPARADOS PARA RIEGO Y PRECIPITACIÓN ---
+    const irrigationMap = new Map<string, any[]>();
+    const precipitationMap = new Map<string, any[]>();
+
     monthlyData.forEach(sectorView => {
         Object.entries(sectorView.dailyIrrigations).forEach(([day, details]) => {
-            const key = `${sectorView.sectorId}-${day}`;
-            irrigationMap.set(key, details);
+            irrigationMap.set(`${sectorView.sectorId}-${day}`, details);
         });
+        // Asumimos que la precipitación viene por finca, no por sector
+        if (sectorView.dailyPrecipitations) {
+             Object.entries(sectorView.dailyPrecipitations).forEach(([day, details]) => {
+                precipitationMap.set(String(day), details);
+            });
+        }
     });
 
     const now = new Date();
-    // Normalizamos 'now' a la medianoche para una comparación de fecha precisa
     const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     return (
@@ -52,28 +55,34 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
             <div className="daily-view-container">
                 {daysArray.map(day => {
                     const date = new Date(year, month - 1, day);
+                    const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     
-                    // --- LÓGICA DE CLASES CORREGIDA Y MEJORADA ---
-                    let dayClass = '';
-                    if (date < todayDate) {
-                        dayClass = 'past';
-                    } else if (date.getTime() === todayDate.getTime()) {
-                        dayClass = 'today';
-                    } else {
-                        dayClass = 'future';
-                    }
-                    // --- FIN DE LA LÓGICA DE CLASES ---
+                    let dayClass = date < todayDate ? 'past' : (date.getTime() === todayDate.getTime() ? 'today' : 'future');
                     
+                    const dailyPrecipitation = precipitationMap.get(String(day));
+                    const totalRain = dailyPrecipitation?.reduce((sum, rec) => sum + (rec?.mmRain || 0), 0) || 0;
+
                     return (
                         <div key={day} className={`day-card ${dayClass}`} ref={dayClass === 'today' ? todayRef : null}>
                             <div className="day-card-header">
-                                <span>{date.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-                                {dayClass === 'today' && <span className="today-badge">HOY</span>}
+                                <span>{date.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric' })}</span>
+                                {/* --- NUEVO BOTÓN PARA AÑADIR LLUVIA --- */}
+                                <button className="btn-add-precipitation" onClick={() => setPrecipitationModalDate(dateString)}>
+                                    <i className="fas fa-cloud-rain"></i> Añadir Lluvia
+                                </button>
                             </div>
+                            
+                            {/* --- MOSTRAR REGISTRO DE LLUVIA --- */}
+                            {totalRain > 0 && (
+                                <div className="precipitation-row">
+                                    <i className="fas fa-cloud-showers-heavy"></i>
+                                    <span>Precipitación: <strong>{totalRain.toFixed(1)} mm</strong></span>
+                                </div>
+                            )}
+
                             <div className="sector-list">
                                 {sectors.map(sector => {
-                                    const recordKey = `${sector.id}-${day}`;
-                                    const dailyRecords = irrigationMap.get(recordKey);
+                                    const dailyRecords = irrigationMap.get(`${sector.id}-${day}`);
                                     const totalWater = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
                                     const totalHours = dailyRecords?.reduce((sum, rec) => sum + (rec?.irrigationHours || 0), 0) || 0;
 
@@ -82,14 +91,14 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
                                             <span className="sector-name">{sector.name}</span>
                                             {totalWater > 0 ? (
                                                 <div className="irrigation-data">
-                                                    <span className="water-amount" title="Volumen de agua">{totalWater.toFixed(1)} m³</span>
-                                                    <span className="hours" title="Horas de riego">({totalHours.toFixed(1)} hs)</span>
-                                                    <button className="btn-view" onClick={() => handleOpenModal(sector.id, day)}>
+                                                    <span className="water-amount">{totalWater.toFixed(1)} m³</span>
+                                                    <span className="hours">({totalHours.toFixed(1)} hs)</span>
+                                                    <button className="btn-view" onClick={() => setIrrigationModal({ sectorId: sector.id, date: dateString })}>
                                                         Ver/Editar
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <button className="btn-add-irrigation" onClick={() => handleOpenModal(sector.id, day)}>
+                                                <button className="btn-add-irrigation" onClick={() => setIrrigationModal({ sectorId: sector.id, date: dateString })}>
                                                     <i className="fas fa-plus"></i> Añadir Riego
                                                 </button>
                                             )}
@@ -102,12 +111,20 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month }: Dail
                 })}
             </div>
 
-            {modalInfo && (
+            {irrigationModal && (
                 <IrrigationForm
                     farmId={farmId}
-                    sectorId={modalInfo.sectorId}
-                    date={modalInfo.date}
-                    onClose={() => setModalInfo(null)}
+                    sectorId={irrigationModal.sectorId}
+                    date={irrigationModal.date}
+                    onClose={() => setIrrigationModal(null)}
+                />
+            )}
+            
+            {/* --- RENDERIZADO DEL NUEVO MODAL --- */}
+            {precipitationModalDate && (
+                <PrecipitationForm
+                    farmId={farmId}
+                    onClose={() => setPrecipitationModalDate(null)}
                 />
             )}
         </>

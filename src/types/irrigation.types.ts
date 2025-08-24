@@ -1,6 +1,8 @@
 // Archivo: src/types/irrigation.types.ts
 
-// --- INTERFACES PARA LA VISTA MENSUAL (se mantienen igual) ---
+import type { PrecipitationRecord } from './precipitation.types';
+
+// --- INTERFACES PARA LA VISTA MENSUAL ---
 
 export interface DailyIrrigationDetail {
   irrigationId: number;
@@ -11,26 +13,28 @@ export interface DailyIrrigationDetail {
 
 export type DailyIrrigationMap = Record<string, DailyIrrigationDetail[]>;
 
+// --- INTERFAZ MODIFICADA ---
 export interface MonthlyIrrigationSectorView {
   sectorId: number;
   sectorName: string;
   dailyIrrigations: DailyIrrigationMap;
+  // --- CAMPO AÑADIDO ---
+  // El backend ahora también nos enviará las precipitaciones por día.
+  dailyPrecipitations?: Record<string, PrecipitationRecord[]>; 
 }
 
 
-// --- ¡INTERFACES MODIFICADAS! ---
+// --- Estructuras para crear y recibir registros de riego (sin cambios) ---
 
-// Estructura para crear un nuevo registro de riego (según tu especificación)
 export interface IrrigationCreateData {
-  startDateTime: string;      // Formato ISO: "2025-08-23T10:00:00"
-  endDateTime: string;        // Formato ISO: "2025-08-23T12:30:00"
-  waterAmount: number;        // Cantidad de agua (ej: 150.5)
-  irrigationHours: number;    // Horas de riego (ej: 2.5)
-  sectorId: number;           // ID del sector
-  equipmentId: number;        // ID del equipo
+  startDateTime: string;
+  endDateTime: string;
+  waterAmount: number;
+  irrigationHours: number;
+  sectorId: number;
+  equipmentId: number;
 }
 
-// Estructura de un registro de riego individual (respuesta de la API)
 export interface IrrigationRecord {
     id: number;
     startDateTime: string;

@@ -1,20 +1,31 @@
 // Archivo: src/types/fertilization.types.ts
 
-// Estructura para crear un nuevo registro de fertilización
+/**
+ * Define la estructura de datos que se debe ENVIAR a la API
+ * para registrar una nueva aplicación de fertilizante.
+ * Coincide con el JSON Request Body del backend.
+ */
 export interface FertilizationCreateData {
-  fertilizationDate: string; // Formato YYYY-MM-DD
-  fertilizerType: string;
-  quantityKg: number;
   sectorId: number;
+  date: string; // Formato YYYY-MM-DD
+  fertilizerType: string;
+  quantity: number;
+  quantityUnit: 'KG' | 'LITERS'; // Debe ser uno de estos dos valores
 }
 
-// Estructura de un registro de fertilización una vez creado
+/**
+ * Define la estructura de datos que se RECIBE de la API
+ * como respuesta a una creación o consulta exitosa.
+ * Coincide con el JSON Response Body del backend.
+ */
 export interface FertilizationRecord {
   id: number;
-  fertilizationDate: string;
-  fertilizerType: string;
-  quantityKg: number;
   sectorId: number;
   sectorName: string;
+  farmId: number;
   farmName: string;
+  date: string;
+  fertilizerType: string;
+  quantity: number;
+  quantityUnit: 'KG' | 'LITERS';
 }
