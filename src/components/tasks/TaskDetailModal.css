@@ -1,0 +1,99 @@
+/* Archivo: src/components/tasks/TaskDetailModal.css */
+
+.task-detail-modal {
+    max-width: 700px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--color-text-light);
+}
+
+.task-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: var(--color-text-light);
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    margin-top: 15px;
+}
+
+.comments-section {
+    margin-top: 30px;
+}
+
+.comments-section h5 {
+    font-size: 16px;
+    color: var(--color-text-dark);
+}
+
+.comments-list {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.comment-item {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-text {
+    margin: 0 0 5px 0;
+}
+
+.comment-author {
+    font-size: 12px;
+    color: var(--color-text-light);
+}
+
+.comment-form {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+    padding: 8px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.btn-add-comment {
+    align-self: flex-end;
+    background-color: var(--color-primary);
+    color: var(--color-primary-text);
+    border: none;
+    padding: 8px 15px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+}

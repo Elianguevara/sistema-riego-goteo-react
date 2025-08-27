@@ -4,24 +4,22 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import farmService from '../../services/farmService';
 import irrigationService from '../../services/irrigationService';
+import weatherService from '../../services/weatherService'; // <-- 1. IMPORTAR SERVICIO DE CLIMA
 import DailyIrrigationView from '../../components/irrigation/DailyIrrigationView';
+import type { CurrentWeather } from '../../types/weather.types'; // <-- 2. IMPORTAR TIPO DE CLIMA
 import './RegisterIrrigation.css';
 
 const RegisterIrrigation = () => {
     const today = new Date();
     const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
-    
-    // --- INICIO DE CAMBIOS: Estados para manejar la fecha ---
     const [year, setYear] = useState(today.getFullYear());
-    const [month, setMonth] = useState(today.getMonth() + 1); // Mes es 1-12
-    // --- FIN DE CAMBIOS ---
+    const [month, setMonth] = useState(today.getMonth() + 1);
 
     const { data: farms = [], isLoading: isLoadingFarms } = useQuery<any[], Error>({
         queryKey: ['myFarms'],
         queryFn: () => farmService.getFarms(),
     });
 
-    // La query ahora depende de los estados 'year' y 'month'
     const { data: monthlyData = [], isLoading: isLoadingIrrigations } = useQuery({
         queryKey: ['irrigations', selectedFarmId, year, month],
         queryFn: () => irrigationService.getMonthlyIrrigationView(selectedFarmId!, year, month),
@@ -34,7 +32,19 @@ const RegisterIrrigation = () => {
         enabled: !!selectedFarmId,
     });
 
-    // --- INICIO DE CAMBIOS: Funciones para navegar entre meses ---
+    // --- 3. NUEVA QUERY PARA OBTENER EL CLIMA ACTUAL ---
+    const { 
+        data: weatherData, 
+        isLoading: isLoadingWeather, 
+        error: weatherError 
+    } = useQuery<CurrentWeather, Error>({
+        queryKey: ['weather', selectedFarmId],
+        queryFn: () => weatherService.getCurrentWeather(selectedFarmId!),
+        enabled: !!selectedFarmId, // Solo se ejecuta si hay una finca seleccionada
+        retry: false, // No reintentar en caso de error (ej. 409)
+        staleTime: 1000 * 60 * 15, // Considerar los datos frescos por 15 minutos
+    });
+
     const handleMonthChange = (offset: number) => {
         const newDate = new Date(year, month - 1 + offset);
         setYear(newDate.getFullYear());
@@ -42,8 +52,6 @@ const RegisterIrrigation = () => {
     };
 
     const monthName = new Date(year, month - 1).toLocaleString('es-AR', { month: 'long' });
-    // --- FIN DE CAMBIOS ---
-
 
     const renderContent = () => {
         if (isLoadingFarms) {
@@ -67,7 +75,6 @@ const RegisterIrrigation = () => {
                         {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
                     </select>
 
-                    {/* --- INICIO DE CAMBIOS: Controles de navegación --- */}
                     {selectedFarmId && (
                         <div className="month-navigator">
                             <button onClick={() => handleMonthChange(-1)}>&lt;</button>
@@ -75,17 +82,20 @@ const RegisterIrrigation = () => {
                             <button onClick={() => handleMonthChange(1)}>&gt;</button>
                         </div>
                     )}
-                    {/* --- FIN DE CAMBIOS --- */}
                 </div>
 
                 {selectedFarmId ? (
                     (isLoadingIrrigations || isLoadingSectors) ? <p>Cargando datos de riego...</p> :
+                    // --- 4. PASAR DATOS DEL CLIMA AL COMPONENTE HIJO ---
                     <DailyIrrigationView
                         farmId={selectedFarmId}
                         sectors={sectors}
                         monthlyData={monthlyData}
                         year={year}
                         month={month}
+                        weatherData={weatherData}
+                        isLoadingWeather={isLoadingWeather}
+                        weatherError={weatherError}
                     />
                 ) : (
                     <div className="empty-state">

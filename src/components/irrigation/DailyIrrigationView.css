@@ -178,4 +178,26 @@
     padding: 6px 12px;
     border-radius: var(--border-radius-md);
 }
-/* --- FIN DE LA MODIFICACIÓN --- */
+/* ... (estilos existentes) ... */
+
+/* --- NUEVOS ESTILOS PARA EL CLIMA EN LA TARJETA --- */
+.current-weather-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    padding: 6px 12px;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-dark);
+}
+
+.current-weather-display i {
+    color: var(--color-primary);
+}
+
+.current-weather-display .weather-description {
+    text-transform: capitalize;
+    color: var(--color-text-light);
+    font-size: 13px;
+}

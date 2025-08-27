@@ -6,6 +6,8 @@ export interface Farm {
   location: string;
   reservoirCapacity: number;
   farmSize: number;
+  latitude?: number;  // <-- CAMPO AÑADIDO Y CORREGIDO
+  longitude?: number; // <-- CAMPO AÑADIDO Y CORREGIDO
 }
 
 export interface IrrigationEquipment {
@@ -54,6 +56,8 @@ export interface FarmCreateData {
   location: string;
   reservoirCapacity: number;
   farmSize: number;
+  latitude: number;
+  longitude: number;
 }
 
 // Para actualizar una Finca
@@ -66,6 +70,7 @@ export interface EquipmentCreateData {
   hasFlowMeter: boolean;
   equipmentType: string;
   equipmentStatus: string;
+  // <-- CORRECCIÓN: Se eliminaron latitude y longitude de aquí, ya que pertenecen a la finca.
 }
 
 // Para actualizar un Equipo
@@ -79,8 +84,6 @@ export interface SectorCreateData {
 
 // Para actualizar un Sector
 export interface SectorUpdateData extends SectorCreateData {}
-
-// ... (interfaces existentes)
 
 // Para crear una Fuente de Agua
 export interface WaterSourceCreateData {

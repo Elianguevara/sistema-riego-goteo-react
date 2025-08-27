@@ -137,3 +137,13 @@
     background-color: var(--color-success);
     color: white;
 }
+.task-card {
+  /* ... estilos existentes ... */
+  cursor: pointer; /* <-- AÑADIR ESTA LÍNEA */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}

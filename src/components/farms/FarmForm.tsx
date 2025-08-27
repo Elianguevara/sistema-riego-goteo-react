@@ -10,11 +10,14 @@ interface FarmFormProps {
 }
 
 const FarmForm: React.FC<FarmFormProps> = ({ currentFarm, onSave, onCancel, isLoading }) => {
+    // 1. El estado inicial ahora incluye latitud y longitud
     const [formData, setFormData] = useState<FarmCreateData>({
         name: '',
         location: '',
         farmSize: 0,
         reservoirCapacity: 0,
+        latitude: 0,
+        longitude: 0,
     });
 
     const isEditing = currentFarm !== null;
@@ -26,9 +29,12 @@ const FarmForm: React.FC<FarmFormProps> = ({ currentFarm, onSave, onCancel, isLo
                 location: currentFarm.location,
                 farmSize: currentFarm.farmSize,
                 reservoirCapacity: currentFarm.reservoirCapacity,
+                latitude: currentFarm.latitude || 0, // Usamos valor por defecto si no existe
+                longitude: currentFarm.longitude || 0,
             });
         } else {
-            setFormData({ name: '', location: '', farmSize: 0, reservoirCapacity: 0 });
+            // Reseteo completo para el modo creación
+            setFormData({ name: '', location: '', farmSize: 0, reservoirCapacity: 0, latitude: 0, longitude: 0 });
         }
     }, [currentFarm, isEditing]);
 
@@ -55,8 +61,17 @@ const FarmForm: React.FC<FarmFormProps> = ({ currentFarm, onSave, onCancel, isLo
                         <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="location">Ubicación</label>
-                        <input type="text" id="location" name="location" value={formData.location} onChange={handleChange} required />
+                        <label htmlFor="location">Ubicación (Ej: "Mendoza, Argentina")</label>
+                        <input type="text" id="location" name="location" value={formData.location} onChange={handleChange} />
+                    </div>
+                     {/* 2. NUEVOS CAMPOS PARA COORDENADAS */}
+                    <div className="form-group">
+                        <label htmlFor="latitude">Latitud</label>
+                        <input type="number" step="any" id="latitude" name="latitude" value={formData.latitude} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="longitude">Longitud</label>
+                        <input type="number" step="any" id="longitude" name="longitude" value={formData.longitude} onChange={handleChange} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="farmSize">Tamaño (hectáreas)</label>

@@ -1,0 +1,36 @@
+/* Archivo: src/components/tasks/TaskFilters.css */
+
+.task-filters-bar {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+    background-color: var(--color-content-bg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-main);
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.filter-group i {
+    color: var(--color-text-light);
+    position: absolute;
+    left: 10px;
+}
+
+.search-input, .filter-select {
+    padding: 8px 12px 8px 35px; /* Espacio para el ícono */
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+    font-size: 14px;
+    min-width: 200px;
+}
+.filter-select {
+    padding-left: 30px; /* Ajuste para el select */
+}

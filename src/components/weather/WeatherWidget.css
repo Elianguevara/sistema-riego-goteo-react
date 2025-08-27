@@ -1,0 +1,63 @@
+/* Archivo: src/components/weather/WeatherWidget.css */
+
+.weather-widget {
+    background: linear-gradient(135deg, #5c97bf 0%, #3f83ae 100%);
+    color: white;
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.weather-widget.loading, .weather-widget.error {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #f8f9fa;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border);
+}
+
+.weather-widget.error {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.main-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.temp {
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.condition {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-transform: capitalize;
+}
+
+.condition i {
+    font-size: 32px;
+    margin-bottom: 5px;
+}
+
+.details {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.details .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
