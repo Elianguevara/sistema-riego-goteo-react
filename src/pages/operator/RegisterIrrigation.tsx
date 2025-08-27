@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import farmService from '../../services/farmService';
 import irrigationService from '../../services/irrigationService';
-import weatherService from '../../services/weatherService'; // <-- 1. IMPORTAR SERVICIO DE CLIMA
+import weatherService from '../../services/weatherService';
 import DailyIrrigationView from '../../components/irrigation/DailyIrrigationView';
-import type { CurrentWeather } from '../../types/weather.types'; // <-- 2. IMPORTAR TIPO DE CLIMA
+import type { CurrentWeather } from '../../types/weather.types';
 import './RegisterIrrigation.css';
 
 const RegisterIrrigation = () => {
@@ -32,7 +32,6 @@ const RegisterIrrigation = () => {
         enabled: !!selectedFarmId,
     });
 
-    // --- 3. NUEVA QUERY PARA OBTENER EL CLIMA ACTUAL ---
     const { 
         data: weatherData, 
         isLoading: isLoadingWeather, 
@@ -40,9 +39,9 @@ const RegisterIrrigation = () => {
     } = useQuery<CurrentWeather, Error>({
         queryKey: ['weather', selectedFarmId],
         queryFn: () => weatherService.getCurrentWeather(selectedFarmId!),
-        enabled: !!selectedFarmId, // Solo se ejecuta si hay una finca seleccionada
-        retry: false, // No reintentar en caso de error (ej. 409)
-        staleTime: 1000 * 60 * 15, // Considerar los datos frescos por 15 minutos
+        enabled: !!selectedFarmId,
+        retry: false,
+        staleTime: 1000 * 60 * 15,
     });
 
     const handleMonthChange = (offset: number) => {
@@ -67,6 +66,10 @@ const RegisterIrrigation = () => {
             );
         }
 
+        // --- LÓGICA DE CARGA CORREGIDA ---
+        // Combinamos todos los estados de carga de la finca seleccionada.
+        const isFarmDataLoading = isLoadingIrrigations || isLoadingSectors || isLoadingWeather;
+
         return (
             <>
                 <div className="filters-bar">
@@ -85,8 +88,8 @@ const RegisterIrrigation = () => {
                 </div>
 
                 {selectedFarmId ? (
-                    (isLoadingIrrigations || isLoadingSectors) ? <p>Cargando datos de riego...</p> :
-                    // --- 4. PASAR DATOS DEL CLIMA AL COMPONENTE HIJO ---
+                    // Mostramos un mensaje de carga unificado.
+                    isFarmDataLoading ? <p>Cargando datos de la finca...</p> :
                     <DailyIrrigationView
                         farmId={selectedFarmId}
                         sectors={sectors}
@@ -94,7 +97,7 @@ const RegisterIrrigation = () => {
                         year={year}
                         month={month}
                         weatherData={weatherData}
-                        isLoadingWeather={isLoadingWeather}
+                        isLoadingWeather={isLoadingWeather} // Se sigue pasando por si el hijo lo necesita
                         weatherError={weatherError}
                     />
                 ) : (
