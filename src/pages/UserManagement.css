@@ -86,23 +86,58 @@ td.actions {
   text-align: left;
 }
 
-.action-icon {
-  margin-right: 20px;
-  cursor: pointer;
-  font-size: 16px;
-  color: var(--color-text-disabled);
-  transition: color 0.2s;
-}
-
-.action-icon.edit:hover {
-  color: var(--color-info);
-}
-
-.action-icon.delete:hover {
-  color: var(--color-danger);
-}
-
 .error-text {
     color: var(--color-danger);
     font-weight: bold;
+}
+
+/* --- NUEVOS ESTILOS PARA PAGINACIÓN Y ORDENAMIENTO --- */
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable-header:hover {
+    color: var(--color-text-dark);
+}
+
+.sort-icon {
+    margin-left: 8px;
+    color: var(--color-text-disabled);
+}
+
+.sortable-header:hover .sort-icon {
+    color: var(--color-text-light);
+}
+
+.fa-sort-up, .fa-sort-down {
+    color: var(--color-text-dark) !important;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pagination-controls button {
+    background-color: var(--color-primary);
+    color: var(--color-primary-text);
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+    background-color: var(--color-border);
+    cursor: not-allowed;
+}
+
+.pagination-controls span {
+    font-size: 14px;
+    font-weight: 600;
 }

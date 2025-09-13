@@ -1,9 +1,6 @@
-import authService from './authService'; // Para obtener el token
-
-// Asumimos que tienes un tipo UserResponse definido, si no, lo crearemos
-// Asumimos que tienes un tipo UserResponse definido, si no, lo crearemos
+import authService from './authService';
 import type { UserResponse, UserCreateData, UserUpdateData, UserStatusUpdateData, PasswordUpdateData } from '../types/user.types';
-// Este servicio maneja las operaciones administrativas relacionadas con los usuarios
+
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/admin`;
 const AUTH_API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
@@ -17,8 +14,7 @@ const getAuthHeader = (): Record<string, string> => {
 };
 
 /**
- * Obtiene todos los usuarios desde la API.
- * Cita del archivo: sistema-riego-goteo-api/src/main/java/com/sistemariegoagoteo/sistema_riego_goteo_api/controller/admin/AdminUserController.java
+ * Obtiene todos los usuarios desde la API. (No paginado)
  */
 const getUsers = async (): Promise<UserResponse[]> => {
     const response = await fetch(`${API_URL}/users`, {
@@ -35,7 +31,6 @@ const getUsers = async (): Promise<UserResponse[]> => {
 
 /**
  * Crea un nuevo usuario (Analista u Operario).
- * Cita: El backend usa el endpoint /register para esta acción, como se ve en AuthController.
  */
 const createUser = async (userData: UserCreateData): Promise<any> => {
     const response = await fetch(`${AUTH_API_URL}/register`, {
@@ -44,12 +39,11 @@ const createUser = async (userData: UserCreateData): Promise<any> => {
         body: JSON.stringify(userData),
     });
     if (!response.ok) throw new Error('Error al crear el usuario.');
-    return await response.text(); // El endpoint de registro devuelve un texto de éxito
+    return await response.text();
 };
 
 /**
  * Actualiza los datos de un usuario.
- * Cita: AdminUserController usa el endpoint PUT /api/admin/users/{id}
  */
 const updateUser = async (id: number, userData: UserUpdateData): Promise<UserResponse> => {
     const response = await fetch(`${API_URL}/users/${id}`, {
@@ -63,7 +57,6 @@ const updateUser = async (id: number, userData: UserUpdateData): Promise<UserRes
 
 /**
  * Elimina un usuario por su ID.
- * Cita: AdminUserController usa el endpoint DELETE /api/admin/users/{id}
  */
 const deleteUser = async (id: number): Promise<void> => {
     const response = await fetch(`${API_URL}/users/${id}`, {
@@ -74,7 +67,6 @@ const deleteUser = async (id: number): Promise<void> => {
 };
 /**
  * Actualiza el estado (activo/inactivo) de un usuario.
- * Cita: Endpoint PUT /api/admin/users/{id}/status
  */
 const updateUserStatus = async (id: number, statusData: UserStatusUpdateData): Promise<UserResponse> => {
     const response = await fetch(`${API_URL}/users/${id}/status`, {
@@ -87,7 +79,6 @@ const updateUserStatus = async (id: number, statusData: UserStatusUpdateData): P
 };
 /**
  * Cambia la contraseña de un usuario.
- * Cita: Endpoint PUT /api/admin/users/{id}/password
  */
 const changeUserPassword = async (id: number, passwordData: PasswordUpdateData): Promise<string> => {
     const response = await fetch(`${API_URL}/users/${id}/password`, {
@@ -110,3 +101,4 @@ const adminService = {
 };
 
 export default adminService;
+

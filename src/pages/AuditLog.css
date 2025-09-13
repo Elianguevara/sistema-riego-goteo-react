@@ -6,14 +6,45 @@
     gap: 20px;
 }
 
+/* --- NUEVOS ESTILOS PARA LA BARRA DE FILTROS --- */
+
 .filters-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     padding: 20px;
     background-color: var(--color-content-bg);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-main);
+    align-items: flex-end; /* Alinea los items al final */
+}
+
+.filter-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.main-filters {
+    flex-grow: 3; /* Ocupa más espacio */
+}
+
+.search-filter {
+    flex-grow: 1; /* Ocupa menos espacio */
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.filter-item label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-light);
 }
 
 .filters-container input,
@@ -22,41 +53,82 @@
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-sm);
     font-size: 14px;
+    background-color: #f9f9f9;
 }
 
-.audit-table-container {
+/* --- ESTILOS DE LA LÍNEA DE TIEMPO (sin cambios) --- */
+
+.audit-content-container {
     position: relative;
+    background-color: transparent;
+}
+
+.timeline-day-group {
+    margin-bottom: 30px;
+}
+
+.timeline-day-header {
+    font-size: 1.2rem;
+    color: var(--color-text-dark);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--color-border);
+    text-transform: capitalize;
+}
+
+.event-card {
     background-color: var(--color-content-bg);
-    padding: 20px;
-    border-radius: var(--border-radius-lg);
+    border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-main);
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    border-left: 5px solid;
+    margin-bottom: 15px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
-
-.action-badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
-    color: white;
-    text-transform: uppercase;
-    /* --- CAMBIO: Color de fondo por defecto --- */
-    background-color: var(--color-text-light); /* Gris para acciones desconocidas o N/A */
+.event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
 }
+.event-card.create { border-color: var(--color-success); }
+.event-card.update { border-color: var(--color-info); }
+.event-card.delete { border-color: var(--color-danger); }
+.event-card.assign { border-color: #9b59b6; }
+.event-card.unassign { border-color: #f39c12; }
+.event-card.default { border-color: var(--color-text-light); }
 
-/* --- ESTILOS EXISTENTES Y NUEVOS --- */
-.action-badge.create { background-color: var(--color-success); }
-.action-badge.update { background-color: var(--color-info); }
-.action-badge.delete { background-color: var(--color-danger); }
-.action-badge.assign { background-color: #9b59b6; } /* Púrpura para asignar */
-.action-badge.unassign { background-color: #f39c12; } /* Naranja para desasignar */
+.event-icon-container { font-size: 20px; width: 30px; text-align: center; padding-top: 2px; }
+.event-card.create .event-icon-container { color: var(--color-success); }
+.event-card.update .event-icon-container { color: var(--color-info); }
+.event-card.delete .event-icon-container { color: var(--color-danger); }
+.event-card.assign .event-icon-container { color: #9b59b6; }
+.event-card.unassign .event-icon-container { color: #f39c12; }
 
+.event-content { flex: 1; }
+.event-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.event-action-text { font-weight: bold; font-size: 1rem; color: var(--color-text-dark); }
+.event-time { font-size: 0.8rem; color: var(--color-text-light); }
+.event-details { display: grid; grid-template-columns: max-content 1fr; gap: 5px 10px; font-size: 0.9rem; margin-bottom: 10px; }
+.event-details strong { color: var(--color-text-light); }
+.event-change { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--color-border); }
+.event-change .diff { background-color: #f9f9f9; padding: 8px; border-radius: var(--border-radius-sm); font-family: monospace; }
+.event-change del { color: var(--color-danger); text-decoration: none; background-color: rgba(var(--color-danger-rgb), 0.1); padding: 2px 4px; border-radius: 3px; }
+.event-change ins { color: var(--color-success); text-decoration: none; background-color: var(--color-success-bg); font-weight: bold; margin-left: 10px; padding: 2px 4px; border-radius: 3px; }
 
+/* --- ESTILOS DE PAGINACIÓN Y OTROS --- */
 .pagination-controls {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
     margin-top: 20px;
+}
+.page-size-selector {
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--color-content-bg);
 }
 
 .pagination-controls button {
@@ -77,6 +149,8 @@
   text-align: center;
   padding: 50px 20px;
   color: var(--color-text-light);
+  background-color: var(--color-content-bg);
+  border-radius: var(--border-radius-lg);
 }
 
 .empty-icon {
@@ -86,10 +160,7 @@
 
 .loading-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(255, 255, 255, 0.7);
   display: flex;
   justify-content: center;
@@ -97,3 +168,4 @@
   font-weight: bold;
   z-index: 10;
 }
+

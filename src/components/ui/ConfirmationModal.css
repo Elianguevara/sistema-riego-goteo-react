@@ -1,0 +1,15 @@
+/* src/components/ui/ConfirmationModal.css */
+
+.confirmation-modal p {
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.confirmation-modal .btn-delete {
+  background-color: var(--color-danger);
+  color: var(--color-primary-text);
+}
+
+.confirmation-modal .btn-delete:hover {
+  background-color: var(--color-danger-hover);
+}

@@ -10,17 +10,15 @@ export interface UserResponse {
 }
 
 // Interfaz para el formulario de CREACIÓN
-// Corresponde a RegisterRequest.java
 export interface UserCreateData {
   name: string;
   username: string;
-  password?: string; // Es opcional en la UI si se genera, pero requerido en el backend
+  password?: string;
   email: string;
   rol: 'ADMIN' | 'ANALISTA' | 'OPERARIO';
 }
 
 // Interfaz para el formulario de ACTUALIZACIÓN
-// Corresponde a UserUpdateRequest.java
 export interface UserUpdateData {
   name: string;
   email: string;
@@ -38,4 +36,12 @@ export interface SelfPasswordUpdateData {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
+}
+
+// --- NUEVA INTERFAZ ---
+// Define los parámetros para la petición de usuarios paginados
+export interface UserRequestParams {
+    page?: number;
+    size?: number;
+    sort?: string;
 }

@@ -5,25 +5,10 @@ import adminService from '../services/adminService';
 import type { UserResponse, UserCreateData, UserUpdateData, PasswordUpdateData } from '../types/user.types';
 import UserForm from '../components/users/UserForm';
 import StatusToggle from '../components/ui/StatusToggle';
-import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';import ChangePasswordModal from '../components/users/ChangePasswordModal';
+import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
+import ChangePasswordModal from '../components/users/ChangePasswordModal';
+import ConfirmationModal from '../components/ui/ConfirmationModal';
 import './UserManagement.css';
-
-// Componente para el modal de confirmación de borrado
-const ConfirmationModal = ({ message, onConfirm, onCancel, isLoading }: { message: string, onConfirm: () => void, onCancel: () => void, isLoading: boolean }) => (
-    <div className="modal-overlay">
-        <div className="modal-container">
-            <h3>Confirmación Requerida</h3>
-            <p>{message}</p>
-            <div className="modal-actions">
-                <button className="btn-cancel" onClick={onCancel} disabled={isLoading}>Cancelar</button>
-                <button className="btn-delete" onClick={onConfirm} disabled={isLoading}>
-                    {isLoading ? 'Eliminando...' : 'Confirmar'}
-                </button>
-            </div>
-        </div>
-    </div>
-);
-
 
 const UserManagement = () => {
     const queryClient = useQueryClient();
@@ -35,25 +20,30 @@ const UserManagement = () => {
     const [userForPasswordChange, setUserForPasswordChange] = useState<UserResponse | null>(null);
     const [userToDelete, setUserToDelete] = useState<UserResponse | null>(null);
 
-    // --- OBTENCIÓN DE DATOS ---
+    // --- OBTENCIÓN DE DATOS (Corregido para no usar paginación) ---
     const { data: users = [], isLoading, isError, error } = useQuery<UserResponse[]>({
         queryKey: ['users'],
         queryFn: adminService.getUsers,
     });
 
     // --- LÓGICA DE MUTACIONES (Crear, Editar, Borrar, etc.) ---
-
-    // Función genérica para manejar errores de mutación
     const handleMutationError = (error: Error, defaultMessage: string) => {
         console.error(error);
         toast.error(error.message || defaultMessage);
     };
 
+    const mutationOptions = {
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+    };
+
     const createUserMutation = useMutation({
         mutationFn: adminService.createUser,
+        ...mutationOptions,
         onSuccess: () => {
             toast.success('Usuario creado exitosamente.');
-            queryClient.invalidateQueries({ queryKey: ['users'] });
+            mutationOptions.onSuccess();
             setIsFormModalOpen(false);
         },
         onError: (err) => handleMutationError(err, 'Error al crear el usuario.'),
@@ -61,9 +51,10 @@ const UserManagement = () => {
 
     const updateUserMutation = useMutation({
         mutationFn: (variables: { id: number; data: UserUpdateData }) => adminService.updateUser(variables.id, variables.data),
+        ...mutationOptions,
         onSuccess: () => {
             toast.success('Usuario actualizado exitosamente.');
-            queryClient.invalidateQueries({ queryKey: ['users'] });
+            mutationOptions.onSuccess();
             setIsFormModalOpen(false);
         },
         onError: (err) => handleMutationError(err, 'Error al actualizar el usuario.'),
@@ -71,76 +62,46 @@ const UserManagement = () => {
 
     const deleteUserMutation = useMutation({
         mutationFn: adminService.deleteUser,
+        ...mutationOptions,
         onSuccess: () => {
             toast.success('Usuario eliminado exitosamente.');
-            queryClient.invalidateQueries({ queryKey: ['users'] });
-            setUserToDelete(null); // Cierra el modal de confirmación
+            mutationOptions.onSuccess();
+            setUserToDelete(null);
         },
         onError: (err) => handleMutationError(err, 'Error al eliminar el usuario.'),
     });
 
     const updateUserStatusMutation = useMutation({
         mutationFn: (variables: { id: number; data: { active: boolean } }) => adminService.updateUserStatus(variables.id, variables.data),
+        ...mutationOptions,
         onSuccess: () => {
             toast.success('Estado del usuario actualizado.');
-            queryClient.invalidateQueries({ queryKey: ['users'] });
+            mutationOptions.onSuccess();
         },
         onError: (err) => handleMutationError(err, 'Error al cambiar el estado.'),
     });
 
     const changePasswordMutation = useMutation({
         mutationFn: (variables: { id: number; data: PasswordUpdateData }) => adminService.changeUserPassword(variables.id, variables.data),
-        onSuccess: (successMessage) => {
+        ...mutationOptions,
+        onSuccess: (successMessage: string) => {
             toast.success(successMessage);
             setIsPasswordModalOpen(false);
         },
         onError: (err) => handleMutationError(err, 'Error al cambiar la contraseña.'),
     });
 
-
     // --- MANEJADORES DE EVENTOS PARA ABRIR MODALES ---
-    const handleOpenCreateForm = () => {
-        setCurrentUser(null);
-        setIsFormModalOpen(true);
-    };
-
-    const handleOpenEditForm = (user: UserResponse) => {
-        setCurrentUser(user);
-        setIsFormModalOpen(true);
-    };
-
-    const handleOpenPasswordModal = (user: UserResponse) => {
-        setUserForPasswordChange(user);
-        setIsPasswordModalOpen(true);
-    };
-    
-    const handleOpenDeleteModal = (user: UserResponse) => {
-        setUserToDelete(user);
-    };
-
+    const handleOpenCreateForm = () => { setCurrentUser(null); setIsFormModalOpen(true); };
+    const handleOpenEditForm = (user: UserResponse) => { setCurrentUser(user); setIsFormModalOpen(true); };
+    const handleOpenPasswordModal = (user: UserResponse) => { setUserForPasswordChange(user); setIsPasswordModalOpen(true); };
+    const handleOpenDeleteModal = (user: UserResponse) => { setUserToDelete(user); };
 
     // --- MANEJADORES DE ACCIONES ---
-    const handleSaveForm = (data: UserCreateData | UserUpdateData) => {
-        if (currentUser) {
-            updateUserMutation.mutate({ id: currentUser.id, data: data as UserUpdateData });
-        } else {
-            createUserMutation.mutate(data as UserCreateData);
-        }
-    };
-    
-    const handleConfirmDelete = () => {
-        if (userToDelete) {
-            deleteUserMutation.mutate(userToDelete.id);
-        }
-    };
+    const handleSaveForm = (data: UserCreateData | UserUpdateData) => { if (currentUser) { updateUserMutation.mutate({ id: currentUser.id, data: data as UserUpdateData }); } else { createUserMutation.mutate(data as UserCreateData); } };
+    const handleConfirmDelete = () => { if (userToDelete) { deleteUserMutation.mutate(userToDelete.id); } };
+    const handlePasswordSave = (passwordData: PasswordUpdateData) => { if (userForPasswordChange) { changePasswordMutation.mutate({ id: userForPasswordChange.id, data: passwordData }); } };
 
-    const handlePasswordSave = (passwordData: PasswordUpdateData) => {
-        if (userForPasswordChange) {
-            changePasswordMutation.mutate({ id: userForPasswordChange.id, data: passwordData });
-        }
-    };
-
-    // --- RENDERIZADO DEL COMPONENTE ---
     if (isLoading) return <div className="user-management-page"><p>Cargando usuarios...</p></div>;
     if (isError) return <div className="user-management-page"><p className="error-text">Error: {error.message}</p></div>;
 
@@ -181,20 +142,19 @@ const UserManagement = () => {
                                 </td>
                                 <td className="actions">
                                      <ActionsMenu
-                                             items={[
-                                                { label: 'Editar', action: () => handleOpenEditForm(user) },
-                                                { label: 'Cambiar Contraseña', action: () => handleOpenPasswordModal(user) },
-                                                { label: 'Eliminar', action: () => handleOpenDeleteModal(user), className: 'delete' }
+                                        items={[
+                                            { label: 'Editar', action: () => handleOpenEditForm(user) },
+                                            { label: 'Cambiar Contraseña', action: () => handleOpenPasswordModal(user) },
+                                            { label: 'Eliminar', action: () => handleOpenDeleteModal(user), className: 'delete' }
                                         ]}
-    />
-</td>
+                                    />
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
 
-            {/* --- RENDERIZADO CONDICIONAL DE MODALES --- */}
             {isFormModalOpen && (
                  <div className="modal-overlay">
                     <UserForm
@@ -229,3 +189,4 @@ const UserManagement = () => {
 };
 
 export default UserManagement;
+
