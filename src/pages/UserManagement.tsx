@@ -1,14 +1,23 @@
+// src/pages/UserManagement.tsx
+
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import adminService from '../services/adminService';
 import type { UserResponse, UserCreateData, UserUpdateData, PasswordUpdateData } from '../types/user.types';
+import type { Page } from '../types/audit.types'; // Importamos el tipo Page
 import UserForm from '../components/users/UserForm';
 import StatusToggle from '../components/ui/StatusToggle';
 import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
 import ChangePasswordModal from '../components/users/ChangePasswordModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import './UserManagement.css';
+
+// Tipo para la configuración del ordenamiento
+type SortConfig = {
+    key: string;
+    direction: 'asc' | 'desc';
+};
 
 const UserManagement = () => {
     const queryClient = useQueryClient();
@@ -20,13 +29,18 @@ const UserManagement = () => {
     const [userForPasswordChange, setUserForPasswordChange] = useState<UserResponse | null>(null);
     const [userToDelete, setUserToDelete] = useState<UserResponse | null>(null);
 
-    // --- OBTENCIÓN DE DATOS (Corregido para no usar paginación) ---
-    const { data: users = [], isLoading, isError, error } = useQuery<UserResponse[]>({
-        queryKey: ['users'],
-        queryFn: adminService.getUsers,
+    // --- NUEVOS ESTADOS PARA PAGINACIÓN Y ORDENAMIENTO ---
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(8);
+    const [sort, setSort] = useState<SortConfig>({ key: 'name', direction: 'asc' });
+
+    // --- OBTENCIÓN DE DATOS PAGINADOS ---
+    const { data: usersPage, isLoading, isError, error, isFetching } = useQuery<Page<UserResponse>, Error>({
+        queryKey: ['users', page, size, sort],
+        queryFn: () => adminService.getUsers({ page, size, sort: `${sort.key},${sort.direction}` }),
     });
 
-    // --- LÓGICA DE MUTACIONES (Crear, Editar, Borrar, etc.) ---
+    // --- LÓGICA DE MUTACIONES (Sin cambios) ---
     const handleMutationError = (error: Error, defaultMessage: string) => {
         console.error(error);
         toast.error(error.message || defaultMessage);
@@ -91,19 +105,35 @@ const UserManagement = () => {
         onError: (err) => handleMutationError(err, 'Error al cambiar la contraseña.'),
     });
 
-    // --- MANEJADORES DE EVENTOS PARA ABRIR MODALES ---
+    // --- MANEJADORES DE EVENTOS ---
     const handleOpenCreateForm = () => { setCurrentUser(null); setIsFormModalOpen(true); };
     const handleOpenEditForm = (user: UserResponse) => { setCurrentUser(user); setIsFormModalOpen(true); };
     const handleOpenPasswordModal = (user: UserResponse) => { setUserForPasswordChange(user); setIsPasswordModalOpen(true); };
     const handleOpenDeleteModal = (user: UserResponse) => { setUserToDelete(user); };
-
-    // --- MANEJADORES DE ACCIONES ---
     const handleSaveForm = (data: UserCreateData | UserUpdateData) => { if (currentUser) { updateUserMutation.mutate({ id: currentUser.id, data: data as UserUpdateData }); } else { createUserMutation.mutate(data as UserCreateData); } };
     const handleConfirmDelete = () => { if (userToDelete) { deleteUserMutation.mutate(userToDelete.id); } };
     const handlePasswordSave = (passwordData: PasswordUpdateData) => { if (userForPasswordChange) { changePasswordMutation.mutate({ id: userForPasswordChange.id, data: passwordData }); } };
+    
+    // --- NUEVO MANEJADOR PARA ORDENAMIENTO ---
+    const handleSort = (key: string) => {
+        setSort(prevSort => ({
+            key,
+            direction: prevSort.key === key && prevSort.direction === 'asc' ? 'desc' : 'asc'
+        }));
+        setPage(0); // Volvemos a la primera página al cambiar el orden
+    };
+
+    // Helper para renderizar el ícono de ordenamiento
+    const renderSortIcon = (key: string) => {
+        if (sort.key !== key) return <i className="fas fa-sort sort-icon"></i>;
+        if (sort.direction === 'asc') return <i className="fas fa-sort-up sort-icon"></i>;
+        return <i className="fas fa-sort-down sort-icon"></i>;
+    };
 
     if (isLoading) return <div className="user-management-page"><p>Cargando usuarios...</p></div>;
     if (isError) return <div className="user-management-page"><p className="error-text">Error: {error.message}</p></div>;
+    
+    const users = usersPage?.content ?? [];
 
     return (
         <div className="user-management-page">
@@ -118,9 +148,9 @@ const UserManagement = () => {
                 <table>
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Username</th>
-                            <th>Email</th>
+                            <th className="sortable-header" onClick={() => handleSort('name')}>Nombre {renderSortIcon('name')}</th>
+                            <th className="sortable-header" onClick={() => handleSort('username')}>Username {renderSortIcon('username')}</th>
+                            <th className="sortable-header" onClick={() => handleSort('email')}>Email {renderSortIcon('email')}</th>
                             <th>Rol</th>
                             <th>Estado</th>
                             <th>Acciones</th>
@@ -154,6 +184,19 @@ const UserManagement = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* --- CONTROLES DE PAGINACIÓN --- */}
+            {usersPage && usersPage.totalPages > 1 && (
+                <div className="pagination-controls">
+                    <button onClick={() => setPage(page - 1)} disabled={usersPage.first || isFetching}>
+                        Anterior
+                    </button>
+                    <span>Página {usersPage.number + 1} de {usersPage.totalPages}</span>
+                    <button onClick={() => setPage(page + 1)} disabled={usersPage.last || isFetching}>
+                        Siguiente
+                    </button>
+                </div>
+            )}
 
             {isFormModalOpen && (
                  <div className="modal-overlay">
@@ -189,4 +232,3 @@ const UserManagement = () => {
 };
 
 export default UserManagement;
-

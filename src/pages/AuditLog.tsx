@@ -1,3 +1,5 @@
+// src/pages/AuditLog.tsx
+
 import { useState, useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import auditService from '../services/auditService';
@@ -113,10 +115,14 @@ const AuditLog = () => {
         placeholderData: keepPreviousData,
     });
     
-    // Corregido: La query ahora espera un array simple de usuarios
-    const { data: users = [] } = useQuery<UserResponse[]>({
-        queryKey: ['users'], 
-        queryFn: adminService.getUsers,
+    // --- ¡ESTA ES LA CORRECCIÓN! ---
+    // La query ahora extrae el `content` de la respuesta paginada.
+    const { data: users = [] } = useQuery<UserResponse[], Error>({
+        queryKey: ['usersForFilter'], // Usamos una queryKey diferente para no interferir con otras vistas
+        queryFn: async () => {
+            const page = await adminService.getUsers({ size: 1000 }); // Pedimos muchos para el filtro
+            return page.content;
+        },
     });
 
     const affectedTables = ["User", "Farm", "Sector", "Equipment", "Task", "Irrigation", "Fertilization"];

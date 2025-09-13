@@ -1,6 +1,8 @@
+// src/services/adminService.ts
+
 import authService from './authService';
-import type { UserResponse, UserCreateData, UserUpdateData, UserStatusUpdateData, PasswordUpdateData } from '../types/user.types';
-import type { Page } from '../types/audit.types';
+import type { Page } from '../types/audit.types'; // Reutilizamos la interfaz de paginación
+import type { UserResponse, UserCreateData, UserUpdateData, UserStatusUpdateData, PasswordUpdateData, UserRequestParams } from '../types/user.types';
 
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/admin`;
 const AUTH_API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
@@ -15,10 +17,19 @@ const getAuthHeader = (): Record<string, string> => {
 };
 
 /**
- * Obtiene todos los usuarios desde la API. (Ahora maneja paginación)
+ * Obtiene los usuarios desde la API con paginación y ordenamiento.
+ * @param params Objeto con los parámetros de paginación (page, size, sort).
+ * @returns Una promesa que resuelve al objeto de paginación de la API.
  */
-const getUsers = async (): Promise<UserResponse[]> => {
-    const response = await fetch(`${API_URL}/users`, {
+const getUsers = async (params: UserRequestParams = {}): Promise<Page<UserResponse>> => {
+    // Construimos los query params, con valores por defecto si no se proveen.
+    const queryParams = new URLSearchParams({
+        page: (params.page ?? 0).toString(),
+        size: (params.size ?? 10).toString(),
+        sort: params.sort ?? 'name,asc',
+    });
+
+    const response = await fetch(`${API_URL}/users?${queryParams.toString()}`, {
         method: 'GET',
         headers: getAuthHeader(),
     });
@@ -27,11 +38,7 @@ const getUsers = async (): Promise<UserResponse[]> => {
         throw new Error('Error al obtener la lista de usuarios.');
     }
 
-    // --- ¡ESTA ES LA CORRECCIÓN! ---
-    // 1. Leemos la respuesta como un objeto de paginación.
-    const page: Page<UserResponse> = await response.json();
-    // 2. Devolvemos solo el array 'content'.
-    return page.content; 
+    return await response.json();
 };
 
 /**
@@ -106,4 +113,3 @@ const adminService = {
 };
 
 export default adminService;
-

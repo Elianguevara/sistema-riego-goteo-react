@@ -1,3 +1,4 @@
+// src/pages/Dashboard.tsx
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,6 +8,7 @@ import farmService from '../services/farmService';
 import type { KpiResponse, UserStatsResponse } from '../types/dashboard.types';
 import type { UserResponse } from '../types/user.types';
 import type { Farm } from '../types/farm.types';
+import type { Page } from '../types/audit.types'; // Importamos Page
 import StatusToggle from '../components/ui/StatusToggle';
 import './Dashboard.css';
 
@@ -31,13 +33,17 @@ const TableSkeleton = ({ columns, rows = 5 }: { columns: number, rows?: number }
 );
 
 
-// --- TABLA DE USUARIOS CON SKELETON LOADER ---
+// --- TABLA DE USUARIOS CON DATOS LIMITADOS ---
 const UserTable = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const { data: users = [], isLoading, isError, error } = useQuery<UserResponse[], Error>({
-        queryKey: ['users'],
-        queryFn: adminService.getUsers,
+    
+    // La query ahora espera un objeto Page<UserResponse>
+    const { data: usersPage, isLoading, isError, error } = useQuery<Page<UserResponse>, Error>({
+        queryKey: ['usersDashboard'], // Usamos una key diferente para no colisionar
+        queryFn: () => adminService.getUsers({ page: 0, size: 5, sort: 'lastLogin,desc' }),
     });
+
+    const users = usersPage?.content ?? [];
 
     const filteredUsers = useMemo(() => {
         if (!searchTerm) return users;
@@ -54,7 +60,7 @@ const UserTable = () => {
     return (
         <div className="dashboard-table-container">
             <div className="table-header">
-                <h2 className="table-title">Usuarios</h2>
+                <h2 className="table-title">Usuarios Recientes</h2>
                 <div className="search-container">
                     <i className="fas fa-search search-icon"></i>
                     <input
@@ -92,6 +98,7 @@ const UserTable = () => {
     );
 };
 
+// --- (El resto de Dashboard.tsx no necesita cambios) ---
 // --- TABLA DE FINCAS CON SKELETON LOADER ---
 const FarmsTable = () => {
     const navigate = useNavigate();
