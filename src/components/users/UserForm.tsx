@@ -1,42 +1,47 @@
+// src/components/users/UserForm.tsx
+
 import React, { useState, useEffect } from 'react';
-// Importamos todos los tipos que usaremos para mayor claridad
 import type { UserResponse, UserCreateData, UserUpdateData } from '../../types/user.types';
 import './UserForm.css';
 
 interface UserFormProps {
     currentUser: UserResponse | null;
-    // La función onSave es ahora más inteligente y recibirá el tipo de dato correcto
     onSave: (data: UserCreateData | UserUpdateData) => void;
     onCancel: () => void;
-    isLoading: boolean; // Prop para saber si una operación está en curso
+    isLoading: boolean;
 }
 
 const UserForm: React.FC<UserFormProps> = ({ currentUser, onSave, onCancel, isLoading }) => {
-    // Usamos UserCreateData como el estado base del formulario
-    const [formData, setFormData] = useState<UserCreateData>({
-        name: '',
+    // 1. Estado local con nombre y apellido separados
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
         username: '',
         password: '',
         email: '',
-        rol: 'OPERARIO',
+        rol: 'OPERARIO' as 'ADMIN' | 'ANALISTA' | 'OPERARIO',
     });
 
     const isEditing = currentUser !== null;
 
-    // Este efecto se encarga de rellenar o resetear el formulario
     useEffect(() => {
         if (isEditing && currentUser) {
+            // 2. Al editar, separamos el nombre completo en nombre y apellido
+            const nameParts = currentUser.name.split(' ');
+            const firstName = nameParts.shift() || '';
+            const lastName = nameParts.join(' ');
+
             setFormData({
-                name: currentUser.name,
+                firstName: firstName,
+                lastName: lastName,
                 username: currentUser.username,
                 email: currentUser.email,
-                // Aseguramos que el rol sea uno de los valores permitidos
-                rol: (currentUser.roleName as 'ADMIN' | 'ANALISTA' | 'OPERARIO') || 'OPERARIO',
+                rol: currentUser.roleName as 'ADMIN' | 'ANALISTA' | 'OPERARIO',
                 password: '' 
             });
         } else {
             // Resetea el formulario para el modo de creación
-            setFormData({ name: '', username: '', password: '', email: '', rol: 'OPERARIO' });
+            setFormData({ firstName: '', lastName: '', username: '', password: '', email: '', rol: 'OPERARIO' });
         }
     }, [currentUser, isEditing]);
 
@@ -44,25 +49,28 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onSave, onCancel, isLo
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
-
-    /**
-     * MEJORA CLAVE:
-     * El manejador del submit ahora diferencia entre crear y editar para enviar
-     * solo los campos necesarios a la API.
-     */
+    
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        // 3. Unimos nombre y apellido antes de enviar
+        const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+
         if (isEditing) {
-            // Si estamos editando, creamos un objeto con solo los campos de actualización
             const updateData: UserUpdateData = {
-                name: formData.name,
+                name: fullName,
                 email: formData.email,
             };
             onSave(updateData);
         } else {
-            // Si estamos creando, enviamos el formulario completo
-            onSave(formData);
+            const createData: UserCreateData = {
+                name: fullName,
+                username: formData.username,
+                password: formData.password,
+                email: formData.email,
+                rol: formData.rol,
+            };
+            onSave(createData);
         }
     };
 
@@ -71,9 +79,14 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onSave, onCancel, isLo
             <h3>{isEditing ? 'Editar Usuario' : 'Crear Usuario'}</h3>
             <form onSubmit={handleSubmit} className="user-form">
                 <div className="form-grid">
+                    {/* 4. Nuevos campos en la interfaz */}
                     <div className="form-group">
-                        <label htmlFor="name">Nombre</label>
-                        <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+                        <label htmlFor="firstName">Nombre</label>
+                        <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="lastName">Apellido</label>
+                        <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="username">Nombre de usuario</label>
@@ -84,7 +97,6 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onSave, onCancel, isLo
                         <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                     </div>
                     
-                    {/* El campo de contraseña solo aparece en modo creación */}
                     {!isEditing && (
                         <div className="form-group">
                             <label htmlFor="password">Contraseña</label>
@@ -94,7 +106,6 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onSave, onCancel, isLo
 
                     <div className="form-group">
                         <label htmlFor="rol">Rol</label>
-                        {/* El rol no se puede editar una vez creado, según la API */}
                         <select id="rol" name="rol" value={formData.rol} onChange={handleChange} disabled={isEditing}>
                             <option value="ANALISTA">Analista</option>
                             <option value="OPERARIO">Operario</option>
@@ -103,7 +114,6 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onSave, onCancel, isLo
                     </div>
                 </div>
 
-                {/* MEJORA UX: Los botones se deshabilitan mientras se guarda */}
                 <div className="form-actions">
                     <button type="submit" className="btn-save" disabled={isLoading}>
                         {isLoading ? 'Guardando...' : 'Guardar'}

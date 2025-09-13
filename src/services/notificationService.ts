@@ -1,10 +1,11 @@
-// Archivo: src/services/notificationService.ts
+// src/services/notificationService.ts
 
 import authService from './authService';
 import type { Notification, NotificationPage } from '../types/notification.types';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/notifications`;
 
+// ... (getAuthHeader no cambia)
 const getAuthHeader = (): Record<string, string> => {
     const token = authService.getToken();
     return {
@@ -13,10 +14,7 @@ const getAuthHeader = (): Record<string, string> => {
     };
 };
 
-/**
- * Obtiene las notificaciones paginadas para el usuario logueado.
- * Endpoint: GET /api/notifications
- */
+// ... (getNotifications no cambia)
 const getNotifications = async (page = 0, size = 10): Promise<NotificationPage> => {
     const response = await fetch(`${API_BASE_URL}?page=${page}&size=${size}&sort=createdAt,desc`, {
         headers: getAuthHeader(),
@@ -27,17 +25,27 @@ const getNotifications = async (page = 0, size = 10): Promise<NotificationPage> 
     return response.json();
 };
 
+// --- FUNCIÓN NUEVA ---
 /**
- * Marca una notificación específica como leída.
- * Endpoint: PUT /api/notifications/{id}/read
+ * Obtiene el conteo total de notificaciones no leídas.
+ * Endpoint: GET /api/notifications/unread-count
  */
+const getUnreadCount = async (): Promise<{ unreadCount: number }> => {
+    const response = await fetch(`${API_BASE_URL}/unread-count`, {
+        headers: getAuthHeader(),
+    });
+    if (!response.ok) {
+        throw new Error('Error al obtener el conteo de notificaciones.');
+    }
+    return response.json();
+};
+
+// ... (markAsRead no cambia)
 const markAsRead = async (notificationId: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/${notificationId}/read`, {
         method: 'PUT',
         headers: getAuthHeader(),
     });
-
-    // El status 204 No Content no devuelve cuerpo, pero es una respuesta exitosa
     if (response.status !== 204) {
         throw new Error('Error al marcar la notificación como leída.');
     }
@@ -45,6 +53,7 @@ const markAsRead = async (notificationId: number): Promise<void> => {
 
 const notificationService = {
     getNotifications,
+    getUnreadCount, // <-- Exportar la nueva función
     markAsRead,
 };
 

@@ -1,12 +1,13 @@
-// Archivo: src/pages/NotificationHistory.tsx
+// src/pages/NotificationHistory.tsx
 
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import notificationService from '../services/notificationService';
 import type { Notification, NotificationPage } from '../types/notification.types';
 import './NotificationHistory.css';
 
-// ... (la función timeAgo no cambia)
 const timeAgo = (dateString: string): string => {
     const date = new Date(dateString);
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -23,56 +24,40 @@ const timeAgo = (dateString: string): string => {
     return "Hace un momento";
 };
 
-
 const NotificationHistory = () => {
     const queryClient = useQueryClient();
-    const historyQueryKey = ['notifications', 'history'];
-    const bellQueryKey = ['notifications'];
+    const [page, setPage] = useState(0);
+    const [size, ] = useState(6); // Tamaño de página fijado en 6
+    
+    const historyQueryKey = ['notifications', 'history', page, size];
 
-    const { data: notificationPage, isLoading } = useQuery<NotificationPage, Error>({
+    const { data: notificationPage, isLoading, isFetching } = useQuery<NotificationPage, Error>({
         queryKey: historyQueryKey,
-        queryFn: () => notificationService.getNotifications(0, 20),
+        queryFn: () => notificationService.getNotifications(page, size),
     });
 
     const markAsReadMutation = useMutation({
         mutationFn: notificationService.markAsRead,
-        // --- INICIO DE LA MODIFICACIÓN: Lógica optimista y onSuccess ---
         onMutate: async (notificationId: number) => {
-            // Cancelamos queries de ambas vistas (historial y campana)
             await queryClient.cancelQueries({ queryKey: historyQueryKey });
-            await queryClient.cancelQueries({ queryKey: bellQueryKey });
-
             const previousHistory = queryClient.getQueryData<NotificationPage>(historyQueryKey);
-            const previousBell = queryClient.getQueryData<NotificationPage>(bellQueryKey);
-
-            // Actualización optimista para la página de historial
             queryClient.setQueryData<NotificationPage>(historyQueryKey, oldData => {
                 if (!oldData) return oldData;
                 return { ...oldData, content: oldData.content.map(n => n.id === notificationId ? { ...n, isRead: true } : n) };
             });
-
-            // Actualización optimista para la campana
-            queryClient.setQueryData<NotificationPage>(bellQueryKey, oldData => {
-                if (!oldData) return oldData;
-                return { ...oldData, content: oldData.content.map(n => n.id === notificationId ? { ...n, isRead: true } : n) };
-            });
-
-            return { previousHistory, previousBell };
+            return { previousHistory };
         },
         onSuccess: () => {
-            // Invalidamos ambas queries en caso de éxito para sincronizar con el servidor
-            queryClient.invalidateQueries({ queryKey: historyQueryKey });
-            queryClient.invalidateQueries({ queryKey: bellQueryKey });
+            // Se restaura el toast de éxito
+            toast.success("Notificación marcada como leída.");
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         },
-        onError: (_err, _vars, context) => {
+        onError: (err: Error, _vars, context) => {
+            toast.error(err.message || "No se pudo marcar como leída.");
             if (context?.previousHistory) {
                 queryClient.setQueryData(historyQueryKey, context.previousHistory);
             }
-            if (context?.previousBell) {
-                queryClient.setQueryData(bellQueryKey, context.previousBell);
-            }
         },
-        // --- FIN DE LA MODIFICACIÓN ---
     });
 
     const handleMarkAsRead = (notification: Notification) => {
@@ -89,7 +74,6 @@ const NotificationHistory = () => {
 
     return (
         <div className="notification-history-page">
-            {/* ... (el resto del JSX no cambia) ... */}
             <div className="page-header">
                 <h1>Historial de Notificaciones</h1>
             </div>
@@ -106,13 +90,16 @@ const NotificationHistory = () => {
                                 <span className="item-time">{timeAgo(n.createdAt)}</span>
                                 {n.link && <Link to={n.link} className="item-link">Ver detalle</Link>}
                             </div>
+                            
                             {!n.isRead && (
                                 <button
                                     className="btn-mark-read"
                                     onClick={() => handleMarkAsRead(n)}
-                                    disabled={markAsReadMutation.isPending}
+                                    disabled={markAsReadMutation.isPending && markAsReadMutation.variables === n.id}
                                 >
-                                    Marcar como leída
+                                    {markAsReadMutation.isPending && markAsReadMutation.variables === n.id 
+                                        ? 'Marcando...' 
+                                        : 'Marcar como leída'}
                                 </button>
                             )}
                         </div>
@@ -123,6 +110,18 @@ const NotificationHistory = () => {
                     </div>
                 )}
             </div>
+
+            {notificationPage && notificationPage.totalPages > 1 && (
+                <div className="pagination-controls" style={{ marginTop: '20px' }}>
+                    <button onClick={() => setPage(page - 1)} disabled={notificationPage.first || isFetching}>
+                        Anterior
+                    </button>
+                    <span>Página {notificationPage.number + 1} de {notificationPage.totalPages}</span>
+                    <button onClick={() => setPage(page + 1)} disabled={notificationPage.last || isFetching}>
+                        Siguiente
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

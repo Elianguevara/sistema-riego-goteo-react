@@ -1,19 +1,25 @@
+// src/components/layout/ProfileMenu.tsx
+
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
-import { useAuthData } from '../../hooks/useAuthData'; // <-- 1. Importa el hook
+import { useAuthData } from '../../hooks/useAuthData';
 import './ProfileMenu.css';
 
-// Función helper para obtener las iniciales del nombre de usuario
+// Función helper mejorada para obtener iniciales
 const getInitials = (name: string = '') => {
-  return name.substring(0, 2).toUpperCase();
+  if (!name) return '?';
+  const nameParts = name.split(' ');
+  const firstNameInitial = nameParts[0] ? nameParts[0][0] : '';
+  const lastNameInitial = nameParts.length > 1 ? nameParts[nameParts.length - 1][0] : '';
+  return `${firstNameInitial}${lastNameInitial}`.toUpperCase();
 };
 
 const ProfileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const authData = useAuthData(); // <-- 2. Usa el hook para obtener los datos
+  const authData = useAuthData();
 
   const handleLogout = () => {
     authService.logout();
@@ -33,11 +39,11 @@ const ProfileMenu = () => {
   return (
     <div className="profile-menu-container" ref={menuRef}>
       <button className="profile-menu-trigger" onClick={() => setIsOpen(!isOpen)}>
-        {/* 3. Usa los datos del hook para el avatar */}
-        <div className="avatar">{getInitials(authData?.username)}</div>
+        {/* Usar el nombre para las iniciales */}
+        <div className="avatar">{getInitials(authData?.name)}</div>
         <div className="user-info">
-            {/* 4. Usa los datos del hook para el nombre y el rol */}
-            <span className="user-name">{authData?.username ?? 'Usuario'}</span>
+            {/* Mostrar el nombre en lugar del username */}
+            <span className="user-name">{authData?.name ?? 'Usuario'}</span>
             <span className="user-role">{authData?.role ?? 'Invitado'}</span>
         </div>
         <i className={`fas fa-chevron-down arrow-icon ${isOpen ? 'open' : ''}`}></i>

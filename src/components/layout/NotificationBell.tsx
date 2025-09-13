@@ -1,4 +1,4 @@
-// Archivo: src/components/layout/NotificationBell.tsx
+// src/components/layout/NotificationBell.tsx
 
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,8 +7,8 @@ import notificationService from '../../services/notificationService';
 import type { Notification, NotificationPage } from '../../types/notification.types';
 import './NotificationBell.css';
 
-// ... (la función timeAgo no cambia)
 const timeAgo = (dateString: string): string => {
+    // ... (función timeAgo sin cambios)
     const date = new Date(dateString);
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
     let interval = seconds / 31536000;
@@ -29,42 +29,29 @@ const NotificationBell = () => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const queryKey = ['notifications'];
-
+    // --- QUERIES SEPARADAS ---
+    // Query para la lista del dropdown (las 5 más recientes)
     const { data: notificationPage } = useQuery<NotificationPage, Error>({
-        queryKey,
+        queryKey: ['notifications', 'dropdown'],
         queryFn: () => notificationService.getNotifications(0, 5),
-        refetchInterval: 60000,
+        refetchInterval: 60000, 
     });
+
+    // Query para el contador de la campana
+    const { data: countData } = useQuery<{ unreadCount: number }, Error>({
+        queryKey: ['notifications', 'unreadCount'],
+        queryFn: notificationService.getUnreadCount,
+        refetchInterval: 60000, // También se actualiza cada minuto
+    });
+    // --- FIN QUERIES ---
 
     const markAsReadMutation = useMutation({
         mutationFn: notificationService.markAsRead,
-        onMutate: async (notificationId: number) => {
-            await queryClient.cancelQueries({ queryKey });
-            const previousNotifications = queryClient.getQueryData<NotificationPage>(queryKey);
-            queryClient.setQueryData<NotificationPage>(queryKey, oldData => {
-                if (!oldData) return oldData;
-                return {
-                    ...oldData,
-                    content: oldData.content.map(n =>
-                        n.id === notificationId ? { ...n, isRead: true } : n
-                    ),
-                };
-            });
-            return { previousNotifications };
-        },
-        // --- INICIO DE LA MODIFICACIÓN ---
-        // La invalidación ahora solo ocurre en caso de éxito
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey });
+            // Cuando una notificación se marca como leída, invalidamos TODAS las queries
+            // de notificaciones. Esto hará que tanto el contador como la lista se actualicen.
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         },
-        // --- FIN DE LA MODIFICACIÓN ---
-        onError: (_err, _vars, context) => {
-            if (context?.previousNotifications) {
-                queryClient.setQueryData(queryKey, context.previousNotifications);
-            }
-        },
-        // Se elimina onSettled para evitar la recarga prematura
     });
 
     const handleNotificationClick = (notification: Notification) => {
@@ -75,6 +62,7 @@ const NotificationBell = () => {
     };
 
     useEffect(() => {
+        // ... (código para cerrar el dropdown sin cambios)
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
@@ -85,7 +73,7 @@ const NotificationBell = () => {
     }, []);
 
     const notifications = notificationPage?.content ?? [];
-    const unreadCount = notifications.filter(n => !n.isRead).length;
+    const unreadCount = countData?.unreadCount ?? 0; // Usamos el dato de la nueva query
 
     return (
         <div className="notification-bell" ref={menuRef}>
@@ -93,9 +81,9 @@ const NotificationBell = () => {
                 <i className="fas fa-bell"></i>
                 {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
             </button>
+            
             {isOpen && (
                 <div className="notification-dropdown">
-                    {/* ... (el resto del JSX no cambia) ... */}
                     <div className="dropdown-header">
                         <h3>Notificaciones</h3>
                     </div>
@@ -103,7 +91,7 @@ const NotificationBell = () => {
                         {notifications.length > 0 ? (
                             notifications.map(n => (
                                 <Link
-                                    to="/notifications"
+                                    to={n.link || '#'} // Usamos el link si existe
                                     key={n.id}
                                     className={`notification-item ${n.isRead ? 'read' : ''}`}
                                     onClick={() => handleNotificationClick(n)}
@@ -114,7 +102,7 @@ const NotificationBell = () => {
                             ))
                         ) : (
                             <div className="empty-notifications">
-                                No tienes notificaciones nuevas.
+                                No tienes notificaciones.
                             </div>
                         )}
                     </div>
