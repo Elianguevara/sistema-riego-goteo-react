@@ -1,29 +1,24 @@
 // Archivo: src/App.tsx
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/auth/Login';
-import ProtectedRoute from './components/utils/ProtectedRoute';
-import AdminLayout from './components/layout/AdminLayout';
-import Dashboard from './pages/Dashboard';
-import UserManagement from './pages/UserManagement';
-import UserProfile from './pages/UserProfile';
-import FarmManagement from './pages/FarmManagement';
-import FarmDetail from './pages/FarmDetail';
-import Configuration from './pages/Configuration';
-import AuditLog from './pages/AuditLog';
-import NotificationHistory from './pages/NotificationHistory';
-import MyTasks from './pages/operator/MyTasks';
-import TaskManagement from './pages/analyst/TaskManagement';
-import { useAuthData } from './hooks/useAuthData';
-import RegisterIrrigation from './pages/operator/RegisterIrrigation';
-import RegisterFertilization from './pages/operator/RegisterFertilization';
-// --- INICIO DE LA CORRECCIÓN ---
-// Se importa el componente de página real.
-import RegisterMaintenance from './pages/operator/RegisterMaintenance';
-
-// Se elimina el componente temporal que estaba aquí.
-const Logbook = () => <div>Página de Bitácora (en construcción)</div>;
-// --- FIN DE LA CORRECCIÓN ---
+import Login from './components/auth/Login.tsx';
+import ProtectedRoute from './components/utils/ProtectedRoute.tsx';
+import AdminLayout from './components/layout/AdminLayout.tsx';
+import Dashboard from './pages/Dashboard.tsx';
+import UserManagement from './pages/UserManagement.tsx';
+import UserProfile from './pages/UserProfile.tsx';
+import FarmManagement from './pages/FarmManagement.tsx';
+import FarmDetail from './pages/FarmDetail.tsx';
+import Configuration from './pages/Configuration.tsx';
+import AuditLog from './pages/AuditLog.tsx';
+import NotificationHistory from './pages/NotificationHistory.tsx';
+import MyTasks from './pages/operator/MyTasks.tsx';
+import TaskManagement from './pages/analyst/TaskManagement.tsx';
+import { useAuthData } from './hooks/useAuthData.ts';
+import RegisterIrrigation from './pages/operator/RegisterIrrigation.tsx';
+import RegisterFertilization from './pages/operator/RegisterFertilization.tsx';
+import RegisterMaintenance from './pages/operator/RegisterMaintenance.tsx';
+import OperationLogbook from './pages/operator/OperationLogbook.tsx';
 
 
 // Componente de redirección para la página de inicio según el rol
@@ -94,7 +89,7 @@ function App() {
           path="operator/logbook"
           element={
             <ProtectedRoute allowedRoles={['OPERARIO']}>
-              <Logbook />
+              <OperationLogbook />
             </ProtectedRoute>
           }
         />
@@ -179,3 +174,4 @@ function App() {
 }
 
 export default App;
+

@@ -219,6 +219,7 @@ const getActiveSectors = async (): Promise<Sector[]> => {
     return response.json();
 };
 
+
 const farmService = {
     getFarms,
     createFarm,
