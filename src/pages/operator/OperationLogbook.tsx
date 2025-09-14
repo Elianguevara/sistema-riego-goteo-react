@@ -1,15 +1,14 @@
 // Archivo: src/pages/operator/OperationLogbook.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import farmService from '../../services/farmService';
 import operationLogService from '../../services/operationLogService';
 import type { Farm } from '../../types/farm.types';
 import type { OperationLog } from '../../types/operationLog.types';
 import OperationLogForm from '../../components/logbook/OperationLogForm';
-import './RegisterIrrigation.css'; // Reutilizamos estos estilos
+import './RegisterIrrigation.css';
 
-// Componente para mostrar la lista de logs
 const LogList = ({ farmId }: { farmId: number }) => {
     const { data: logs = [], isLoading } = useQuery<OperationLog[], Error>({
         queryKey: ['operationLogs', farmId],
@@ -50,14 +49,26 @@ const OperationLogbook = () => {
 
     const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['myFarms'], queryFn: farmService.getFarms });
 
+    // Efecto para auto-seleccionar la finca si solo hay una
+    useEffect(() => {
+        if (selectedFarmId || farms.length !== 1) return;
+        setSelectedFarmId(farms[0].id);
+    }, [farms, selectedFarmId]);
+
     return (
         <div className="register-irrigation-page">
             <h1>Bitácora de Operaciones</h1>
             <div className="filters-bar">
-                <select onChange={(e) => setSelectedFarmId(Number(e.target.value))} value={selectedFarmId || ''}>
-                    <option value="">Seleccione una Finca...</option>
-                    {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-                </select>
+                {farms.length === 1 ? (
+                    <div className="farm-display">
+                        <strong>Finca:</strong> {farms[0].name}
+                    </div>
+                ) : (
+                    <select onChange={(e) => setSelectedFarmId(Number(e.target.value))} value={selectedFarmId || ''}>
+                        <option value="">Seleccione una Finca...</option>
+                        {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                    </select>
+                )}
                 <button className="create-user-btn" onClick={() => setIsFormOpen(!isFormOpen)} disabled={!selectedFarmId}>
                      <i className={`fas ${isFormOpen ? 'fa-times' : 'fa-plus'}`}></i>
                      {isFormOpen ? 'Cancelar' : 'Nueva Entrada'}

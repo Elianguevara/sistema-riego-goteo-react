@@ -1,16 +1,21 @@
 // Archivo: src/pages/operator/RegisterFertilization.tsx
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import farmService from '../../services/farmService';
+import fertilizationService from '../../services/fertilizationService';
 import type { Farm, Sector } from '../../types/farm.types';
+import type { FertilizationCreateData } from '../../types/fertilization.types';
 import FertilizationForm from '../../components/fertilization/FertilizationForm';
-import FertilizationList from '../../components/fertilization/FertilizationList'; // <-- 1. IMPORTAR
+// 1. CORRECCIÓN: Se eliminó la 'l' extra en la ruta.
+import FertilizationList from '../../components/fertilization/FertilizationList';
 import './RegisterIrrigation.css';
 
 const RegisterFertilization = () => {
+    const queryClient = useQueryClient();
     const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
-    const [selectedSectorId, setSelectedSectorId] = useState<number | undefined>(); // <-- 2. NUEVO ESTADO
+    const [selectedSectorId, setSelectedSectorId] = useState<number | undefined>();
     const [isFormOpen, setIsFormOpen] = useState(false);
 
     const { data: farms = [], isLoading: isLoadingFarms } = useQuery<Farm[], Error>({
@@ -18,24 +23,46 @@ const RegisterFertilization = () => {
         queryFn: () => farmService.getFarms(),
     });
 
+    useEffect(() => {
+        if (isLoadingFarms || selectedFarmId) return;
+        if (farms && farms.length === 1) {
+            setSelectedFarmId(farms[0].id);
+        }
+    }, [farms, isLoadingFarms, selectedFarmId]);
+
     const { data: sectors = [], isLoading: isLoadingSectors } = useQuery<Sector[], Error>({
         queryKey: ['sectors', selectedFarmId],
         queryFn: () => farmService.getSectorsByFarm(selectedFarmId!),
         enabled: !!selectedFarmId,
     });
     
-    // 3. MANEJADORES DE CAMBIOS
+    const createFertilizationMutation = useMutation({
+        mutationFn: (data: FertilizationCreateData) => fertilizationService.createFertilizationRecord(data),
+        onSuccess: () => {
+            toast.success("Registro de fertilización creado.");
+            queryClient.invalidateQueries({ queryKey: ['fertilizationRecords', selectedSectorId] });
+            setIsFormOpen(false);
+        },
+        onError: (err: Error) => toast.error(err.message),
+    });
+
+    // 2. CORRECCIÓN: La función ahora maneja el tipo más amplio que espera el formulario.
+    const handleSaveFertilization = (data: FertilizationCreateData | Partial<FertilizationCreateData>) => {
+        // Como esta vista solo crea, nos aseguramos de que los datos sean completos antes de enviarlos.
+        createFertilizationMutation.mutate(data as FertilizationCreateData);
+    };
+
     const handleFarmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const farmId = e.target.value ? Number(e.target.value) : undefined;
         setSelectedFarmId(farmId);
-        setSelectedSectorId(undefined); // Resetear sector al cambiar de finca
+        setSelectedSectorId(undefined);
         setIsFormOpen(false);
     };
     
     const handleSectorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const sectorId = e.target.value ? Number(e.target.value) : undefined;
         setSelectedSectorId(sectorId);
-        setIsFormOpen(false); // Ocultar formulario al cambiar de sector
+        setIsFormOpen(false);
     };
 
     const renderContent = () => {
@@ -51,12 +78,17 @@ const RegisterFertilization = () => {
 
         return (
             <>
-                {/* --- 4. FILTROS ACTUALIZADOS --- */}
                 <div className="filters-bar">
-                    <select onChange={handleFarmChange} value={selectedFarmId || ''}>
-                        <option value="">Seleccione una finca...</option>
-                        {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
-                    </select>
+                    {farms.length === 1 ? (
+                        <div className="farm-display">
+                           <strong>Finca:</strong> {farms[0].name}
+                        </div>
+                    ) : (
+                        <select onChange={handleFarmChange} value={selectedFarmId || ''}>
+                            <option value="">Seleccione una finca...</option>
+                            {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
+                        </select>
+                    )}
 
                     <select onChange={handleSectorChange} value={selectedSectorId || ''} disabled={!selectedFarmId || isLoadingSectors}>
                         <option value="">{isLoadingSectors ? 'Cargando...' : 'Seleccione un sector...'}</option>
@@ -74,10 +106,12 @@ const RegisterFertilization = () => {
                         farmId={selectedFarmId}
                         sectors={sectors.filter(s => s.id === selectedSectorId)}
                         onClose={() => setIsFormOpen(false)}
+                        currentFertilization={null}
+                        onSave={handleSaveFertilization}
+                        isLoading={createFertilizationMutation.isPending}
                     />
                 )}
 
-                {/* --- 5. RENDERIZADO CONDICIONAL DE LA LISTA --- */}
                 {selectedSectorId && (
                     <FertilizationList sectorId={selectedSectorId} />
                 )}

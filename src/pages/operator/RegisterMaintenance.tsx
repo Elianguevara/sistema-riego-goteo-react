@@ -1,16 +1,13 @@
 // Archivo: src/pages/operator/RegisterMaintenance.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import farmService from '../../services/farmService';
 import maintenanceService from '../../services/maintenanceService';
 import type { Farm, IrrigationEquipment } from '../../types/farm.types';
 import type { MaintenanceRecord } from '../../types/maintenance.types';
 import MaintenanceForm from '../../components/maintenance/MaintenanceForm';
-// --- INICIO DE LA CORRECCIÓN ---
-// La ruta correcta es './' porque el archivo CSS está en el mismo directorio.
-import './RegisterIrrigation.css'; // Reutilizamos estilos
-// --- FIN DE LA CORRECCIÓN ---
+import './RegisterIrrigation.css';
 
 const MaintenanceList = ({ farmId, equipmentId }: { farmId: number, equipmentId: number }) => {
     const { data: records = [], isLoading } = useQuery<MaintenanceRecord[], Error>({
@@ -53,6 +50,13 @@ const RegisterMaintenance = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
 
     const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['myFarms'], queryFn: farmService.getFarms });
+
+    // Efecto para auto-seleccionar la finca si solo hay una
+    useEffect(() => {
+        if (farmId || farms.length !== 1) return;
+        setFarmId(farms[0].id);
+    }, [farms, farmId]);
+
     const { data: equipments = [] } = useQuery<IrrigationEquipment[]>({
         queryKey: ['equipments', farmId],
         queryFn: () => farmService.getEquipmentsByFarm(farmId!),
@@ -74,10 +78,16 @@ const RegisterMaintenance = () => {
         <div className="register-irrigation-page">
             <h1>Registro de Mantenimiento</h1>
             <div className="filters-bar">
-                <select onChange={handleFarmChange} value={farmId || ''}>
-                    <option value="">Seleccione Finca...</option>
-                    {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-                </select>
+                {farms.length === 1 ? (
+                    <div className="farm-display">
+                        <strong>Finca:</strong> {farms[0].name}
+                    </div>
+                ) : (
+                    <select onChange={handleFarmChange} value={farmId || ''}>
+                        <option value="">Seleccione Finca...</option>
+                        {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                    </select>
+                )}
                 <select onChange={handleEquipmentChange} value={equipmentId || ''} disabled={!farmId}>
                     <option value="">Seleccione Equipo...</option>
                     {equipments.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}

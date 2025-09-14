@@ -1,6 +1,6 @@
 // Archivo: src/pages/operator/RegisterIrrigation.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // 1. Importar useEffect
 import { useQuery } from '@tanstack/react-query';
 import farmService from '../../services/farmService';
 import irrigationService from '../../services/irrigationService';
@@ -19,6 +19,18 @@ const RegisterIrrigation = () => {
         queryKey: ['myFarms'],
         queryFn: () => farmService.getFarms(),
     });
+
+    // 2. Usar useEffect para auto-seleccionar la finca
+    useEffect(() => {
+        // Si no hay fincas cargadas o ya hay una seleccionada, no hacer nada.
+        if (isLoadingFarms || selectedFarmId) return;
+
+        // Si el servicio devuelve exactamente una finca, la seleccionamos por defecto.
+        if (farms && farms.length === 1) {
+            setSelectedFarmId(farms[0].id);
+        }
+    }, [farms, isLoadingFarms, selectedFarmId]);
+
 
     const { data: monthlyData = [], isLoading: isLoadingIrrigations } = useQuery({
         queryKey: ['irrigations', selectedFarmId, year, month],
@@ -66,17 +78,22 @@ const RegisterIrrigation = () => {
             );
         }
 
-        // --- LÓGICA DE CARGA CORREGIDA ---
-        // Combinamos todos los estados de carga de la finca seleccionada.
         const isFarmDataLoading = isLoadingIrrigations || isLoadingSectors || isLoadingWeather;
 
         return (
             <>
                 <div className="filters-bar">
-                    <select onChange={(e) => setSelectedFarmId(e.target.value ? Number(e.target.value) : undefined)} value={selectedFarmId || ''}>
-                        <option value="">Seleccione una finca</option>
-                        {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
-                    </select>
+                    {/* 3. Lógica para mostrar el nombre de la finca o el selector */}
+                    {farms.length === 1 ? (
+                        <div className="farm-display">
+                           <strong>Finca:</strong> {farms[0].name}
+                        </div>
+                    ) : (
+                        <select onChange={(e) => setSelectedFarmId(e.target.value ? Number(e.target.value) : undefined)} value={selectedFarmId || ''}>
+                            <option value="">Seleccione una finca</option>
+                            {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
+                        </select>
+                    )}
 
                     {selectedFarmId && (
                         <div className="month-navigator">
@@ -88,7 +105,6 @@ const RegisterIrrigation = () => {
                 </div>
 
                 {selectedFarmId ? (
-                    // Mostramos un mensaje de carga unificado.
                     isFarmDataLoading ? <p>Cargando datos de la finca...</p> :
                     <DailyIrrigationView
                         farmId={selectedFarmId}
@@ -97,11 +113,11 @@ const RegisterIrrigation = () => {
                         year={year}
                         month={month}
                         weatherData={weatherData}
-                        isLoadingWeather={isLoadingWeather} // Se sigue pasando por si el hijo lo necesita
+                        isLoadingWeather={isLoadingWeather}
                         weatherError={weatherError}
                     />
                 ) : (
-                    <div className="empty-state">
+                     <div className="empty-state">
                         <i className="fas fa-hand-pointer empty-icon"></i>
                         <h3>Seleccione una Finca</h3>
                         <p>Por favor, elija una finca para ver y registrar los riegos y precipitaciones.</p>
