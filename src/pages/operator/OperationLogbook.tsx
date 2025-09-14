@@ -1,5 +1,3 @@
-// Archivo: src/pages/operator/OperationLogbook.tsx
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import farmService from '../../services/farmService';
@@ -7,7 +5,7 @@ import operationLogService from '../../services/operationLogService';
 import type { Farm } from '../../types/farm.types';
 import type { OperationLog } from '../../types/operationLog.types';
 import OperationLogForm from '../../components/logbook/OperationLogForm';
-import './RegisterIrrigation.css';
+import './RegisterIrrigation.css'; // Usa los mismos estilos
 
 const LogList = ({ farmId }: { farmId: number }) => {
     const { data: logs = [], isLoading } = useQuery<OperationLog[], Error>({
@@ -49,7 +47,6 @@ const OperationLogbook = () => {
 
     const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['myFarms'], queryFn: farmService.getFarms });
 
-    // Efecto para auto-seleccionar la finca si solo hay una
     useEffect(() => {
         if (selectedFarmId || farms.length !== 1) return;
         setSelectedFarmId(farms[0].id);
@@ -76,9 +73,9 @@ const OperationLogbook = () => {
             </div>
 
             {isFormOpen && selectedFarmId && (
-                <div className="modal-overlay">
-                    <OperationLogForm farmId={selectedFarmId} onClose={() => setIsFormOpen(false)} />
-                </div>
+                // El formulario aquí no se muestra en un modal, sino directamente en la página.
+                // Es una pequeña diferencia de diseño pero la lógica es la misma.
+                <OperationLogForm farmId={selectedFarmId} onClose={() => setIsFormOpen(false)} />
             )}
 
             {selectedFarmId && <LogList farmId={selectedFarmId} />}

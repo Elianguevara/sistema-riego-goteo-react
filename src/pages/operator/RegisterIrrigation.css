@@ -37,7 +37,6 @@
   margin-bottom: 20px;
   display: block;
 }
-/* ... estilos existentes ... */
 
 .month-navigator {
     display: flex;
@@ -73,3 +72,32 @@
     font-size: 16px;
     font-weight: 500;
 }
+
+/* --- INICIO DE LA CORRECCIÓN --- */
+/* Estilos para el botón de acción principal en las páginas de registro */
+.create-user-btn {
+  background-color: var(--color-primary);
+  color: var(--color-primary-text);
+  border: none;
+  padding: 8px 15px;
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+  margin-left: auto; /* Empuja el botón hacia la derecha */
+}
+
+.create-user-btn:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.create-user-btn:disabled {
+  background-color: var(--color-border);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+/* --- FIN DE LA CORRECCIÓN --- */

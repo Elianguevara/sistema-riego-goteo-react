@@ -1,0 +1,54 @@
+/* Archivo: src/pages/analyst/PrecipitationAnalysis.css */
+
+.analysis-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.summary-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.summary-card {
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+    text-align: center;
+}
+
+.summary-card h4 {
+    margin-top: 0;
+    color: var(--color-text-dark);
+}
+
+.summary-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-info);
+    margin: 10px 0 5px;
+}
+
+.summary-value.effective {
+    color: var(--color-primary);
+}
+
+.summary-label {
+    font-size: 14px;
+    color: var(--color-text-light);
+}
+
+.analysis-card {
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+}
+
+.table-container {
+    max-height: 400px;
+    overflow-y: auto;
+}

@@ -23,6 +23,7 @@ const RegisterFertilization = React.lazy(() => import('./pages/operator/Register
 const RegisterMaintenance = React.lazy(() => import('./pages/operator/RegisterMaintenance'));
 const OperatorDashboard = React.lazy(() => import('./pages/operator/OperatorDashboard'));
 const OperationLogbook = React.lazy(() => import('./pages/operator/OperationLogbook'));
+const PrecipitationAnalysis = React.lazy(() => import('./pages/analyst/PrecipitationAnalysis'));
 
 
 // Componente de redirección para la página de inicio según el rol
@@ -109,12 +110,20 @@ function App() {
             }
           />
 
-          {/* Ruta exclusiva para el Analista */}
+          {/* Rutas exclusivas para el Analista */}
           <Route
             path="analyst/tasks"
             element={
               <ProtectedRoute allowedRoles={['ANALISTA']}>
                 <TaskManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="analyst/precipitation"
+            element={
+              <ProtectedRoute allowedRoles={['ANALISTA']}>
+                <PrecipitationAnalysis />
               </ProtectedRoute>
             }
           />
@@ -189,4 +198,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,5 +1,3 @@
-// Archivo: src/pages/operator/RegisterMaintenance.tsx
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import farmService from '../../services/farmService';
@@ -7,7 +5,7 @@ import maintenanceService from '../../services/maintenanceService';
 import type { Farm, IrrigationEquipment } from '../../types/farm.types';
 import type { MaintenanceRecord } from '../../types/maintenance.types';
 import MaintenanceForm from '../../components/maintenance/MaintenanceForm';
-import './RegisterIrrigation.css';
+import './RegisterIrrigation.css'; // Usa los mismos estilos
 
 const MaintenanceList = ({ farmId, equipmentId }: { farmId: number, equipmentId: number }) => {
     const { data: records = [], isLoading } = useQuery<MaintenanceRecord[], Error>({
@@ -45,32 +43,33 @@ const MaintenanceList = ({ farmId, equipmentId }: { farmId: number, equipmentId:
 };
 
 const RegisterMaintenance = () => {
-    const [farmId, setFarmId] = useState<number | undefined>();
-    const [equipmentId, setEquipmentId] = useState<number | undefined>();
+    const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
+    const [selectedEquipmentId, setSelectedEquipmentId] = useState<number | undefined>();
     const [isFormOpen, setIsFormOpen] = useState(false);
 
     const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['myFarms'], queryFn: farmService.getFarms });
 
-    // Efecto para auto-seleccionar la finca si solo hay una
     useEffect(() => {
-        if (farmId || farms.length !== 1) return;
-        setFarmId(farms[0].id);
-    }, [farms, farmId]);
+        if (selectedFarmId || farms.length !== 1) return;
+        setSelectedFarmId(farms[0].id);
+    }, [farms, selectedFarmId]);
 
     const { data: equipments = [] } = useQuery<IrrigationEquipment[]>({
-        queryKey: ['equipments', farmId],
-        queryFn: () => farmService.getEquipmentsByFarm(farmId!),
-        enabled: !!farmId,
+        queryKey: ['equipments', selectedFarmId],
+        queryFn: () => farmService.getEquipmentsByFarm(selectedFarmId!),
+        enabled: !!selectedFarmId,
     });
 
     const handleFarmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFarmId(Number(e.target.value));
-        setEquipmentId(undefined);
+        const farmId = e.target.value ? Number(e.target.value) : undefined;
+        setSelectedFarmId(farmId);
+        setSelectedEquipmentId(undefined);
         setIsFormOpen(false);
     };
     
     const handleEquipmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setEquipmentId(Number(e.target.value));
+        const equipmentId = e.target.value ? Number(e.target.value) : undefined;
+        setSelectedEquipmentId(equipmentId);
         setIsFormOpen(false);
     };
 
@@ -83,27 +82,27 @@ const RegisterMaintenance = () => {
                         <strong>Finca:</strong> {farms[0].name}
                     </div>
                 ) : (
-                    <select onChange={handleFarmChange} value={farmId || ''}>
-                        <option value="">Seleccione Finca...</option>
+                    <select onChange={handleFarmChange} value={selectedFarmId || ''}>
+                        <option value="">Seleccione una Finca...</option>
                         {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
                     </select>
                 )}
-                <select onChange={handleEquipmentChange} value={equipmentId || ''} disabled={!farmId}>
-                    <option value="">Seleccione Equipo...</option>
+                <select onChange={handleEquipmentChange} value={selectedEquipmentId || ''} disabled={!selectedFarmId}>
+                    <option value="">Seleccione un Equipo...</option>
                     {equipments.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
-                <button className="create-user-btn" onClick={() => setIsFormOpen(!isFormOpen)} disabled={!equipmentId}>
+                <button className="create-user-btn" onClick={() => setIsFormOpen(!isFormOpen)} disabled={!selectedEquipmentId}>
                      <i className={`fas ${isFormOpen ? 'fa-times' : 'fa-plus'}`}></i>
                      {isFormOpen ? 'Cancelar' : 'Nuevo Mantenimiento'}
                 </button>
             </div>
 
-            {isFormOpen && farmId && equipmentId && (
-                <MaintenanceForm farmId={farmId} equipmentId={equipmentId} onClose={() => setIsFormOpen(false)} />
+            {isFormOpen && selectedFarmId && selectedEquipmentId && (
+                <MaintenanceForm farmId={selectedFarmId} equipmentId={selectedEquipmentId} onClose={() => setIsFormOpen(false)} />
             )}
 
-            {equipmentId && farmId && (
-                <MaintenanceList farmId={farmId} equipmentId={equipmentId} />
+            {selectedFarmId && selectedEquipmentId && (
+                <MaintenanceList farmId={selectedFarmId} equipmentId={selectedEquipmentId} />
             )}
         </div>
     );

@@ -1,4 +1,5 @@
-// Archivo: src/components/irrigation/DailyIrrigationView.tsx (Versión de Depuración)
+// Archivo: src/components/irrigation/DailyIrrigationView.tsx
+// (Verifica que tu archivo se vea así)
 
 import { useState, useEffect, useRef } from 'react';
 import type { MonthlyIrrigationSectorView } from '../../types/irrigation.types';
@@ -32,13 +33,9 @@ const getWeatherIcon = (main: string) => {
 };
 
 const MiniWeatherDisplay = ({ isLoading, error, data }: { isLoading: boolean, error: Error | null, data: CurrentWeather | undefined }) => {
-    if (isLoading) {
-        return <><i className="fas fa-spinner fa-spin"></i> Cargando...</>;
-    }
-    if (error) {
-        return <><i className="fas fa-exclamation-circle" title={error.message}></i> Clima no disponible</>;
-    }
-    if (data && data.main && data.weather && data.weather.length > 0) {
+    if (isLoading) return <><i className="fas fa-spinner fa-spin"></i> Cargando...</>;
+    if (error) return <><i className="fas fa-exclamation-circle" title={error.message}></i> Clima no disponible</>;
+    if (data?.main && data.weather?.[0]) {
         const weatherInfo = data.weather[0];
         return (
             <>
@@ -51,25 +48,20 @@ const MiniWeatherDisplay = ({ isLoading, error, data }: { isLoading: boolean, er
     return null;
 };
 
-
 const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weatherData, isLoadingWeather, weatherError }: DailyViewProps) => {
     
-    // --- LÍNEA DE DEPURACIÓN ---
-    // Esto imprimirá en la consola del navegador los datos que recibe el componente.
-    console.log("DATOS DEL CLIMA RECIBIDOS EN DailyIrrigationView:", { isLoadingWeather, weatherError, weatherData });
-
-    const [irrigationModal, setIrrigationModal] = useState<{ sectorId: number; date: string; } | null>(null);
+    const [irrigationModal, setIrrigationModal] = useState<{ sector: Sector; date: string; } | null>(null);
     const [precipitationModalDate, setPrecipitationModalDate] = useState<string | null>(null);
     const todayRef = useRef<HTMLDivElement>(null);
-
-    const daysInMonth = new Date(year, month, 0).getDate();
-    const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
     useEffect(() => {
         setTimeout(() => {
             todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
     }, [month, year]);
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
     const irrigationMap = new Map<string, any[]>();
     const precipitationMap = new Map<string, any[]>();
@@ -94,9 +86,7 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                 {daysArray.map(day => {
                     const date = new Date(year, month - 1, day);
                     const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    
                     let dayClass = date < todayDate ? 'past' : (date.getTime() === todayDate.getTime() ? 'today' : 'future');
-                    
                     const dailyPrecipitation = precipitationMap.get(String(day));
                     const totalRain = dailyPrecipitation?.reduce((sum, rec) => sum + (rec?.mmRain || 0), 0) || 0;
 
@@ -105,17 +95,7 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                             <div className="day-card-header">
                                 <span>{date.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric' })}</span>
                                 <div className="header-actions">
-                                    
-                                    {dayClass === 'today' && (
-                                        <div className="current-weather-display">
-                                            <MiniWeatherDisplay 
-                                                isLoading={isLoadingWeather}
-                                                error={weatherError}
-                                                data={weatherData}
-                                            />
-                                        </div>
-                                    )}
-
+                                    {dayClass === 'today' && <MiniWeatherDisplay isLoading={isLoadingWeather} error={weatherError} data={weatherData} />}
                                     {totalRain > 0 && (
                                         <div className="daily-precipitation-display">
                                             <i className="fas fa-cloud-showers-heavy"></i>
@@ -127,7 +107,6 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                                     </button>
                                 </div>
                             </div>
-                            
                             <div className="sector-list">
                                 {sectors.map(sector => {
                                     const dailyRecords = irrigationMap.get(`${sector.id}-${day}`);
@@ -141,12 +120,12 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                                                 <div className="irrigation-data">
                                                     <span className="water-amount">{totalWater.toFixed(1)} m³</span>
                                                     <span className="hours">({totalHours.toFixed(1)} hs)</span>
-                                                    <button className="btn-view" onClick={() => setIrrigationModal({ sectorId: sector.id, date: dateString })}>
+                                                    <button className="btn-view" onClick={() => setIrrigationModal({ sector, date: dateString })}>
                                                         Ver/Editar
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <button className="btn-add-irrigation" onClick={() => setIrrigationModal({ sectorId: sector.id, date: dateString })}>
+                                                <button className="btn-add-irrigation" onClick={() => setIrrigationModal({ sector, date: dateString })}>
                                                     <i className="fas fa-plus"></i> Añadir Riego
                                                 </button>
                                             )}
@@ -162,7 +141,7 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
             {irrigationModal && (
                 <IrrigationForm
                     farmId={farmId}
-                    sectorId={irrigationModal.sectorId}
+                    sector={irrigationModal.sector}
                     date={irrigationModal.date}
                     onClose={() => setIrrigationModal(null)}
                 />
@@ -171,6 +150,7 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
             {precipitationModalDate && (
                 <PrecipitationForm
                     farmId={farmId}
+                    date={precipitationModalDate}
                     onClose={() => setPrecipitationModalDate(null)}
                 />
             )}

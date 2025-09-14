@@ -4,50 +4,65 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import irrigationService from '../../services/irrigationService';
-import farmService from '../../services/farmService'; // Necesario para obtener equipos
+import farmService from '../../services/farmService';
 import type { IrrigationCreateData, IrrigationRecord } from '../../types/irrigation.types';
-import type { IrrigationEquipment } from '../../types/farm.types';
-import './IrrigationForm.css';
+import type { IrrigationEquipment, Sector } from '../../types/farm.types';
+// --- INICIO DE LA CORRECCIÓN ---
+// Se importa el archivo de estilos correcto para los modales de formulario.
+import '../users/ChangePasswordModal.css';
+// --- FIN DE LA CORRECCIÓN ---
 
 interface IrrigationFormProps {
     farmId: number;
-    sectorId: number;
-    date: string; // Fecha en formato YYYY-MM-DD
+    sector: Sector;
+    date: string;
     onClose: () => void;
 }
 
-const IrrigationForm = ({ farmId, sectorId, date, onClose }: IrrigationFormProps) => {
+const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) => {
     const queryClient = useQueryClient();
 
-    // Cargar equipos de la finca
-    const { data: equipment = [], isLoading: isLoadingEquipment } = useQuery<IrrigationEquipment[], Error>({
+    const { data: allEquipment = [], isLoading: isLoadingEquipment } = useQuery<IrrigationEquipment[], Error>({
         queryKey: ['equipments', farmId],
         queryFn: () => farmService.getEquipmentsByFarm(farmId),
-        enabled: !!farmId,
     });
 
-    // Estados para el formulario
     const [startTime, setStartTime] = useState('08:00');
     const [irrigationHours, setIrrigationHours] = useState(1);
-    const [waterAmount, setWaterAmount] = useState(10); // Valor por defecto
-    const [selectedEquipmentId, setSelectedEquipmentId] = useState<string>('');
+    const [waterAmount, setWaterAmount] = useState(10);
+    const [selectedEquipmentId, setSelectedEquipmentId] = useState<string>(sector.equipmentId?.toString() || '');
 
-    // Lógica para calcular fechas de inicio y fin en formato ISO
+    useEffect(() => {
+        if (sector.equipmentId) {
+            setSelectedEquipmentId(sector.equipmentId.toString());
+        }
+    }, [sector]);
+
+    // Lógica para evitar la conversión de zona horaria (se mantiene la corrección anterior)
     const { startDateTime, endDateTime } = useMemo(() => {
         if (!date || !startTime || irrigationHours <= 0) {
             return { startDateTime: null, endDateTime: null };
         }
+        
         const start = new Date(`${date}T${startTime}`);
-        const end = new Date(start.getTime() + irrigationHours * 60 * 60 * 1000);
+        const finalStartDateTime = `${date}T${startTime}:00`;
+
+        const end = new Date(start.getTime() + irrigationHours * 3600 * 1000);
+        const finalEndDateTime = end.getFullYear() +
+            '-' + String(end.getMonth() + 1).padStart(2, '0') +
+            '-' + String(end.getDate()).padStart(2, '0') +
+            'T' + String(end.getHours()).padStart(2, '0') +
+            ':' + String(end.getMinutes()).padStart(2, '0') +
+            ':' + String(end.getSeconds()).padStart(2, '0');
+
         return {
-            startDateTime: start.toISOString().slice(0, 19), // Formato "YYYY-MM-DDTHH:mm:ss"
-            endDateTime: end.toISOString().slice(0, 19),
+            startDateTime: finalStartDateTime,
+            endDateTime: finalEndDateTime,
         };
     }, [date, startTime, irrigationHours]);
 
-
     const mutation = useMutation<IrrigationRecord, Error, IrrigationCreateData>({
-        mutationFn: irrigationService.createIrrigation, // Llama al servicio actualizado
+        mutationFn: irrigationService.createIrrigation,
         onSuccess: () => {
             toast.success('Riego registrado correctamente.');
             queryClient.invalidateQueries({ queryKey: ['irrigations', farmId] });
@@ -62,13 +77,12 @@ const IrrigationForm = ({ farmId, sectorId, date, onClose }: IrrigationFormProps
             toast.error("Por favor, complete todos los campos requeridos.");
             return;
         }
-
         const formData: IrrigationCreateData = {
             startDateTime,
             endDateTime,
             waterAmount: parseFloat(waterAmount.toString()),
             irrigationHours: parseFloat(irrigationHours.toString()),
-            sectorId,
+            sectorId: sector.id,
             equipmentId: parseInt(selectedEquipmentId, 10),
         };
         mutation.mutate(formData);
@@ -77,7 +91,7 @@ const IrrigationForm = ({ farmId, sectorId, date, onClose }: IrrigationFormProps
     return (
         <div className="modal-overlay">
             <div className="modal-container">
-                <h3>Registrar Riego</h3>
+                <h3>Registrar Riego para {sector.name}</h3>
                 <p><strong>Fecha:</strong> {new Date(date + 'T00:00:00').toLocaleDateString('es-AR', {day: '2-digit', month: '2-digit', year: 'numeric'})}</p>
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
@@ -91,12 +105,16 @@ const IrrigationForm = ({ farmId, sectorId, date, onClose }: IrrigationFormProps
                         </div>
                          <div className="form-group">
                             <label htmlFor="equipmentId">Equipo</label>
-                            <select name="equipmentId" value={selectedEquipmentId} onChange={(e) => setSelectedEquipmentId(e.target.value)} required disabled={isLoadingEquipment}>
-                                <option value="">{isLoadingEquipment ? 'Cargando...' : 'Seleccione equipo'}</option>
-                                {equipment.map(eq => (
-                                    <option key={eq.id} value={eq.id}>{eq.name}</option>
-                                ))}
-                            </select>
+                            {sector.equipmentId ? (
+                                <input type="text" value={sector.equipmentName || `Equipo ID: ${sector.equipmentId}`} disabled />
+                            ) : (
+                                <select name="equipmentId" value={selectedEquipmentId} onChange={(e) => setSelectedEquipmentId(e.target.value)} required disabled={isLoadingEquipment}>
+                                    <option value="">{isLoadingEquipment ? 'Cargando...' : 'Seleccione equipo'}</option>
+                                    {allEquipment.map(eq => (
+                                        <option key={eq.id} value={eq.id}>{eq.name}</option>
+                                    ))}
+                                </select>
+                            )}
                         </div>
                         <div className="form-group">
                             <label htmlFor="waterAmount">Cantidad de Agua (m³)</label>

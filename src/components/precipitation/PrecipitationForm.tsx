@@ -5,17 +5,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import precipitationService from '../../services/precipitationService';
 import type { PrecipitationCreateData } from '../../types/precipitation.types';
-import '../users/UserForm.css'; // Reutilizamos los estilos de otros formularios
+import '../users/UserForm.css';
 
+// 1. AÑADIMOS 'date' A LAS PROPIEDADES REQUERIDAS
 interface Props {
     farmId: number;
+    date: string; // Formato YYYY-MM-DD
     onClose: () => void;
 }
 
-const PrecipitationForm = ({ farmId, onClose }: Props) => {
+const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
     const queryClient = useQueryClient();
+    
+    // 2. USAMOS LA FECHA RECIBIDA PARA INICIALIZAR EL FORMULARIO
     const [formData, setFormData] = useState<PrecipitationCreateData>({
-        precipitationDate: new Date().toISOString().split('T')[0],
+        precipitationDate: date,
         mmRain: 10,
     });
 
@@ -23,7 +27,6 @@ const PrecipitationForm = ({ farmId, onClose }: Props) => {
         mutationFn: (data: PrecipitationCreateData) => precipitationService.createPrecipitation(farmId, data),
         onSuccess: () => {
             toast.success('Precipitación registrada correctamente.');
-            // Invalidamos la query de la vista mensual para que se actualice con la nueva lluvia
             queryClient.invalidateQueries({ queryKey: ['irrigations'] });
             onClose();
         },
@@ -46,12 +49,13 @@ const PrecipitationForm = ({ farmId, onClose }: Props) => {
     return (
         <div className="modal-overlay">
             <div className="modal-container">
-                <h3>Registrar Precipitación</h3>
+                <h3>Registrar Precipitación para el {new Date(date + 'T00:00:00').toLocaleDateString()}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="precipitationDate">Fecha</label>
-                            <input type="date" id="precipitationDate" name="precipitationDate" value={formData.precipitationDate} onChange={handleChange} required />
+                            {/* 3. EL CAMPO DE FECHA AHORA ES DE SOLO LECTURA */}
+                            <input type="date" id="precipitationDate" name="precipitationDate" value={formData.precipitationDate} readOnly />
                         </div>
                         <div className="form-group">
                             <label htmlFor="mmRain">Lluvia (mm)</label>

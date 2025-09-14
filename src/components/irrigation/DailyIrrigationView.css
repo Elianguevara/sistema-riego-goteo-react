@@ -201,3 +201,23 @@
     color: var(--color-text-light);
     font-size: 13px;
 }
+/* ... (estilos existentes) ... */
+
+/* --- INICIO DE LA MODIFICACIÓN --- */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Aumenta el espacio para que no se vea apretado */
+}
+
+.daily-precipitation-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2980b9; /* Color azul para representar agua */
+    background-color: #d4eaf7; /* Fondo azul claro */
+    padding: 6px 12px;
+    border-radius: var(--border-radius-md);
+}

@@ -58,6 +58,9 @@ const AdminLayout = () => {
                         <Link to="/analyst/tasks" className={location.pathname.startsWith('/analyst/tasks') ? 'active' : ''}>
                             <i className="fas fa-tasks"></i> Gestión de Tareas
                         </Link>
+                        <Link to="/analyst/precipitation" className={location.pathname.startsWith('/analyst/precipitation') ? 'active' : ''}>
+                            <i className="fas fa-cloud-rain"></i> Análisis de Lluvia
+                        </Link>
                         <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
                             <i className="fas fa-users"></i> Usuarios
                         </Link>
