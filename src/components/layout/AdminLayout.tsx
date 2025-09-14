@@ -24,11 +24,13 @@ const AdminLayout = () => {
             case 'OPERARIO':
                 return (
                     <>
+                        <Link to="/operator/dashboard" className={location.pathname === '/operator/dashboard' ? 'active' : ''}>
+                            <i className="fas fa-home"></i> Panel Principal
+                        </Link>
                         <Link to="/tasks" className={location.pathname.startsWith('/tasks') ? 'active' : ''}>
                             <i className="fas fa-clipboard-list"></i> Mis Tareas
                         </Link>
                         
-                        {/* --- INICIO DE LA MODIFICACIÓN: Nuevos enlaces para futuras funcionalidades --- */}
                         <Link to="/operator/irrigation" className={location.pathname === '/operator/irrigation' ? 'active' : ''}>
                             <i className="fas fa-tint"></i> Registrar Riego
                         </Link>
@@ -41,7 +43,6 @@ const AdminLayout = () => {
                         <Link to="/operator/logbook" className={location.pathname === '/operator/logbook' ? 'active' : ''}>
                             <i className="fas fa-book"></i> Bitácora
                         </Link>
-                        {/* --- FIN DE LA MODIFICACIÓN --- */}
 
                         <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
                             <i className="fas fa-bell"></i> Notificaciones

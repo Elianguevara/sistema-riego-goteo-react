@@ -1,0 +1,168 @@
+/* src/pages/operator/OperatorDashboard.css */
+
+.operator-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.operator-dashboard h1 {
+    font-size: 28px;
+    margin: 0;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.dashboard-main-column, .dashboard-side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* --- Tarjetas de Resumen de Tareas --- */
+.summary-cards {
+    display: flex;
+    gap: 25px;
+}
+
+.summary-card {
+    flex: 1;
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+    position: relative;
+    overflow: hidden;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.summary-card .count {
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.summary-card .label {
+    font-size: 18px;
+}
+
+.summary-card .card-link {
+    margin-top: 15px;
+    padding: 8px 12px;
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--border-radius-sm);
+    align-self: flex-start;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.summary-card .card-link:hover {
+    background-color: rgba(255,255,255,0.4);
+}
+
+.summary-card.pending {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.summary-card.in-progress {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+/* --- Tarjeta de Accesos Rápidos --- */
+.quick-actions-card {
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.action-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: var(--color-app-bg);
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    color: var(--color-text-dark);
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.action-button i {
+    font-size: 24px;
+    color: var(--color-primary);
+}
+
+.action-button:hover {
+    background-color: var(--color-primary);
+    color: white;
+}
+.action-button:hover i {
+    color: white;
+}
+
+
+/* --- Tarjeta de Información de Finca y Clima --- */
+.farm-info-card {
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.farm-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.farm-details i {
+    font-size: 24px;
+    color: var(--color-text-light);
+}
+
+.farm-details strong {
+    font-size: 18px;
+}
+.farm-details p {
+    margin: 0;
+    color: var(--color-text-light);
+}
+
+
+/* --- Responsividad --- */
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .summary-cards {
+        flex-direction: column;
+    }
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}

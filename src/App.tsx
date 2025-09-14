@@ -2,26 +2,27 @@
 
 import React, { Suspense } from 'react'; // 1. Importar Suspense
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/auth/Login.tsx';
-import ProtectedRoute from './components/utils/ProtectedRoute.tsx';
-import AdminLayout from './components/layout/AdminLayout.tsx';
-import { useAuthData } from './hooks/useAuthData.ts';
+import Login from './components/auth/Login';
+import ProtectedRoute from './components/utils/ProtectedRoute';
+import AdminLayout from './components/layout/AdminLayout';
+import { useAuthData } from './hooks/useAuthData';
 
 // 2. Usar React.lazy para importar dinámicamente cada página
-const Dashboard = React.lazy(() => import('./pages/Dashboard.tsx'));
-const UserManagement = React.lazy(() => import('./pages/UserManagement.tsx'));
-const UserProfile = React.lazy(() => import('./pages/UserProfile.tsx'));
-const FarmManagement = React.lazy(() => import('./pages/FarmManagement.tsx'));
-const FarmDetail = React.lazy(() => import('./pages/FarmDetail.tsx'));
-const Configuration = React.lazy(() => import('./pages/Configuration.tsx'));
-const AuditLog = React.lazy(() => import('./pages/AuditLog.tsx'));
-const NotificationHistory = React.lazy(() => import('./pages/NotificationHistory.tsx'));
-const MyTasks = React.lazy(() => import('./pages/operator/MyTasks.tsx'));
-const TaskManagement = React.lazy(() => import('./pages/analyst/TaskManagement.tsx'));
-const RegisterIrrigation = React.lazy(() => import('./pages/operator/RegisterIrrigation.tsx'));
-const RegisterFertilization = React.lazy(() => import('./pages/operator/RegisterFertilization.tsx'));
-const RegisterMaintenance = React.lazy(() => import('./pages/operator/RegisterMaintenance.tsx'));
-const OperationLogbook = React.lazy(() => import('./pages/operator/OperationLogbook.tsx'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const UserManagement = React.lazy(() => import('./pages/UserManagement'));
+const UserProfile = React.lazy(() => import('./pages/UserProfile'));
+const FarmManagement = React.lazy(() => import('./pages/FarmManagement'));
+const FarmDetail = React.lazy(() => import('./pages/FarmDetail'));
+const Configuration = React.lazy(() => import('./pages/Configuration'));
+const AuditLog = React.lazy(() => import('./pages/AuditLog'));
+const NotificationHistory = React.lazy(() => import('./pages/NotificationHistory'));
+const MyTasks = React.lazy(() => import('./pages/operator/MyTasks'));
+const TaskManagement = React.lazy(() => import('./pages/analyst/TaskManagement'));
+const RegisterIrrigation = React.lazy(() => import('./pages/operator/RegisterIrrigation'));
+const RegisterFertilization = React.lazy(() => import('./pages/operator/RegisterFertilization'));
+const RegisterMaintenance = React.lazy(() => import('./pages/operator/RegisterMaintenance'));
+const OperatorDashboard = React.lazy(() => import('./pages/operator/OperatorDashboard'));
+const OperationLogbook = React.lazy(() => import('./pages/operator/OperationLogbook'));
 
 
 // Componente de redirección para la página de inicio según el rol
@@ -30,7 +31,7 @@ const DashboardRedirect = () => {
     if (!authData) return null;
     
     if (authData.role === 'OPERARIO') {
-        return <Navigate to="/tasks" replace />;
+        return <Navigate to="/operator/dashboard" replace />;
     }
     return <Dashboard />;
 };
@@ -57,6 +58,15 @@ function App() {
             }
           />
           
+          {/* --- NUEVA RUTA PARA EL DASHBOARD DEL OPERARIO --- */}
+          <Route
+            path="operator/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['OPERARIO']}>
+                <OperatorDashboard />
+              </ProtectedRoute>
+            }
+          />
           {/* --- Rutas del Operario --- */}
           <Route
             path="tasks"
@@ -179,3 +189,4 @@ function App() {
 }
 
 export default App;
+
