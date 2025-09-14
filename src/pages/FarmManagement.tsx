@@ -1,44 +1,28 @@
+// src/pages/FarmManagement.tsx
+
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 import farmService from '../services/farmService';
 import type { Farm, FarmCreateData, FarmUpdateData } from '../types/farm.types';
 import FarmForm from '../components/farms/FarmForm';
-// PASO 1: Importar el nuevo ActionsMenu genérico y su tipo
 import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
-
-// El modal de confirmación sigue siendo reutilizable y está bien como está
-const ConfirmationModal = ({ message, onConfirm, onCancel, isLoading }: { message: string, onConfirm: () => void, onCancel: () => void, isLoading: boolean }) => (
-    <div className="modal-overlay">
-        <div className="modal-container">
-            <h3>Confirmación Requerida</h3>
-            <p>{message}</p>
-            <div className="modal-actions">
-                <button className="btn-cancel" onClick={onCancel} disabled={isLoading}>Cancelar</button>
-                <button className="btn-delete" onClick={onConfirm} disabled={isLoading}>
-                    {isLoading ? 'Eliminando...' : 'Confirmar'}
-                </button>
-            </div>
-        </div>
-    </div>
-);
+import ConfirmationModal from '../components/ui/ConfirmationModal';
+import FarmCard from '../components/farms/FarmCard';
 
 const FarmManagement = () => {
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
     
-    // --- Estados para modales (sin cambios) ---
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [currentFarm, setCurrentFarm] = useState<Farm | null>(null);
     const [farmToDelete, setFarmToDelete] = useState<Farm | null>(null);
 
-    // --- Obtención y Mutaciones (sin cambios) ---
     const { data: farms = [], isLoading, isError, error } = useQuery<Farm[], Error>({
         queryKey: ['farms'],
         queryFn: farmService.getFarms,
     });
 
+    // --- Mutaciones (sin cambios) ---
     const createFarmMutation = useMutation({
         mutationFn: farmService.createFarm,
         onSuccess: () => {
@@ -94,7 +78,7 @@ const FarmManagement = () => {
         }
     };
 
-    // PASO 2: Definir las acciones específicas para las fincas
+    // --- Función de acciones simplificada ---
     const getFarmActions = (farm: Farm): ActionMenuItem[] => [
         {
             label: 'Editar Finca',
@@ -103,11 +87,10 @@ const FarmManagement = () => {
         {
             label: 'Eliminar Finca',
             action: () => setFarmToDelete(farm),
-            className: 'delete', // Clase para estilizar el botón de eliminar
+            className: 'delete',
         }
     ];
 
-    // --- Renderizado ---
     if (isLoading) return <div className="user-management-page"><p>Cargando fincas...</p></div>;
     if (isError) return <div className="user-management-page"><p className="error-text">Error: {error.message}</p></div>;
 
@@ -120,35 +103,14 @@ const FarmManagement = () => {
                 </button>
             </div>
 
-            <div className="user-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Ubicación</th>
-                            <th>Capacidad Reserva (L)</th>
-                            <th>Tamaño (ha)</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {farms.map((farm) => (
-                            <tr key={farm.id}>
-                                <td>{farm.name}</td>
-                                <td>{farm.location}</td>
-                                <td>{farm.reservoirCapacity.toLocaleString('es-AR')}</td>
-                                <td>{farm.farmSize.toLocaleString('es-AR')}</td>
-                                <td className="actions">
-                                    <button className="btn-secondary" onClick={() => navigate(`/farms/${farm.id}`)}>
-                                        Ver Detalles
-                                    </button>
-                                    {/* PASO 3: Usar el nuevo componente ActionsMenu */}
-                                    <ActionsMenu items={getFarmActions(farm)} />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div className="farm-grid-container">
+                {farms.map((farm) => (
+                    <FarmCard 
+                        key={farm.id} 
+                        farm={farm} 
+                        actions={getFarmActions(farm)}
+                    />
+                ))}
             </div>
             
             {isFormModalOpen && (
