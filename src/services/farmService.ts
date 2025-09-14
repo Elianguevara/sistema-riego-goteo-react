@@ -15,7 +15,7 @@ const getAuthHeader = (): Record<string, string> => {
     return headers;
 };
 
-// --- Operaciones CRUD para Fincas (sin cambios) ---
+// --- Operaciones CRUD para Fincas ---
 const getFarms = async (): Promise<Farm[]> => {
     const response = await fetch(`${API_BASE_URL}/farms`, {
         method: 'GET',
@@ -78,7 +78,7 @@ const getFarmById = async (id: number): Promise<Farm> => {
     return response.json();
 };
 
-// --- Operaciones de Sectores, Equipos, etc. (sin cambios) ---
+// --- Operaciones de Sectores, Equipos, etc. ---
 const getSectorsByFarm = async (farmId: number): Promise<Sector[]> => {
     const response = await fetch(`${API_BASE_URL}/farms/${farmId}/sectors`, {
         method: 'GET',
@@ -190,13 +190,7 @@ const deleteWaterSource = async (waterSourceId: number): Promise<void> => {
     if (!response.ok) throw new Error('Error al eliminar la fuente de agua.');
 };
 
-// --- INICIO DE LA MODIFICACIÓN ---
-/**
- * Obtiene la lista de usuarios asignados a una finca.
- * Usa el endpoint de admin ahora accesible por el rol ANALISTA.
- */
 const getAssignedUsers = async (farmId: number): Promise<UserResponse[]> => {
-    // Se cambia la URL al endpoint correcto confirmado por el backend
     const response = await fetch(`${API_BASE_URL}/admin/users/farms/${farmId}/users`, {
         method: 'GET',
         headers: getAuthHeader(),
@@ -209,8 +203,21 @@ const getAssignedUsers = async (farmId: number): Promise<UserResponse[]> => {
     }
     return response.json();
 };
-// --- FIN DE LA MODIFICACIÓN ---
 
+/**
+ * Obtiene una lista de todos los sectores activos en todas las fincas.
+ * Endpoint: GET /api/sectors/active
+ */
+const getActiveSectors = async (): Promise<Sector[]> => {
+    const response = await fetch(`${API_BASE_URL}/sectors/active`, {
+        method: 'GET',
+        headers: getAuthHeader(),
+    });
+    if (!response.ok) {
+        throw new Error('Error al obtener los sectores activos.');
+    }
+    return response.json();
+};
 
 const farmService = {
     getFarms,
@@ -233,6 +240,7 @@ const farmService = {
     updateWaterSource,
     deleteWaterSource,
     getAssignedUsers,
+    getActiveSectors, // Se añade la nueva función al objeto exportado
 };
 
 export default farmService;

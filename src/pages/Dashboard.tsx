@@ -1,4 +1,3 @@
-// src/pages/Dashboard.tsx
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,8 +6,8 @@ import adminService from '../services/adminService';
 import farmService from '../services/farmService';
 import type { KpiResponse, UserStatsResponse } from '../types/dashboard.types';
 import type { UserResponse } from '../types/user.types';
-import type { Farm } from '../types/farm.types';
-import type { Page } from '../types/audit.types'; // Importamos Page
+import type { Farm, Sector } from '../types/farm.types';
+import type { Page } from '../types/audit.types';
 import StatusToggle from '../components/ui/StatusToggle';
 import './Dashboard.css';
 
@@ -32,14 +31,12 @@ const TableSkeleton = ({ columns, rows = 5 }: { columns: number, rows?: number }
     </div>
 );
 
-
 // --- TABLA DE USUARIOS CON DATOS LIMITADOS ---
 const UserTable = () => {
     const [searchTerm, setSearchTerm] = useState('');
     
-    // La query ahora espera un objeto Page<UserResponse>
     const { data: usersPage, isLoading, isError, error } = useQuery<Page<UserResponse>, Error>({
-        queryKey: ['usersDashboard'], // Usamos una key diferente para no colisionar
+        queryKey: ['usersDashboard'],
         queryFn: () => adminService.getUsers({ page: 0, size: 5, sort: 'lastLogin,desc' }),
     });
 
@@ -98,7 +95,6 @@ const UserTable = () => {
     );
 };
 
-// --- (El resto de Dashboard.tsx no necesita cambios) ---
 // --- TABLA DE FINCAS CON SKELETON LOADER ---
 const FarmsTable = () => {
     const navigate = useNavigate();
@@ -144,13 +140,46 @@ const FarmsTable = () => {
     );
 };
 
-// --- COMPONENTES PLACEHOLDER ---
-const SectorsTable = () => (
-    <div className="dashboard-table-container">
-        <h2 className="table-title">Sectores Activos</h2>
-        <p>Vista de tabla de sectores activos no implementada aún.</p>
-    </div>
-);
+// Se reemplaza el componente provisional por uno funcional
+const SectorsTable = () => {
+    const navigate = useNavigate();
+    const { data: sectors = [], isLoading, isError, error } = useQuery<Sector[], Error>({
+        queryKey: ['activeSectors'],
+        queryFn: farmService.getActiveSectors,
+    });
+
+    if (isLoading) return <TableSkeleton columns={4} />;
+    if (isError) return <p className="error-text">Error al cargar sectores: {error.message}</p>;
+
+    return (
+        <div className="dashboard-table-container">
+            <div className="table-header">
+                <h2 className="table-title">Sectores Activos</h2>
+                <button className="btn-secondary" onClick={() => navigate('/farms')}>
+                    Gestionar Fincas
+                </button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sector</th>
+                        <th>Finca</th>
+                        <th>Equipo Asignado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sectors.map((sector) => (
+                        <tr key={sector.id} onClick={() => navigate(`/farms/${sector.farmId}`)} style={{ cursor: 'pointer' }}>
+                            <td>{sector.name}</td>
+                            <td>{sector.farmName}</td>
+                            <td>{sector.equipmentName || 'N/A'}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
 
 const AlertsTable = () => (
     <div className="dashboard-table-container">
@@ -291,7 +320,6 @@ const Dashboard = () => {
             <span className="card-label">Alertas Activas</span>
           </div>
         </div>
-        {/* Nueva Tarjeta para Estadísticas de Usuarios */}
         <div 
           className={`stat-card ${activeTable === 'user-stats' ? 'active' : ''}`} 
           onClick={() => setActiveTable('user-stats')}
@@ -312,3 +340,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
