@@ -7,10 +7,7 @@ import irrigationService from '../../services/irrigationService';
 import farmService from '../../services/farmService';
 import type { IrrigationCreateData, IrrigationRecord } from '../../types/irrigation.types';
 import type { IrrigationEquipment, Sector } from '../../types/farm.types';
-// --- INICIO DE LA CORRECCIÓN ---
-// Se importa el archivo de estilos correcto para los modales de formulario.
-import '../users/ChangePasswordModal.css';
-// --- FIN DE LA CORRECCIÓN ---
+import '../users/UserForm.css'; // Aseguramos que se usen los estilos correctos para el modal
 
 interface IrrigationFormProps {
     farmId: number;
@@ -38,16 +35,20 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
         }
     }, [sector]);
 
-    // Lógica para evitar la conversión de zona horaria (se mantiene la corrección anterior)
+    // --- ESTA ES LA CORRECCIÓN CLAVE Y DEFINITIVA PARA LA FECHA ---
     const { startDateTime, endDateTime } = useMemo(() => {
-        if (!date || !startTime || irrigationHours <= 0) {
+        if (!date || !startTime || !/^\d{2}:\d{2}$/.test(startTime) || irrigationHours <= 0) {
             return { startDateTime: null, endDateTime: null };
         }
         
-        const start = new Date(`${date}T${startTime}`);
+        // 1. Construimos la fecha de inicio como un string simple. NO se convierte a objeto Date para el envío.
         const finalStartDateTime = `${date}T${startTime}:00`;
 
+        // 2. Para calcular la fecha de fin, creamos un objeto Date temporal que respeta la hora local.
+        const start = new Date(finalStartDateTime);
         const end = new Date(start.getTime() + irrigationHours * 3600 * 1000);
+        
+        // 3. Formateamos la fecha de fin manualmente para construir un string sin la conversión a UTC de toISOString().
         const finalEndDateTime = end.getFullYear() +
             '-' + String(end.getMonth() + 1).padStart(2, '0') +
             '-' + String(end.getDate()).padStart(2, '0') +
@@ -60,6 +61,7 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
             endDateTime: finalEndDateTime,
         };
     }, [date, startTime, irrigationHours]);
+    // --- FIN DE LA CORRECCIÓN DE FECHA ---
 
     const mutation = useMutation<IrrigationRecord, Error, IrrigationCreateData>({
         mutationFn: irrigationService.createIrrigation,

@@ -199,13 +199,15 @@ const UserManagement = () => {
             )}
 
             {isFormModalOpen && (
-                 <div className="modal-overlay">
-                    <UserForm
-                        currentUser={currentUser}
-                        onSave={handleSaveForm}
-                        onCancel={() => setIsFormModalOpen(false)}
-                        isLoading={createUserMutation.isPending || updateUserMutation.isPending}
-                    />
+                <div className="modal-overlay">
+                    <div className="modal-container"> 
+                        <UserForm
+                            currentUser={currentUser}
+                            onSave={handleSaveForm}
+                            onCancel={() => setIsFormModalOpen(false)}
+                            isLoading={createUserMutation.isPending || updateUserMutation.isPending}
+                        />
+                    </div>
                 </div>
             )}
 

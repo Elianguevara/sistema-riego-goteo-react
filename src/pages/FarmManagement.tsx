@@ -113,16 +113,20 @@ const FarmManagement = () => {
                 ))}
             </div>
             
+            {/* INICIO DE LA CORRECCIÓN */}
             {isFormModalOpen && (
                  <div className="modal-overlay">
-                    <FarmForm
-                        currentFarm={currentFarm}
-                        onSave={handleSaveForm}
-                        onCancel={() => setIsFormModalOpen(false)}
-                        isLoading={createFarmMutation.isPending || updateFarmMutation.isPending}
-                    />
+                    <div className="modal-container">
+                        <FarmForm
+                            currentFarm={currentFarm}
+                            onSave={handleSaveForm}
+                            onCancel={() => setIsFormModalOpen(false)}
+                            isLoading={createFarmMutation.isPending || updateFarmMutation.isPending}
+                        />
+                    </div>
                 </div>
             )}
+            {/* FIN DE LA CORRECCIÓN */}
 
             {farmToDelete && (
                 <ConfirmationModal

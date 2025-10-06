@@ -1,4 +1,4 @@
-// Archivo: src/pages/FarmDetail.tsx
+// src/pages/FarmDetail.tsx
 
 import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 // Services
 import farmService from '../services/farmService';
 import adminService from '../services/adminService';
-import fertilizationService from '../services/fertilizationService';
 import weatherService from '../services/weatherService'; 
 
 // Components
@@ -17,64 +16,29 @@ import EquipmentForm from '../components/farms/EquipmentForm';
 import WaterSourceForm from '../components/farms/WaterSourceForm';
 import AssignUserForm from '../components/farms/AssignUserForm';
 import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
-import FertilizationForm from '../components/fertilization/FertilizationForm';
 import WeatherWidget from '../components/weather/WeatherWidget'; 
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 
 // Types
 import type { Farm, Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData, WaterSource, WaterSourceCreateData, WaterSourceUpdateData } from '../types/farm.types';
 import type { UserResponse } from '../types/user.types';
-import type { FertilizationRecord, FertilizationCreateData } from '../types/fertilization.types';
 import type { CurrentWeather } from '../types/weather.types'; 
 import { useAuthData } from '../hooks/useAuthData';
 
 import './FarmDetail.css';
 
-// Componente interno para la lista de fertilizaciones
-const FertilizationList = ({ fertilizations, onEdit, onDelete, canEdit, canDelete }: { fertilizations: FertilizationRecord[], onEdit: (f: FertilizationRecord) => void, onDelete: (id: number) => void, canEdit: boolean, canDelete: boolean }) => {
-    const getActions = (fertilization: FertilizationRecord): ActionMenuItem[] => {
-        const items: ActionMenuItem[] = [];
-        if (canEdit) items.push({ label: 'Editar', action: () => onEdit(fertilization) });
-        if (canDelete) items.push({ label: 'Eliminar', action: () => onDelete(fertilization.id), className: 'delete' });
-        return items;
-    };
-
-    return (
-        <table className="detail-table">
-            <thead><tr><th>Fecha</th><th>Tipo</th><th>Cantidad</th><th>Acciones</th></tr></thead>
-            <tbody>
-                {fertilizations.map(f => (
-                    <tr key={f.id}>
-                        <td>{new Date(f.date + 'T00:00:00').toLocaleDateString()}</td>
-                        <td>{f.fertilizerType}</td>
-                        <td>{f.quantity} {f.quantityUnit}</td>
-                        <td className='actions'><ActionsMenu items={getActions(f)} /></td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    );
-};
-
-
 const FarmDetail = () => {
-    // Definición de tipo para las pestañas
-    type FarmDetailTab = 'waterSources' | 'equipments' | 'sectors' | 'fertilizations' | 'users';
+    // 1. Se elimina 'fertilizations' de los tipos de pestañas
+    type FarmDetailTab = 'waterSources' | 'equipments' | 'sectors' | 'users';
 
     const { farmId } = useParams<{ farmId: string }>();
     const queryClient = useQueryClient();
-    const authData = useAuthData();
     const farmIdNum = Number(farmId);
 
-    // Estado para la pestaña activa, comenzando por el primer paso
+    // El estado inicial ahora es 'waterSources'
     const [activeTab, setActiveTab] = useState<FarmDetailTab>('waterSources');
 
-    // Permisos
-    const canCreateFertilization = authData?.role === 'ADMIN' || authData?.role === 'ANALISTA' || authData?.role === 'OPERARIO';
-    const canEditFertilization = authData?.role === 'ADMIN' || authData?.role === 'OPERARIO';
-    const canDeleteFertilization = authData?.role === 'ADMIN';
-
-    // Estados para modales
+    // Estados para modales (se eliminan los relacionados a fertilización)
     const [isSectorModalOpen, setIsSectorModalOpen] = useState(false);
     const [currentSector, setCurrentSector] = useState<Sector | null>(null);
     const [sectorToDelete, setSectorToDelete] = useState<Sector | null>(null);
@@ -86,12 +50,8 @@ const FarmDetail = () => {
     const [waterSourceToDelete, setWaterSourceToDelete] = useState<WaterSource | null>(null);
     const [isAssignUserModalOpen, setIsAssignUserModalOpen] = useState(false);
     const [userToUnassign, setUserToUnassign] = useState<UserResponse | null>(null);
-    const [selectedSectorForFertilization, setSelectedSectorForFertilization] = useState<Sector | null>(null);
-    const [isFertilizationModalOpen, setIsFertilizationModalOpen] = useState(false);
-    const [currentFertilization, setCurrentFertilization] = useState<FertilizationRecord | null>(null);
-    const [fertilizationToDelete, setFertilizationToDelete] = useState<FertilizationRecord | null>(null);
 
-    // Obtención de Datos
+    // Obtención de Datos (se eliminan las queries de fertilización)
     const { data: farm, isLoading: isLoadingFarm, isError, error } = useQuery<Farm, Error>({ queryKey: ['farmDetails', farmId], queryFn: () => farmService.getFarmById(farmIdNum), enabled: !!farmIdNum });
     const { data: sectors = [], isLoading: isLoadingSectors } = useQuery<Sector[], Error>({ queryKey: ['sectors', farmId], queryFn: () => farmService.getSectorsByFarm(farmIdNum), enabled: !!farmIdNum });
     const { data: equipments = [], isLoading: isLoadingEquipments } = useQuery<IrrigationEquipment[], Error>({ queryKey: ['equipments', farmId], queryFn: () => farmService.getEquipmentsByFarm(farmIdNum), enabled: !!farmIdNum });
@@ -99,16 +59,9 @@ const FarmDetail = () => {
     const { data: assignedUsers = [], isLoading: isLoadingAssignedUsers } = useQuery<UserResponse[], Error>({ queryKey: ['assignedUsers', farmId], queryFn: () => farmService.getAssignedUsers(farmIdNum), enabled: !!farmIdNum });
     const { data: allUsersPage } = useQuery({ queryKey: ['allUsersForAssignment'], queryFn: () => adminService.getUsers({ page: 0, size: 1000 }), });
     const allUsers = allUsersPage?.content ?? [];
-    const { data: fertilizations = [], isLoading: isLoadingFertilizations } = useQuery<FertilizationRecord[], Error>({ queryKey: ['fertilizations', selectedSectorForFertilization?.id], queryFn: () => fertilizationService.getFertilizationsBySector(selectedSectorForFertilization!.id), enabled: !!selectedSectorForFertilization, });
     const { data: weatherData, isLoading: isLoadingWeather, error: weatherError } = useQuery<CurrentWeather, Error>({ queryKey: ['weather', farmId], queryFn: () => weatherService.getCurrentWeather(farmIdNum), enabled: !!farmIdNum && !!farm?.latitude && !!farm?.longitude, retry: false, });
     
-    useEffect(() => {
-        if (!selectedSectorForFertilization && sectors.length > 0) {
-            setSelectedSectorForFertilization(sectors[0]);
-        }
-    }, [sectors, selectedSectorForFertilization]);
-    
-    // Mutaciones (sin cambios en su lógica interna)
+    // Mutaciones (se eliminan las relacionadas a fertilización)
     const createSectorMutation = useMutation({ mutationFn: (data: SectorCreateData) => farmService.createSector(farmIdNum, data), onSuccess: () => { toast.success("Sector creado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const updateSectorMutation = useMutation({ mutationFn: (data: SectorUpdateData) => farmService.updateSector(farmIdNum, currentSector!.id, data), onSuccess: () => { toast.success("Sector actualizado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const deleteSectorMutation = useMutation({ mutationFn: (sectorId: number) => farmService.deleteSector(farmIdNum, sectorId), onSuccess: () => { toast.success("Sector eliminado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setSectorToDelete(null); }, onError: (err: Error) => toast.error(err.message) });
@@ -120,11 +73,8 @@ const FarmDetail = () => {
     const deleteWaterSourceMutation = useMutation({ mutationFn: (id: number) => farmService.deleteWaterSource(id), onSuccess: () => { toast.success("Fuente de agua eliminada."); queryClient.invalidateQueries({ queryKey: ['waterSources', farmId] }); setWaterSourceToDelete(null); }, onError: (err: Error) => toast.error(err.message) });
     const assignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.assignUserToFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario asignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setIsAssignUserModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const unassignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.unassignUserFromFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario desasignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setUserToUnassign(null); }, onError: (err: Error) => toast.error(err.message) });
-    const createFertilizationMutation = useMutation({ mutationFn: fertilizationService.createFertilizationRecord, onSuccess: () => { toast.success("Registro de fertilización creado."); queryClient.invalidateQueries({ queryKey: ['fertilizations', selectedSectorForFertilization?.id] }); setIsFertilizationModalOpen(false); }, onError: (err: Error) => toast.error(err.message), });
-    const updateFertilizationMutation = useMutation({ mutationFn: (variables: { id: number, data: Partial<FertilizationCreateData>}) => fertilizationService.updateFertilization(variables.id, variables.data), onSuccess: () => { toast.success("Registro de fertilización actualizado."); queryClient.invalidateQueries({ queryKey: ['fertilizations', selectedSectorForFertilization?.id] }); setIsFertilizationModalOpen(false); }, onError: (err: Error) => toast.error(err.message), });
-    const deleteFertilizationMutation = useMutation({ mutationFn: (fertilizationId: number) => fertilizationService.deleteFertilization(fertilizationId), onSuccess: () => { toast.success("Registro de fertilización eliminado."); queryClient.invalidateQueries({ queryKey: ['fertilizations', selectedSectorForFertilization?.id] }); setFertilizationToDelete(null); }, onError: (err: Error) => toast.error(err.message), });
 
-    // Manejadores de Eventos
+    // Manejadores de Eventos (sin cambios en su lógica interna)
     const handleOpenCreateSectorForm = () => { setCurrentSector(null); setIsSectorModalOpen(true); };
     const handleOpenEditSectorForm = (sector: Sector) => { setCurrentSector(sector); setIsSectorModalOpen(true); };
     const handleSaveSector = (data: SectorCreateData | SectorUpdateData) => { if (currentSector) { updateSectorMutation.mutate(data as SectorUpdateData); } else { createSectorMutation.mutate(data as SectorCreateData); } };
@@ -139,10 +89,7 @@ const FarmDetail = () => {
     const handleConfirmDeleteWaterSource = () => { if(waterSourceToDelete) { deleteWaterSourceMutation.mutate(waterSourceToDelete.id); } };
     const handleSaveUserAssignment = (userId: number) => { assignUserMutation.mutate(userId); };
     const handleConfirmUnassignUser = () => { if(userToUnassign) { unassignUserMutation.mutate(userToUnassign.id); }};
-    const handleOpenCreateFertilizationForm = () => { setCurrentFertilization(null); setIsFertilizationModalOpen(true); };
-    const handleOpenEditFertilizationForm = (fertilization: FertilizationRecord) => { setCurrentFertilization(fertilization); setIsFertilizationModalOpen(true); };
-    const handleSaveFertilization = (data: FertilizationCreateData | Partial<FertilizationCreateData>) => { if (currentFertilization) { updateFertilizationMutation.mutate({ id: currentFertilization.id, data }); } else { createFertilizationMutation.mutate(data as FertilizationCreateData); } };
-    const handleConfirmDeleteFertilization = () => { if (fertilizationToDelete) { deleteFertilizationMutation.mutate(fertilizationToDelete.id); } };
+    
     const availableUsersToAssign = useMemo(() => { const assignedUserIds = new Set(assignedUsers.map(u => u.id)); return allUsers.filter(u => !assignedUserIds.has(u.id)); }, [allUsers, assignedUsers]);
     const getSectorActions = (sector: Sector): ActionMenuItem[] => ([ { label: 'Editar', action: () => handleOpenEditSectorForm(sector) }, { label: 'Eliminar', action: () => setSectorToDelete(sector), className: 'delete' } ]);
     const getEquipmentActions = (equipment: IrrigationEquipment): ActionMenuItem[] => ([ { label: 'Editar', action: () => handleOpenEditEquipmentForm(equipment) }, { label: 'Eliminar', action: () => setEquipmentToDelete(equipment), className: 'delete' } ]);
@@ -154,7 +101,6 @@ const FarmDetail = () => {
     // Lógica para deshabilitar pestañas
     const isEquipmentsDisabled = waterSources.length === 0;
     const isSectorsDisabled = equipments.length === 0;
-    const isFertilizationsDisabled = sectors.length === 0;
 
     return (
         <div className="farm-detail-page">
@@ -162,13 +108,12 @@ const FarmDetail = () => {
             
             <WeatherWidget weatherData={weatherData} isLoading={isLoadingWeather} error={weatherError} />
             
-            {/* --- NAVEGACIÓN POR PESTAÑAS --- */}
+            {/* 2. Se elimina la pestaña de Fertilización y se reordenan los números */}
             <div className="farm-detail-tabs">
                 <button onClick={() => setActiveTab('waterSources')} className={`tab-button ${activeTab === 'waterSources' ? 'active' : ''}`}><span className="tab-number">1</span> Fuentes de Agua</button>
                 <button onClick={() => setActiveTab('equipments')} className={`tab-button ${activeTab === 'equipments' ? 'active' : ''}`} disabled={isEquipmentsDisabled}><span className="tab-number">2</span> Equipos</button>
                 <button onClick={() => setActiveTab('sectors')} className={`tab-button ${activeTab === 'sectors' ? 'active' : ''}`} disabled={isSectorsDisabled}><span className="tab-number">3</span> Sectores</button>
-                <button onClick={() => setActiveTab('fertilizations')} className={`tab-button ${activeTab === 'fertilizations' ? 'active' : ''}`} disabled={isFertilizationsDisabled}><span className="tab-number">4</span> Fertilización</button>
-                <button onClick={() => setActiveTab('users')} className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}><span className="tab-number">5</span> Usuarios</button>
+                <button onClick={() => setActiveTab('users')} className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}><span className="tab-number">4</span> Usuarios</button>
             </div>
 
             {/* --- CONTENIDO DE LA PESTAÑA ACTIVA --- */}
@@ -204,31 +149,8 @@ const FarmDetail = () => {
                         )}
                     </div>
                 )}
-
-                {activeTab === 'fertilizations' && (
-                    <div className="detail-card">
-                        <div className="card-header">
-                             <div className="fertilization-header">
-                                <h3>Fertilizaciones</h3>
-                                <select value={selectedSectorForFertilization?.id || ''} onChange={(e) => setSelectedSectorForFertilization(sectors.find(s => s.id === Number(e.target.value)) || null)}>
-                                    {sectors.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                </select>
-                            </div>
-                            {canCreateFertilization && (
-                                <button className="btn-add" onClick={handleOpenCreateFertilizationForm}><i className="fas fa-plus"></i> Añadir Registro</button>
-                            )}
-                        </div>
-                        {isLoadingFertilizations ? <p>Cargando...</p> : (
-                            <FertilizationList
-                                fertilizations={fertilizations}
-                                onEdit={handleOpenEditFertilizationForm}
-                                onDelete={(id: number) => setFertilizationToDelete(fertilizations.find(f => f.id === id) || null)}
-                                canEdit={canEditFertilization}
-                                canDelete={canDeleteFertilization}
-                            />
-                        )}
-                    </div>
-                )}
+                
+                {/* 3. Se elimina el bloque de contenido de la pestaña de fertilización */}
 
                 {activeTab === 'users' && (
                     <div className="detail-card">
@@ -243,7 +165,7 @@ const FarmDetail = () => {
                 )}
             </div>
             
-            {/* Modales */}
+            {/* Modales (se eliminan los relacionados a fertilización) */}
             {isSectorModalOpen && <SectorForm currentSector={currentSector} availableEquipment={equipments} onSave={handleSaveSector} onCancel={() => setIsSectorModalOpen(false)} isLoading={createSectorMutation.isPending || updateSectorMutation.isPending} />}
             {sectorToDelete && <ConfirmationModal message={`¿Seguro de eliminar el sector "${sectorToDelete.name}"?`} onConfirm={handleConfirmDeleteSector} onCancel={() => setSectorToDelete(null)} isLoading={deleteSectorMutation.isPending} />}
             {isEquipmentModalOpen && <EquipmentForm currentEquipment={currentEquipment} onSave={handleSaveEquipment} onCancel={() => setIsEquipmentModalOpen(false)} isLoading={createEquipmentMutation.isPending || updateEquipmentMutation.isPending} />}
@@ -252,20 +174,8 @@ const FarmDetail = () => {
             {waterSourceToDelete && <ConfirmationModal message={`¿Seguro de eliminar la fuente de agua "${waterSourceToDelete.type}"?`} onConfirm={handleConfirmDeleteWaterSource} onCancel={() => setWaterSourceToDelete(null)} isLoading={deleteWaterSourceMutation.isPending} />}
             {isAssignUserModalOpen && <AssignUserForm availableUsers={availableUsersToAssign} onSave={handleSaveUserAssignment} onCancel={() => setIsAssignUserModalOpen(false)} isLoading={assignUserMutation.isPending} />}
             {userToUnassign && <ConfirmationModal message={`¿Seguro de desasignar a "${userToUnassign.name}" de esta finca?`} onConfirm={handleConfirmUnassignUser} onCancel={() => setUserToUnassign(null)} isLoading={unassignUserMutation.isPending} />}
-            {isFertilizationModalOpen && selectedSectorForFertilization && (
-                <FertilizationForm
-                    currentFertilization={currentFertilization}
-                    farmId={farmIdNum}
-                    sectors={[selectedSectorForFertilization]}
-                    onSave={handleSaveFertilization}
-                    onClose={() => setIsFertilizationModalOpen(false)}
-                    isLoading={createFertilizationMutation.isPending || updateFertilizationMutation.isPending}
-                />
-            )}
-            {fertilizationToDelete && <ConfirmationModal message={`¿Seguro de eliminar este registro de fertilización?`} onConfirm={handleConfirmDeleteFertilization} onCancel={() => setFertilizationToDelete(null)} isLoading={deleteFertilizationMutation.isPending} />}
         </div>
     );
 };
 
 export default FarmDetail;
-

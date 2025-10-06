@@ -5,12 +5,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import precipitationService from '../../services/precipitationService';
 import type { PrecipitationCreateData } from '../../types/precipitation.types';
-import '../users/UserForm.css';
+import '../users/UserForm.css'; // Reutilizamos los estilos de otros formularios
 
 // 1. AÑADIMOS 'date' A LAS PROPIEDADES REQUERIDAS
 interface Props {
     farmId: number;
-    date: string; // Formato YYYY-MM-DD
+    date: string; // <-- La fecha del día seleccionado
     onClose: () => void;
 }
 
@@ -49,12 +49,12 @@ const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
     return (
         <div className="modal-overlay">
             <div className="modal-container">
-                <h3>Registrar Precipitación para el {new Date(date + 'T00:00:00').toLocaleDateString()}</h3>
+                <h3>Registrar Precipitación para el {new Date(date + 'T00:00:00').toLocaleDateString('es-AR')}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="precipitationDate">Fecha</label>
-                            {/* 3. EL CAMPO DE FECHA AHORA ES DE SOLO LECTURA */}
+                            {/* 3. EL CAMPO DE FECHA AHORA ES DE SOLO LECTURA PARA EVITAR ERRORES */}
                             <input type="date" id="precipitationDate" name="precipitationDate" value={formData.precipitationDate} readOnly />
                         </div>
                         <div className="form-group">
