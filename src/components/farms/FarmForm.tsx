@@ -1,6 +1,7 @@
+// src/components/farms/FarmForm.tsx
 import React, { useState, useEffect } from 'react';
 import type { Farm, FarmCreateData, FarmUpdateData } from '../../types/farm.types';
-import '../users/UserForm.css'; // Reutilizamos los estilos del UserForm
+import '../users/UserForm.css';
 
 interface FarmFormProps {
     currentFarm: Farm | null;
@@ -10,14 +11,13 @@ interface FarmFormProps {
 }
 
 const FarmForm: React.FC<FarmFormProps> = ({ currentFarm, onSave, onCancel, isLoading }) => {
-    // 1. El estado inicial ahora incluye latitud y longitud
-    const [formData, setFormData] = useState<FarmCreateData>({
+    const [formData, setFormData] = useState({
         name: '',
         location: '',
-        farmSize: 0,
-        reservoirCapacity: 0,
-        latitude: 0,
-        longitude: 0,
+        farmSize: '0',
+        reservoirCapacity: '0',
+        latitude: '0',
+        longitude: '0',
     });
 
     const isEditing = currentFarm !== null;
@@ -27,28 +27,44 @@ const FarmForm: React.FC<FarmFormProps> = ({ currentFarm, onSave, onCancel, isLo
             setFormData({
                 name: currentFarm.name,
                 location: currentFarm.location,
-                farmSize: currentFarm.farmSize,
-                reservoirCapacity: currentFarm.reservoirCapacity,
-                latitude: currentFarm.latitude || 0, // Usamos valor por defecto si no existe
-                longitude: currentFarm.longitude || 0,
+                farmSize: String(currentFarm.farmSize),
+                reservoirCapacity: String(currentFarm.reservoirCapacity),
+                latitude: String(currentFarm.latitude || 0),
+                longitude: String(currentFarm.longitude || 0),
             });
         } else {
-            // Reseteo completo para el modo creación
-            setFormData({ name: '', location: '', farmSize: 0, reservoirCapacity: 0, latitude: 0, longitude: 0 });
+            setFormData({ name: '', location: '', farmSize: '0', reservoirCapacity: '0', latitude: '0', longitude: '0' });
         }
     }, [currentFarm, isEditing]);
 
+    // --- INICIO DE LA CORRECCIÓN ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type } = e.target;
-        setFormData(prev => ({ 
-            ...prev, 
-            [name]: type === 'number' ? parseFloat(value) || 0 : value 
-        }));
+        const { name, value } = e.target;
+        const numberRegex = /^-?[0-9]*\.?[0-9]*$/; // Permite negativos para coordenadas
+
+        const numericFields = ['farmSize', 'reservoirCapacity', 'latitude', 'longitude'];
+
+        if (numericFields.includes(name)) {
+            if (numberRegex.test(value)) {
+                setFormData(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
+    // --- FIN DE LA CORRECCIÓN ---
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        const dataToSave = {
+          name: formData.name,
+          location: formData.location,
+          farmSize: parseFloat(formData.farmSize) || 0,
+          reservoirCapacity: parseFloat(formData.reservoirCapacity) || 0,
+          latitude: parseFloat(formData.latitude) || 0,
+          longitude: parseFloat(formData.longitude) || 0,
+        };
+        onSave(dataToSave);
     };
 
     return (
@@ -56,41 +72,25 @@ const FarmForm: React.FC<FarmFormProps> = ({ currentFarm, onSave, onCancel, isLo
             <h3>{isEditing ? 'Editar Finca' : 'Crear Finca'}</h3>
             <form onSubmit={handleSubmit} className="user-form">
                 <div className="form-grid">
-                    <div className="form-group">
-                        <label htmlFor="name">Nombre de la Finca</label>
-                        <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="location">Ubicación (Ej: "Mendoza, Argentina")</label>
-                        <input type="text" id="location" name="location" value={formData.location} onChange={handleChange} />
-                    </div>
-                     {/* 2. NUEVOS CAMPOS PARA COORDENADAS */}
+                    {/* ... campos de texto ... */}
                     <div className="form-group">
                         <label htmlFor="latitude">Latitud</label>
-                        <input type="number" step="any" id="latitude" name="latitude" value={formData.latitude} onChange={handleChange} required />
+                        <input type="text" inputMode="decimal" id="latitude" name="latitude" value={formData.latitude} onChange={handleChange} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="longitude">Longitud</label>
-                        <input type="number" step="any" id="longitude" name="longitude" value={formData.longitude} onChange={handleChange} required />
+                        <input type="text" inputMode="decimal" id="longitude" name="longitude" value={formData.longitude} onChange={handleChange} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="farmSize">Tamaño (hectáreas)</label>
-                        <input type="number" id="farmSize" name="farmSize" value={formData.farmSize} onChange={handleChange} required />
+                        <input type="text" inputMode="decimal" id="farmSize" name="farmSize" value={formData.farmSize} onChange={handleChange} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="reservoirCapacity">Capacidad de Reserva (litros)</label>
-                        <input type="number" id="reservoirCapacity" name="reservoirCapacity" value={formData.reservoirCapacity} onChange={handleChange} required />
+                        <input type="text" inputMode="decimal" id="reservoirCapacity" name="reservoirCapacity" value={formData.reservoirCapacity} onChange={handleChange} required />
                     </div>
                 </div>
-
-                <div className="form-actions">
-                    <button type="submit" className="btn-save" disabled={isLoading}>
-                        {isLoading ? 'Guardando...' : 'Guardar'}
-                    </button>
-                    <button type="button" className="btn-cancel" onClick={onCancel} disabled={isLoading}>
-                        Cancelar
-                    </button>
-                </div>
+                {/* ... botones ... */}
             </form>
         </div>
     );

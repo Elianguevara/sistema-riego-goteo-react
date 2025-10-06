@@ -15,10 +15,10 @@ interface Props {
 
 const MaintenanceForm = ({ farmId, equipmentId, onClose }: Props) => {
     const queryClient = useQueryClient();
-    const [formData, setFormData] = useState<MaintenanceCreateData>({
+    const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
         description: '',
-        workHours: 1,
+        workHours: '1', // Como string
     });
 
     const mutation = useMutation({
@@ -31,21 +31,35 @@ const MaintenanceForm = ({ farmId, equipmentId, onClose }: Props) => {
         onError: (err: Error) => toast.error(err.message),
     });
 
+    // --- INICIO DE LA CORRECCIÓN ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'number' ? (value ? parseFloat(value) : undefined) : value,
-        }));
+        const { name, value } = e.target;
+        const numberRegex = /^[0-9]*\.?[0-9]*$/;
+
+        if (name === 'workHours') {
+            if (numberRegex.test(value)) {
+                setFormData(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
+    // --- FIN DE LA CORRECCIÓN ---
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.description) {
-            toast.error("La descripción es obligatoria.");
+        if (!formData.description.trim()) {
+            toast.error("La descripción no puede estar vacía.");
             return;
         }
-        mutation.mutate(formData);
+
+        const dataToSubmit: MaintenanceCreateData = {
+            date: formData.date,
+            description: formData.description,
+            workHours: formData.workHours ? parseFloat(formData.workHours) : undefined,
+        };
+        
+        mutation.mutate(dataToSubmit);
     };
 
     return (
@@ -71,7 +85,8 @@ const MaintenanceForm = ({ farmId, equipmentId, onClose }: Props) => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="workHours">Horas de Trabajo (Opcional)</label>
-                        <input type="number" id="workHours" name="workHours" value={formData.workHours || ''} onChange={handleChange} step="0.5" />
+                        {/* Corregido: type="text" y inputMode="decimal" */}
+                        <input type="text" inputMode="decimal" id="workHours" name="workHours" value={formData.workHours} onChange={handleChange} step="0.5" />
                     </div>
                 </div>
                 <div className="form-actions">

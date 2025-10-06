@@ -1,3 +1,5 @@
+// src/components/farms/EquipmentForm.tsx
+
 import React, { useState, useEffect } from 'react';
 import type { IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData } from '../../types/farm.types';
 import '../users/UserForm.css';
@@ -9,14 +11,13 @@ interface EquipmentFormProps {
     isLoading: boolean;
 }
 
-// Estos valores deberían coincidir con los enums del backend
 const EQUIPMENT_TYPES = ['BOMBA_AGUA', 'VALVULA_PRINCIPAL', 'FILTRO', 'OTRO'];
 const EQUIPMENT_STATUSES = ['ACTIVO', 'INACTIVO', 'MANTENIMIENTO'];
 
 const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave, onCancel, isLoading }) => {
-    const [formData, setFormData] = useState<EquipmentCreateData>({
+    const [formData, setFormData] = useState({
         name: '',
-        measuredFlow: 0,
+        measuredFlow: '0', // Como string
         hasFlowMeter: false,
         equipmentType: 'OTRO',
         equipmentStatus: 'ACTIVO',
@@ -28,7 +29,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
         if (isEditing && currentEquipment) {
             setFormData({
                 name: currentEquipment.name,
-                measuredFlow: currentEquipment.measuredFlow,
+                measuredFlow: String(currentEquipment.measuredFlow), // Convertido a string
                 hasFlowMeter: currentEquipment.hasFlowMeter,
                 equipmentType: currentEquipment.equipmentType,
                 equipmentStatus: currentEquipment.equipmentStatus,
@@ -36,22 +37,36 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
         }
     }, [currentEquipment, isEditing]);
 
+    // --- INICIO DE LA CORRECCIÓN ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
+        const numberRegex = /^[0-9]*\.?[0-9]*$/; // Regex para validar números decimales positivos
+
         if (type === 'checkbox') {
             const { checked } = e.target as HTMLInputElement;
             setFormData(prev => ({ ...prev, [name]: checked }));
+        } else if (name === 'measuredFlow') {
+            // Solo actualiza si el valor es válido
+            if (numberRegex.test(value)) {
+                setFormData(prev => ({ ...prev, [name]: value }));
+            }
         } else {
+            // Para todos los demás campos, actualiza directamente
             setFormData(prev => ({
                 ...prev,
-                [name]: type === 'number' ? parseFloat(value) || 0 : value,
+                [name]: value,
             }));
         }
     };
+    // --- FIN DE LA CORRECCIÓN ---
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        const dataToSave = {
+            ...formData,
+            measuredFlow: parseFloat(formData.measuredFlow) || 0, // Conversión a número
+        };
+        onSave(dataToSave);
     };
 
     return (
@@ -72,7 +87,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
                         </div>
                          <div className="form-group">
                             <label htmlFor="measuredFlow">Flujo Medido (L/h)</label>
-                            <input type="number" id="measuredFlow" name="measuredFlow" value={formData.measuredFlow} onChange={handleChange} required />
+                            {/* Corregido: type="text" y inputMode="decimal" */}
+                            <input type="text" inputMode="decimal" id="measuredFlow" name="measuredFlow" value={formData.measuredFlow} onChange={handleChange} required />
                         </div>
                         <div className="form-group">
                             <label htmlFor="equipmentStatus">Estado</label>

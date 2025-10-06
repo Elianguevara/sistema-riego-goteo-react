@@ -7,7 +7,7 @@ import irrigationService from '../../services/irrigationService';
 import farmService from '../../services/farmService';
 import type { IrrigationCreateData, IrrigationRecord } from '../../types/irrigation.types';
 import type { IrrigationEquipment, Sector } from '../../types/farm.types';
-import '../users/UserForm.css'; // Aseguramos que se usen los estilos correctos para el modal
+import '../users/ChangePasswordModal.css';
 
 interface IrrigationFormProps {
     farmId: number;
@@ -25,8 +25,8 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
     });
 
     const [startTime, setStartTime] = useState('08:00');
-    const [irrigationHours, setIrrigationHours] = useState(1);
-    const [waterAmount, setWaterAmount] = useState(10);
+    const [irrigationHours, setIrrigationHours] = useState('1');
+    const [waterAmount, setWaterAmount] = useState('10');
     const [selectedEquipmentId, setSelectedEquipmentId] = useState<string>(sector.equipmentId?.toString() || '');
 
     useEffect(() => {
@@ -35,20 +35,16 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
         }
     }, [sector]);
 
-    // --- ESTA ES LA CORRECCIÓN CLAVE Y DEFINITIVA PARA LA FECHA ---
     const { startDateTime, endDateTime } = useMemo(() => {
-        if (!date || !startTime || !/^\d{2}:\d{2}$/.test(startTime) || irrigationHours <= 0) {
+        const hours = parseFloat(irrigationHours);
+        if (!date || !startTime || !hours || hours <= 0) {
             return { startDateTime: null, endDateTime: null };
         }
         
-        // 1. Construimos la fecha de inicio como un string simple. NO se convierte a objeto Date para el envío.
+        const start = new Date(`${date}T${startTime}`);
         const finalStartDateTime = `${date}T${startTime}:00`;
 
-        // 2. Para calcular la fecha de fin, creamos un objeto Date temporal que respeta la hora local.
-        const start = new Date(finalStartDateTime);
-        const end = new Date(start.getTime() + irrigationHours * 3600 * 1000);
-        
-        // 3. Formateamos la fecha de fin manualmente para construir un string sin la conversión a UTC de toISOString().
+        const end = new Date(start.getTime() + hours * 3600 * 1000);
         const finalEndDateTime = end.getFullYear() +
             '-' + String(end.getMonth() + 1).padStart(2, '0') +
             '-' + String(end.getDate()).padStart(2, '0') +
@@ -61,7 +57,6 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
             endDateTime: finalEndDateTime,
         };
     }, [date, startTime, irrigationHours]);
-    // --- FIN DE LA CORRECCIÓN DE FECHA ---
 
     const mutation = useMutation<IrrigationRecord, Error, IrrigationCreateData>({
         mutationFn: irrigationService.createIrrigation,
@@ -73,17 +68,33 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
         onError: (err: Error) => toast.error(err.message),
     });
 
+    // --- INICIO DE LA CORRECCIÓN ---
+    const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const numberRegex = /^[0-9]*\.?[0-9]*$/; // Regex para validar números decimales positivos
+
+        if (numberRegex.test(value)) {
+            if (name === 'irrigationHours') {
+                setIrrigationHours(value);
+            } else if (name === 'waterAmount') {
+                setWaterAmount(value);
+            }
+        }
+    };
+    // --- FIN DE LA CORRECCIÓN ---
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!startDateTime || !endDateTime || !selectedEquipmentId) {
             toast.error("Por favor, complete todos los campos requeridos.");
             return;
         }
+
         const formData: IrrigationCreateData = {
             startDateTime,
             endDateTime,
-            waterAmount: parseFloat(waterAmount.toString()),
-            irrigationHours: parseFloat(irrigationHours.toString()),
+            waterAmount: parseFloat(waterAmount) || 0,
+            irrigationHours: parseFloat(irrigationHours) || 0,
             sectorId: sector.id,
             equipmentId: parseInt(selectedEquipmentId, 10),
         };
@@ -103,7 +114,8 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
                         </div>
                         <div className="form-group">
                             <label htmlFor="irrigationHours">Horas de Riego</label>
-                            <input type="number" step="0.5" name="irrigationHours" value={irrigationHours} onChange={(e) => setIrrigationHours(parseFloat(e.target.value) || 0)} required />
+                            {/* Corregido: type="text" y inputMode="decimal", se usa el nuevo handler */}
+                            <input type="text" inputMode="decimal" step="0.5" name="irrigationHours" value={irrigationHours} onChange={handleNumericChange} required />
                         </div>
                          <div className="form-group">
                             <label htmlFor="equipmentId">Equipo</label>
@@ -120,7 +132,8 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
                         </div>
                         <div className="form-group">
                             <label htmlFor="waterAmount">Cantidad de Agua (m³)</label>
-                            <input type="number" step="0.1" name="waterAmount" value={waterAmount} onChange={(e) => setWaterAmount(parseFloat(e.target.value) || 0)} required />
+                            {/* Corregido: type="text" y inputMode="decimal", se usa el nuevo handler */}
+                            <input type="text" inputMode="decimal" step="0.1" name="waterAmount" value={waterAmount} onChange={handleNumericChange} required />
                         </div>
                     </div>
                      <div className="form-group calculated-field">

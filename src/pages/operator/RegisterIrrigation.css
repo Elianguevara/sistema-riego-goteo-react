@@ -100,4 +100,32 @@
   color: var(--color-text-disabled);
   cursor: not-allowed;
 }
-/* --- FIN DE LA CORRECCIÓN --- */
+.view-switcher {
+    display: flex;
+    background-color: var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 4px;
+    margin-left: 20px; /* Espacio después del selector de finca */
+}
+
+.view-switcher button {
+    background-color: transparent;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-light);
+    font-size: 16px;
+    line-height: 1; /* Para alinear mejor el icono */
+    transition: all 0.2s ease-in-out;
+}
+
+.view-switcher button:hover {
+    color: var(--color-text-dark);
+}
+
+.view-switcher button.active {
+    background-color: var(--color-content-bg);
+    color: var(--color-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

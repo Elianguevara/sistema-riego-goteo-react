@@ -5,22 +5,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import precipitationService from '../../services/precipitationService';
 import type { PrecipitationCreateData } from '../../types/precipitation.types';
-import '../users/UserForm.css'; // Reutilizamos los estilos de otros formularios
+import '../users/UserForm.css';
 
-// 1. AÑADIMOS 'date' A LAS PROPIEDADES REQUERIDAS
 interface Props {
     farmId: number;
-    date: string; // <-- La fecha del día seleccionado
+    date: string;
     onClose: () => void;
 }
 
 const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
     const queryClient = useQueryClient();
     
-    // 2. USAMOS LA FECHA RECIBIDA PARA INICIALIZAR EL FORMULARIO
-    const [formData, setFormData] = useState<PrecipitationCreateData>({
+    const [formState, setFormState] = useState({
         precipitationDate: date,
-        mmRain: 10,
+        mmRain: '10',
     });
 
     const mutation = useMutation({
@@ -28,38 +26,52 @@ const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
         onSuccess: () => {
             toast.success('Precipitación registrada correctamente.');
             queryClient.invalidateQueries({ queryKey: ['irrigations'] });
+            queryClient.invalidateQueries({ queryKey: ['precipitationHistory', farmId] });
             onClose();
         },
         onError: (err: Error) => toast.error(err.message),
     });
 
+    // --- INICIO DE LA CORRECCIÓN ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'number' ? parseFloat(value) || 0 : value,
-        }));
+        const { name, value } = e.target;
+        
+        // Expresión regular para validar números (enteros o decimales)
+        const numberRegex = /^[0-9]*\.?[0-9]*$/;
+
+        if (name === 'mmRain') {
+            // Solo actualiza el estado si el valor es numérico o un campo vacío
+            if (numberRegex.test(value)) {
+                setFormState(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setFormState(prev => ({ ...prev, [name]: value }));
+        }
     };
+    // --- FIN DE LA CORRECCIÓN ---
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        mutation.mutate(formData);
+        const dataToSubmit: PrecipitationCreateData = {
+            precipitationDate: formState.precipitationDate,
+            mmRain: parseFloat(formState.mmRain) || 0,
+        };
+        mutation.mutate(dataToSubmit);
     };
 
     return (
         <div className="modal-overlay">
             <div className="modal-container">
-                <h3>Registrar Precipitación para el {new Date(date + 'T00:00:00').toLocaleDateString('es-AR')}</h3>
+                <h3>Registrar Precipitación para el {new Date(date + 'T00:00:00').toLocaleDateString()}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="precipitationDate">Fecha</label>
-                            {/* 3. EL CAMPO DE FECHA AHORA ES DE SOLO LECTURA PARA EVITAR ERRORES */}
-                            <input type="date" id="precipitationDate" name="precipitationDate" value={formData.precipitationDate} readOnly />
+                            <input type="date" id="precipitationDate" name="precipitationDate" value={formState.precipitationDate} readOnly />
                         </div>
                         <div className="form-group">
                             <label htmlFor="mmRain">Lluvia (mm)</label>
-                            <input type="number" id="mmRain" name="mmRain" value={formData.mmRain} onChange={handleChange} step="0.5" required />
+                            <input type="text" inputMode="decimal" id="mmRain" name="mmRain" value={formState.mmRain} onChange={handleChange} required />
                         </div>
                     </div>
                     <div className="modal-actions">

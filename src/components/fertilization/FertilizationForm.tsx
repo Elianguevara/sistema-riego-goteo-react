@@ -21,7 +21,7 @@ const FertilizationForm = ({ farmId, sectors, currentFertilization, onSave, onCl
         sectorId: currentFertilization?.sectorId || sectors[0]?.id || 0,
         date: currentFertilization?.date || new Date().toISOString().split('T')[0],
         fertilizerType: currentFertilization?.fertilizerType || '',
-        quantity: currentFertilization?.quantity || 25,
+        quantity: String(currentFertilization?.quantity || '25'), // Como string
         quantityUnit: currentFertilization?.quantityUnit || 'KG' as 'KG' | 'LITERS',
     });
 
@@ -31,23 +31,34 @@ const FertilizationForm = ({ farmId, sectors, currentFertilization, onSave, onCl
                 sectorId: currentFertilization.sectorId,
                 date: currentFertilization.date,
                 fertilizerType: currentFertilization.fertilizerType,
-                quantity: currentFertilization.quantity,
+                quantity: String(currentFertilization.quantity),
                 quantityUnit: currentFertilization.quantityUnit,
             });
         }
     }, [currentFertilization, isEditing]);
 
+    // --- INICIO DE LA CORRECCIÓN ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'number' ? parseFloat(value) || 0 : value,
-        }));
+        const { name, value } = e.target;
+        const numberRegex = /^[0-9]*\.?[0-9]*$/;
+
+        if (name === 'quantity') {
+            if (numberRegex.test(value)) {
+                setFormData(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
+    // --- FIN DE LA CORRECCIÓN ---
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        const dataToSave = {
+            ...formData,
+            quantity: parseFloat(formData.quantity) || 0,
+        };
+        onSave(dataToSave);
     };
 
     return (
@@ -73,7 +84,8 @@ const FertilizationForm = ({ farmId, sectors, currentFertilization, onSave, onCl
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="quantity">Cantidad</label>
-                            <input type="number" id="quantity" name="quantity" value={formData.quantity} onChange={handleChange} step="0.5" required />
+                            {/* Corregido: type="text" y inputMode="decimal" */}
+                            <input type="text" inputMode="decimal" id="quantity" name="quantity" value={formData.quantity} onChange={handleChange} step="0.5" required />
                         </div>
                         <div className="form-group">
                             <label htmlFor="quantityUnit">Unidad</label>
