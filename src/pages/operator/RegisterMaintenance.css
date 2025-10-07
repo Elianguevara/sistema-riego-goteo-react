@@ -1,0 +1,72 @@
+/* Archivo: src/pages/operator/RegisterMaintenance.css */
+
+.maintenance-list-container {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.maintenance-card {
+    background-color: var(--color-content-bg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-main);
+    padding: 15px 20px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    border-left: 5px solid #f39c12; /* Color naranja para mantenimiento */
+}
+
+.maintenance-card-icon {
+    font-size: 20px;
+    color: #f39c12;
+    padding-top: 3px;
+}
+
+.maintenance-card-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.maintenance-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.maintenance-date {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.maintenance-description {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-dark);
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.maintenance-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 20px;
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+}
+
+.maintenance-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.maintenance-actions {
+    margin-left: auto;
+}

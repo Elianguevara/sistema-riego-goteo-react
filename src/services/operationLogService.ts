@@ -14,13 +14,19 @@ const getAuthHeader = (): Record<string, string> => {
 };
 
 /**
- * Obtiene la bitácora de operaciones de una finca.
- * GET /api/farms/{farmId}/operationlogs
+ * Obtiene la bitácora de operaciones de una finca, con filtro opcional por tipo.
+ * GET /api/farms/{farmId}/operationlogs?type={operationType}
  */
-const getOperationLogsByFarm = async (farmId: number): Promise<OperationLog[]> => {
-    const response = await fetch(`${API_BASE_URL}/farms/${farmId}/operationlogs`, {
+const getOperationLogsByFarm = async (farmId: number, type?: string): Promise<OperationLog[]> => {
+    let url = `${API_BASE_URL}/farms/${farmId}/operationlogs`;
+    if (type) {
+        url += `?type=${encodeURIComponent(type)}`;
+    }
+    
+    const response = await fetch(url, {
         headers: getAuthHeader(),
     });
+
     if (!response.ok) {
         throw new Error('Error al obtener la bitácora de operaciones.');
     }
@@ -38,34 +44,10 @@ const createOperationLog = async (farmId: number, data: OperationLogCreateData):
         body: JSON.stringify(data),
     });
 
-    // --- MANEJO DE ERRORES MEJORADO ---
     if (!response.ok) {
-        if (response.status === 403) {
-            throw new Error('Permiso denegado: No puedes crear entradas en esta bitácora.');
-        }
-        try {
-            const errorData = await response.json();
-            // Si el backend envía un mensaje de error específico, lo mostramos
-            throw new Error(errorData.message || 'Error al crear la entrada en la bitácora.');
-        } catch (e) {
-            // Si la respuesta de error no es un JSON, mostramos un error genérico
-            throw new Error(`Error del servidor: ${response.status}. Intenta de nuevo más tarde.`);
-        }
-    }
-    return response.json();
-};
-
-
-/**
- * Obtiene un registro específico por su ID.
- * GET /api/operationlogs/{logId}
- */
-const getOperationLogById = async (logId: number): Promise<OperationLog> => {
-    const response = await fetch(`${API_BASE_URL}/operationlogs/${logId}`, {
-        headers: getAuthHeader(),
-    });
-    if (!response.ok) {
-        throw new Error('Error al obtener el detalle del registro.');
+        if (response.status === 403) throw new Error('Permiso denegado: No puedes crear entradas en esta bitácora.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al crear la entrada en la bitácora.');
     }
     return response.json();
 };
@@ -87,12 +69,26 @@ const updateOperationLog = async (logId: number, data: OperationLogUpdateData): 
     return response.json();
 };
 
+/**
+ * NUEVA FUNCIÓN
+ * Obtiene la lista de tipos de operación predefinidos.
+ * GET /api/operation-types
+ */
+const getOperationTypes = async (): Promise<string[]> => {
+    const response = await fetch(`${API_BASE_URL}/operation-types`, {
+        headers: getAuthHeader(),
+    });
+    if (!response.ok) {
+        throw new Error('Error al obtener los tipos de operación.');
+    }
+    return response.json();
+};
 
 const operationLogService = {
     getOperationLogsByFarm,
     createOperationLog,
-    getOperationLogById,
     updateOperationLog,
+    getOperationTypes, // <-- Exportamos la nueva función
 };
 
 export default operationLogService;

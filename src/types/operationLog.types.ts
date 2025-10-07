@@ -5,17 +5,17 @@ export interface OperationLog {
   id: number;
   farmId: number;
   farmName: string;
-  startDatetime: string; // Formato ISO 8601
-  endDatetime: string | null; // Puede ser nulo si la operación no ha terminado
-  description: string;
+  operationDatetime: string; // Formato ISO 8601
+  operationType: string;
+  description?: string; // Es opcional
   createdByUsername: string;
 }
 
 // Lo que ENVIAMOS a la API para CREAR un registro
 export interface OperationLogCreateData {
-  startDatetime: string;
-  endDatetime?: string | null;
-  description: string;
+  operationDatetime: string;
+  operationType: string;
+  description?: string;
 }
 
 // Lo que ENVIAMOS a la API para ACTUALIZAR

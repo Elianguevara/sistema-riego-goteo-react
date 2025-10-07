@@ -1,0 +1,73 @@
+/* Archivo: src/pages/operator/OperationLogbook.css */
+
+.log-list-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.log-day-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.log-day-header {
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--color-border);
+    text-transform: capitalize;
+}
+
+.log-card {
+    background-color: var(--color-content-bg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-main);
+    padding: 15px 20px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    border-left: 5px solid var(--color-info);
+}
+
+.log-card-icon {
+    font-size: 20px;
+    color: var(--color-info);
+    padding-top: 3px;
+}
+
+.log-card-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.log-description {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-dark);
+}
+
+.log-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 20px; /* Espacio vertical y horizontal */
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    padding-top: 10px;
+    border-top: 1px dashed var(--color-border);
+}
+
+.log-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.log-actions {
+    margin-left: auto;
+}
