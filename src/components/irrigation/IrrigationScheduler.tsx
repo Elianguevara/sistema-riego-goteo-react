@@ -1,8 +1,8 @@
 // Archivo: src/components/irrigation/IrrigationScheduler.tsx
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { MonthlyIrrigationSectorView } from '../../types/irrigation.types';
-import type { Sector } from '../../types/farm.types'; // Importamos el tipo Sector
+import type { Sector } from '../../types/farm.types';
 import IrrigationForm from './IrrigationForm';
 import './IrrigationScheduler.css';
 
@@ -14,8 +14,19 @@ interface SchedulerProps {
 }
 
 const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProps) => {
-    // --- LÓGICA CORREGIDA: El estado ahora almacena el objeto Sector completo ---
     const [modalInfo, setModalInfo] = useState<{ sector: Sector; date: string; } | null>(null);
+    const todayRef = useRef<HTMLTableCellElement>(null);
+
+    // Auto-scroll al día actual cuando cambia el mes
+    useEffect(() => {
+        setTimeout(() => {
+            todayRef.current?.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest',
+                inline: 'center'
+            });
+        }, 200);
+    }, [month, year]);
 
     const daysInMonth = new Date(year, month, 0).getDate();
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -23,16 +34,14 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
     const handleCellClick = (sectorId: number, day: number) => {
         const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         
-        // Buscamos la información del sector en los datos que ya tenemos
         const sectorData = validMonthlyData.find(s => s.sectorId === sectorId);
-        if (!sectorData) return; // Si no lo encuentra, no hacemos nada
+        if (!sectorData) return;
 
-        // Construimos el objeto Sector que el formulario necesita
         const sectorForForm: Sector = {
             id: sectorData.sectorId,
             name: sectorData.sectorName,
             farmId: farmId,
-            farmName: '', // No es crucial para el formulario
+            farmName: '',
         };
 
         setModalInfo({ sector: sectorForForm, date });
@@ -46,6 +55,7 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
     const today = now.getDate();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
+    const todayDate = new Date(currentYear, currentMonth - 1, today);
 
     return (
         <>
@@ -54,31 +64,44 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                     <thead>
                         <tr>
                             <th>Sector</th>
-                            {daysArray.map(day => <th key={day}>{day}</th>)}
+                            {daysArray.map(day => {
+                                const date = new Date(year, month - 1, day);
+                                const isToday = date.getTime() === todayDate.getTime();
+                                return (
+                                    <th key={day} className={isToday ? 'today-header' : ''}>
+                                        {day}
+                                    </th>
+                                );
+                            })}
                         </tr>
                     </thead>
                     <tbody>
-                        {validMonthlyData.map(sectorData => (
+                        {validMonthlyData.map((sectorData, rowIndex) => (
                             <tr key={sectorData.sectorId}>
                                 <td>{sectorData.sectorName}</td>
                                 {daysArray.map(day => {
                                     const dailyIrrigations = sectorData.dailyIrrigations?.[day];
                                     const dailyPrecipitations = sectorData.dailyPrecipitations?.[day];
                                     
-                                    const totalWater = dailyIrrigations?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
+                                    const totalHours = dailyIrrigations?.reduce((sum, rec) => sum + (rec?.irrigationHours || 0), 0) || 0;
                                     const totalRain = dailyPrecipitations?.reduce((sum, rec) => sum + (rec?.mmRain || 0), 0) || 0;
 
-                                    const isToday = day === today && month === currentMonth && year === currentYear;
+                                    const date = new Date(year, month - 1, day);
+                                    const dayClass = date < todayDate ? 'past' : (date.getTime() === todayDate.getTime() ? 'today' : 'future');
 
                                     let intensityClass = '';
-                                    if (totalWater > 0) intensityClass = 'intensity-1';
-                                    if (totalWater > 50) intensityClass = 'intensity-2';
-                                    if (totalWater > 100) intensityClass = 'intensity-3';
+                                    if (totalHours > 0) intensityClass = 'intensity-1';
+                                    if (totalHours > 2) intensityClass = 'intensity-2';
+                                    if (totalHours > 4) intensityClass = 'intensity-3';
 
-                                    const cellClassName = `day-cell ${totalWater > 0 ? 'filled' : 'empty'} ${isToday ? 'today' : ''} ${intensityClass}`.trim();
+                                    const cellClassName = `day-cell ${totalHours > 0 ? 'filled' : 'empty'} ${dayClass} ${intensityClass}`.trim();
 
                                     return (
-                                        <td key={day} onClick={() => handleCellClick(sectorData.sectorId, day)}>
+                                        <td 
+                                            key={day} 
+                                            onClick={() => handleCellClick(sectorData.sectorId, day)}
+                                            ref={dayClass === 'today' && rowIndex === 0 ? todayRef : null}
+                                        >
                                             <div className={cellClassName}>
                                                 <div className="cell-header">
                                                     {totalRain > 0 && (
@@ -89,10 +112,10 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                                                 </div>
 
                                                 <div className="irrigation-details">
-                                                    {totalWater > 0 ? (
-                                                        <span className="irrigation-amount">
-                                                            <i className="fas fa-tint irrigation-icon"></i>
-                                                            {totalWater.toFixed(1)}
+                                                    {totalHours > 0 ? (
+                                                        <span className="irrigation-time">
+                                                          <i className="fas fa-clock"></i>
+                                                          {totalHours.toFixed(1)} hs
                                                         </span>
                                                     ) : (
                                                         <i className="fas fa-plus"></i>
@@ -116,10 +139,9 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
             </div>
             
             {modalInfo && (
-                // --- LLAMADA AL COMPONENTE CORREGIDA ---
                 <IrrigationForm
                     farmId={farmId}
-                    sector={modalInfo.sector} // Pasamos el objeto 'sector' completo
+                    sector={modalInfo.sector}
                     date={modalInfo.date}
                     onClose={() => setModalInfo(null)}
                 />

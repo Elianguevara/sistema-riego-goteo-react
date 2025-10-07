@@ -3,221 +3,397 @@
 .daily-view-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    padding: 8px;
 }
 
+/* --- TARJETAS DE DÍA CON DISEÑO MODERNO --- */
 .day-card {
-    background-color: #ffffff;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-main);
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    border-left: 5px solid transparent;
-    transition: all 0.2s ease-in-out;
-    border: 1px solid #eee;
+    border: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
-/* --- ESTILOS CON LA NUEVA PALETA DE COLORES --- */
+.day-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, transparent, currentColor 20%, currentColor 80%, transparent);
+    opacity: 0.8;
+}
 
-/* Verde para el día actual (se mantiene) */
+.day-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* --- HOY: Verde vibrante --- */
 .day-card.today {
-    border-left-color: var(--color-primary);
-    background-color: #e8f5e9;
-    border-color: #dcedc8;
+    border-color: #10b981;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
 }
 
-/* Ámbar suave para días pasados (nuevo color) */
+.day-card.today::before {
+    color: #10b981;
+}
+
+/* --- PASADO: Gris suave y neutral --- */
 .day-card.past {
-    background-color: #fff8e1; /* Un ámbar muy suave y cálido */
-    border-left-color: #ffc107; /* Borde ámbar */
-    border-color: #ffecb3;
+    border-color: #e5e7eb;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    opacity: 0.92;
 }
 
-/* Azul suave para días futuros (se mantiene) */
+.day-card.past::before {
+    color: #9ca3af;
+}
+
+/* --- FUTURO: Azul cielo --- */
 .day-card.future {
-    background-color: #e3f2fd; 
-    border-left-color: #90caf9;
-    border-color: #bbdefb;
+    border-color: #60a5fa;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
 }
-/* --- FIN DE ESTILOS NUEVOS --- */
 
+.day-card.future::before {
+    color: #3b82f6;
+}
 
+/* --- HEADER DE LA TARJETA --- */
 .day-card-header {
-    background-color: #f8f9fa;
-    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 16px 20px;
     font-weight: 600;
-    color: var(--color-text-dark);
+    font-size: 0.95rem;
+    color: #1f2937;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .day-card.today .day-card-header {
-    background-color: #dcedc8;
+    background: rgba(220, 252, 231, 0.7);
+    color: #065f46;
 }
 
-/* --- ESTILO CORREGIDO PARA EL HEADER DE DÍAS PASADOS --- */
 .day-card.past .day-card-header {
-    background-color: #ffecb3; /* Header ámbar, a juego con la tarjeta */
+    background: rgba(249, 250, 251, 0.7);
+    color: #6b7280;
 }
 
 .day-card.future .day-card-header {
-    background-color: #bbdefb;
+    background: rgba(219, 234, 254, 0.7);
+    color: #1e40af;
 }
 
-.today-badge {
-    background-color: var(--color-primary);
-    color: var(--color-primary-text);
-    padding: 4px 8px;
-    border-radius: var(--border-radius-sm);
-    font-size: 12px;
+.day-card-header > span {
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
+/* --- ACCIONES DEL HEADER --- */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Display de clima actual */
+.current-weather-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    border-radius: 10px;
+    color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.current-weather-display i {
+    color: #f59e0b;
+    font-size: 1rem;
+}
+
+.current-weather-display strong {
+    color: #1f2937;
+}
+
+.current-weather-display .weather-description {
+    text-transform: capitalize;
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Display de precipitación */
+.daily-precipitation-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e40af;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    padding: 6px 12px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.2);
+}
+
+.daily-precipitation-display i {
+    font-size: 0.9rem;
+}
+
+/* Botón añadir lluvia */
+.btn-add-precipitation {
+    background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+    color: #1e40af;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.btn-add-precipitation:hover {
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-add-precipitation:active {
+    transform: translateY(0);
+}
+
+/* --- LISTA DE SECTORES --- */
 .sector-list {
     display: flex;
     flex-direction: column;
+    padding: 8px;
 }
 
 .sector-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid var(--color-border);
+    padding: 16px 18px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.sector-row:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .sector-row:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .sector-name {
-    font-weight: 500;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
 }
 
+/* --- DATOS DE RIEGO --- */
 .irrigation-data {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .irrigation-data .water-amount {
-    font-weight: 600;
-    color: var(--color-success);
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0ea5e9;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.irrigation-data .water-amount::before {
+    content: '💧';
+    font-size: 0.9rem;
 }
 
 .irrigation-data .hours {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    padding: 4px 10px;
+    border-radius: 8px;
 }
 
+/* Botón ver/editar */
 .btn-view {
-    background: none;
-    border: 1px solid var(--color-border);
-    color: var(--color-text-light);
-    padding: 6px 10px;
-    border-radius: var(--border-radius-sm);
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border: 1.5px solid #d1d5db;
+    color: #4b5563;
+    padding: 8px 14px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
+.btn-view::before {
+    content: '✏️';
+    font-size: 0.85rem;
+}
+
+.btn-view:hover {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón añadir riego */
 .btn-add-irrigation {
-    background-color: #eafaf1;
-    color: var(--color-primary);
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
     border: none;
-    padding: 8px 12px;
-    border-radius: var(--border-radius-md);
-    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: background-color 0.2s;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
 .btn-add-irrigation:hover {
-    background-color: #d4f4e3;
-}
-/* ... estilos existentes ... */
-
-.btn-add-precipitation {
-    background-color: #e3f2fd;
-    color: #3498db;
-    border: none;
-    padding: 6px 10px;
-    border-radius: var(--border-radius-md);
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: background-color 0.2s;
+    background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
 }
 
-.btn-add-precipitation:hover {
-    background-color: #bbdefb;
+.btn-add-irrigation:active {
+    transform: translateY(0);
 }
 
-/* --- INICIO DE LA MODIFICACIÓN --- */
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.btn-add-irrigation i {
+    font-size: 0.9rem;
 }
 
-.daily-precipitation-display {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #2980b9;
-    background-color: #d4eaf7;
-    padding: 6px 12px;
-    border-radius: var(--border-radius-md);
-}
-/* ... (estilos existentes) ... */
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .daily-view-container {
+        gap: 16px;
+        padding: 4px;
+    }
 
-/* --- NUEVOS ESTILOS PARA EL CLIMA EN LA TARJETA --- */
-.current-weather-display {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    padding: 6px 12px;
-    background-color: rgba(0,0,0,0.05);
-    border-radius: var(--border-radius-md);
-    color: var(--color-text-dark);
-}
+    .day-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 16px;
+    }
 
-.current-weather-display i {
-    color: var(--color-primary);
-}
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
 
-.current-weather-display .weather-description {
-    text-transform: capitalize;
-    color: var(--color-text-light);
-    font-size: 13px;
-}
-/* ... (estilos existentes) ... */
+    .sector-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px;
+    }
 
-/* --- INICIO DE LA MODIFICACIÓN --- */
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Aumenta el espacio para que no se vea apretado */
+    .irrigation-data {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-add-irrigation {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
-.daily-precipitation-display {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #2980b9; /* Color azul para representar agua */
-    background-color: #d4eaf7; /* Fondo azul claro */
-    padding: 6px 12px;
-    border-radius: var(--border-radius-md);
+/* --- ANIMACIONES --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.day-card {
+    animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.day-card:nth-child(1) { animation-delay: 0.05s; }
+.day-card:nth-child(2) { animation-delay: 0.1s; }
+.day-card:nth-child(3) { animation-delay: 0.15s; }
+.day-card:nth-child(4) { animation-delay: 0.2s; }
+.day-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* Estados de carga */
+.btn-add-irrigation:disabled,
+.btn-add-precipitation:disabled,
+.btn-view:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mejora visual para scroll */
+.daily-view-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.daily-view-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.daily-view-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.daily-view-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }

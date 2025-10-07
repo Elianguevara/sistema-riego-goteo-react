@@ -2,10 +2,10 @@
 
 .scheduler-container {
     overflow-x: auto;
-    background: #ffffff;
-    padding: 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 16px;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .scheduler-table {
@@ -19,19 +19,30 @@
 /* Headers de los días */
 .scheduler-table th {
     font-weight: 600;
-    color: #6b7280;
-    padding: 10px 4px;
+    color: #64748b;
+    padding: 12px 6px;
     text-align: center;
     border: none;
     font-size: 0.8rem;
-    background-color: #f9fafb;
-    border-bottom: 2px solid #e5e7eb;
-    width: 56px;
-    min-width: 56px;
-    max-width: 56px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-bottom: 2px solid #e2e8f0;
+    width: 62px;
+    min-width: 62px;
+    max-width: 62px;
     position: sticky;
     top: 0;
     z-index: 11;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+/* Header del día actual destacado */
+.scheduler-table th.today-header {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+    font-weight: 700;
+    border-bottom-color: #3b82f6;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
 }
 
 .scheduler-table th:first-child {
@@ -42,122 +53,136 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #374151;
+    color: #334155;
+    font-weight: 700;
 }
 
-/* Primera columna - nombres de sectores con texto en dos líneas */
+/* Primera columna - nombres de sectores */
 .scheduler-table tbody td:first-child {
     font-weight: 600;
     font-size: 0.85rem;
     line-height: 1.3;
     text-align: left;
-    background-color: #ffffff;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     position: sticky;
     left: 0;
     z-index: 10;
-    padding: 12px 16px;
-    color: #111827;
-    border-right: 2px solid #e5e7eb;
-    border-bottom: 1px solid #f3f4f6;
+    padding: 14px 18px;
+    color: #1e293b;
+    border-right: 3px solid #e2e8f0;
+    border-bottom: 1px solid #f1f5f9;
     min-width: 180px;
     max-width: 180px;
     vertical-align: middle;
-    white-space: normal; /* Permite que el texto se divida en líneas */
+    white-space: normal;
     word-wrap: break-word;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.03);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.04);
 }
 
 .scheduler-table tbody tr:hover td:first-child {
-    background-color: #f9fafb;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .scheduler-table td {
     border: none;
     padding: 0;
     vertical-align: middle;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f8fafc;
 }
 
-/* --- CELDA COMPACTA Y LIMPIA --- */
+/* --- CELDA MEJORADA CON DISEÑO CARD --- */
 .day-cell {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 70px;
-    min-height: 70px;
-    max-height: 70px;
-    width: 50px;
-    min-width: 50px;
-    max-width: 50px;
-    padding: 6px;
-    margin: 3px;
-    border-radius: 8px;
+    height: 85px;
+    min-height: 85px;
+    max-height: 85px;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
+    padding: 8px;
+    margin: 4px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1.5px solid #e5e7eb;
-    background-color: #ffffff;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #e2e8f0;
+    background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .day-cell:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: #3b82f6;
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+    border-color: #60a5fa;
     z-index: 5;
 }
 
-/* Celda de hoy - punto indicador sutil */
+/* Celda de hoy - destacada */
 .day-cell.today {
     border-color: #3b82f6;
-    border-width: 2px;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    border-width: 2.5px;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .day-cell.today::after {
     content: '';
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 6px;
-    height: 6px;
-    background-color: #3b82f6;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     border-radius: 50%;
-    box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);
+    animation: pulse-today 2s infinite;
+}
+
+@keyframes pulse-today {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.3);
+    }
 }
 
 /* Celda vacía */
 .day-cell.empty {
-    background-color: #fafafa;
-    border: 1.5px dashed #d1d5db;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 2px dashed #cbd5e1;
     justify-content: center;
     align-items: center;
-    color: #d1d5db;
+    color: #cbd5e1;
 }
 
 .day-cell.empty i {
-    font-size: 1.2rem;
-    opacity: 0.5;
-    transition: all 0.2s ease;
+    font-size: 1.5rem;
+    opacity: 0.4;
+    transition: all 0.3s ease;
 }
 
 .day-cell.empty:hover {
-    background-color: #e0f2fe;
-    border-color: #0ea5e9;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #60a5fa;
     border-style: solid;
 }
 
 .day-cell.empty:hover i {
-    color: #0ea5e9;
+    color: #3b82f6;
     opacity: 1;
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
 }
 
 /* Header de la celda - badge de precipitación */
 .cell-header {
     display: flex;
     justify-content: flex-end;
-    min-height: 18px;
+    min-height: 20px;
 }
 
 .precipitation-badge {
@@ -165,18 +190,19 @@
     align-items: center;
     gap: 3px;
     font-size: 0.65rem;
-    font-weight: 600;
-    background-color: #dbeafe;
+    font-weight: 700;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     color: #1e40af;
-    padding: 2px 6px;
+    padding: 3px 6px;
     border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.15);
 }
 
 .precipitation-badge i {
     font-size: 0.65rem;
 }
 
-/* Detalles de riego - centrado */
+/* Detalles de riego - diseño mejorado */
 .irrigation-details {
     text-align: center;
     display: flex;
@@ -184,89 +210,101 @@
     justify-content: center;
     align-items: center;
     flex: 1;
-    gap: 3px;
+    gap: 6px;
 }
 
-.irrigation-amount {
-    display: none; /* Ocultamos la cantidad de agua */
-}
-
-.irrigation-icon {
-    font-size: 1.2rem;
-    color: #0ea5e9;
-}
-
-/* Horarios de riego - Prominente */
+/* Badge de horas - más prominente y atractivo */
 .irrigation-time {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    color: #0369a1;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 4px 6px;
-    border-radius: 6px;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: 4px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    padding: 6px 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.irrigation-time::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.irrigation-time:hover::before {
+    left: 100%;
 }
 
 .irrigation-time i {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
 }
 
-/* Colores del Heatmap - Sistema de intensidad en tonos azules (agua) */
+/* Colores del Heatmap - Intensidades de azul más distintivas */
 .day-cell.intensity-1 {
-    background-color: #e0f2fe;
-    border-color: #7dd3fc;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #93c5fd;
 }
 
-.day-cell.intensity-1 .irrigation-amount {
-    color: #0284c7;
+.day-cell.intensity-1 .irrigation-time {
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+    box-shadow: 0 3px 8px rgba(56, 189, 248, 0.35);
 }
 
 .day-cell.intensity-2 {
-    background-color: #bae6fd;
+    background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
     border-color: #38bdf8;
 }
 
-.day-cell.intensity-2 .irrigation-amount {
-    color: #0369a1;
+.day-cell.intensity-2 .irrigation-time {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    box-shadow: 0 3px 8px rgba(14, 165, 233, 0.4);
 }
 
 .day-cell.intensity-3 {
-    background-color: #7dd3fc;
+    background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%);
     border-color: #0ea5e9;
 }
 
-.day-cell.intensity-3 .irrigation-amount {
-    color: #075985;
+.day-cell.intensity-3 .irrigation-time {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    box-shadow: 0 3px 10px rgba(2, 132, 199, 0.5);
 }
 
 /* Estado vacío */
 .empty-state {
     text-align: center;
-    padding: 40px 24px;
-    background-color: #fafafa;
-    border-radius: 8px;
+    padding: 48px 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
     margin: 20px;
-    border: 2px dashed #d1d5db;
+    border: 2px dashed #cbd5e1;
 }
 
 .empty-state p {
-    color: #6b7280;
+    color: #64748b;
     font-size: 0.95rem;
     margin: 0;
+    font-weight: 500;
 }
 
 /* Filas alternas para mejor legibilidad */
 .scheduler-table tbody tr:nth-child(even) {
-    background-color: #fafbfc;
+    background-color: rgba(248, 250, 252, 0.5);
 }
 
 .scheduler-table tbody tr:hover {
-    background-color: #f0f9ff;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
 }
 
 /* Responsive */
@@ -277,9 +315,39 @@
     }
     
     .day-cell {
-        height: 60px;
-        min-height: 60px;
-        max-height: 60px;
+        height: 75px;
+        min-height: 75px;
+        max-height: 75px;
+        width: 54px;
+        min-width: 54px;
+        max-width: 54px;
+        padding: 6px;
+        margin: 3px;
+    }
+    
+    .irrigation-time {
+        font-size: 0.7rem;
+        padding: 5px 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .scheduler-container {
+        padding: 12px;
+    }
+    
+    .scheduler-table th:first-child,
+    .scheduler-table tbody td:first-child {
+        min-width: 140px;
+        max-width: 140px;
+        padding: 10px 14px;
+        font-size: 0.75rem;
+    }
+    
+    .day-cell {
+        height: 70px;
+        min-height: 70px;
+        max-height: 70px;
         width: 50px;
         min-width: 50px;
         max-width: 50px;
@@ -287,64 +355,39 @@
         margin: 2px;
     }
     
-    .irrigation-amount {
-        font-size: 1rem;
+    .irrigation-time {
+        font-size: 0.65rem;
+        padding: 4px 6px;
     }
 }
 
-@media (max-width: 768px) {
-    .scheduler-container {
-        padding: 0;
-    }
-    
-    .scheduler-table th:first-child,
-    .scheduler-table tbody td:first-child {
-        min-width: 140px;
-        max-width: 140px;
-        padding: 10px 12px;
-        font-size: 0.7rem;
-    }
-    
-    .day-cell {
-        height: 55px;
-        min-height: 55px;
-        max-height: 55px;
-        width: 48px;
-        min-width: 48px;
-        max-width: 48px;
-        padding: 4px;
-    }
-    
-    .irrigation-amount {
-        font-size: 0.9rem;
-    }
-}
-
-/* Scroll personalizado */
+/* Scroll personalizado mejorado */
 .scheduler-container::-webkit-scrollbar {
-    height: 10px;
+    height: 12px;
 }
 
 .scheduler-container::-webkit-scrollbar-track {
     background: #f1f5f9;
+    border-radius: 6px;
 }
 
 .scheduler-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 5px;
+    background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+    border-radius: 6px;
+    border: 2px solid #f1f5f9;
 }
 
 .scheduler-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
 }
 
-/* Mejora visual cuando hay scroll horizontal */
+/* Mejora visual para la columna sticky */
 .scheduler-table tbody td:first-child::after {
     content: '';
     position: absolute;
     right: 0;
     top: 0;
     bottom: 0;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, #e5e7eb 20%, #e5e7eb 80%, transparent);
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, #e2e8f0 15%, #e2e8f0 85%, transparent);
 }
