@@ -1,0 +1,110 @@
+/* Archivo: src/pages/analyst/AnalystDashboard.css */
+
+.analyst-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Contenedor principal del grid */
+.dashboard-grid-analyst {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto 1fr; /* Fila auto para widgets, fila flexible para el resto */
+    gap: 25px;
+    height: 100%;
+}
+
+/* Estilos de los Widgets (contenedores) */
+.dashboard-widget {
+    background-color: var(--color-content-bg);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-main);
+    display: flex;
+    flex-direction: column;
+}
+
+.widget-title {
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Widgets específicos */
+.map-widget {
+    grid-column: 1 / 3; /* Ocupa 2 de 3 columnas */
+    grid-row: 1 / 3; /* Ocupa 2 filas */
+    min-height: 500px;
+}
+
+.tasks-widget {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+}
+
+.water-balance-widget {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+}
+
+/* Estilos para el mapa */
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    border-radius: var(--border-radius-sm);
+}
+
+/* Estilos para el resumen de tareas */
+.task-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    text-align: center;
+}
+
+.task-summary-item .count {
+    font-size: 2.5rem;
+    font-weight: 700;
+    display: block;
+}
+.task-summary-item .label {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+.task-summary-item .count.pending { color: var(--color-info); }
+.task-summary-item .count.in-progress { color: #f39c12; }
+.task-summary-item .count.completed { color: var(--color-success); }
+
+.widget-footer {
+    margin-top: auto; /* Empuja el footer hacia abajo */
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border);
+    text-align: right;
+}
+
+/* Estilos para el gráfico de balance hídrico */
+.water-balance-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.water-balance-controls select {
+    flex-grow: 1;
+}
+
+/* Responsividad */
+@media (max-width: 1200px) {
+    .dashboard-grid-analyst {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+    .map-widget, .tasks-widget, .water-balance-widget {
+        grid-column: auto;
+        grid-row: auto;
+    }
+}

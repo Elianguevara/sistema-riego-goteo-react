@@ -30,7 +30,6 @@ const AdminLayout = () => {
                         <Link to="/tasks" className={location.pathname.startsWith('/tasks') ? 'active' : ''}>
                             <i className="fas fa-clipboard-list"></i> Mis Tareas
                         </Link>
-                        
                         <Link to="/operator/irrigation" className={location.pathname === '/operator/irrigation' ? 'active' : ''}>
                             <i className="fas fa-tint"></i> Registrar Riego
                         </Link>
@@ -43,7 +42,6 @@ const AdminLayout = () => {
                         <Link to="/operator/logbook" className={location.pathname === '/operator/logbook' ? 'active' : ''}>
                             <i className="fas fa-book"></i> Bitácora
                         </Link>
-
                         <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
                             <i className="fas fa-bell"></i> Notificaciones
                         </Link>
@@ -52,23 +50,27 @@ const AdminLayout = () => {
             case 'ANALISTA':
                 return (
                     <>
-                        <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
-                            <i className="fas fa-home"></i> Principal
+                        {/* --- MENÚ DEL ANALISTA ACTUALIZADO Y COMPLETO --- */}
+                        <Link to="/analyst/dashboard" className={location.pathname === '/analyst/dashboard' ? 'active' : ''}>
+                            <i className="fas fa-chart-bar"></i> Principal
                         </Link>
                         <Link to="/analyst/tasks" className={location.pathname.startsWith('/analyst/tasks') ? 'active' : ''}>
                             <i className="fas fa-tasks"></i> Gestión de Tareas
                         </Link>
+                        <Link to="/analyst/irrigation-analysis" className={location.pathname.startsWith('/analyst/irrigation-analysis') ? 'active' : ''}>
+                            <i className="fas fa-chart-line"></i> Análisis de Riego
+                        </Link>
                         <Link to="/analyst/precipitation" className={location.pathname.startsWith('/analyst/precipitation') ? 'active' : ''}>
                             <i className="fas fa-cloud-rain"></i> Análisis de Lluvia
                         </Link>
-                        <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
-                            <i className="fas fa-users"></i> Usuarios
-                        </Link>
                         <Link to="/farms" className={location.pathname.startsWith('/farms') ? 'active' : ''}>
-                            <i className="fas fa-seedling"></i> Fincas
+                            <i className="fas fa-seedling"></i> Gestión de Fincas
                         </Link>
-                         <Link to="/config" className={location.pathname === '/config' ? 'active' : ''}>
-                            <i className="fas fa-cog"></i> Configuración
+                        <Link to="/analyst/reports" className={location.pathname.startsWith('/analyst/reports') ? 'active' : ''}>
+                            <i className="fas fa-file-alt"></i> Reportes
+                        </Link>
+                         <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
+                            <i className="fas fa-users"></i> Usuarios
                         </Link>
                     </>
                 );
@@ -77,19 +79,19 @@ const AdminLayout = () => {
                 return (
                      <>
                         <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
-                            <i className="fas fa-home"></i> Principal
-                        </Link>
-                        <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
-                            <i className="fas fa-bell"></i> Notificaciones
+                            <i className="fas fa-tachometer-alt"></i> Principal
                         </Link>
                         <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
-                            <i className="fas fa-users"></i> Usuarios
+                            <i className="fas fa-users-cog"></i> Usuarios
                         </Link>
                         <Link to="/farms" className={location.pathname.startsWith('/farms') ? 'active' : ''}>
                             <i className="fas fa-seedling"></i> Fincas
                         </Link>
                         <Link to="/audit" className={location.pathname === '/audit' ? 'active' : ''}>
                             <i className="fas fa-history"></i> Auditoría
+                        </Link>
+                         <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
+                            <i className="fas fa-bell"></i> Notificaciones
                         </Link>
                         <Link to="/config" className={location.pathname === '/config' ? 'active' : ''}>
                             <i className="fas fa-cog"></i> Configuración

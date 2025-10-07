@@ -1,13 +1,13 @@
 // Archivo: src/App.tsx
 
-import React, { Suspense } from 'react'; // 1. Importar Suspense
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/auth/Login';
 import ProtectedRoute from './components/utils/ProtectedRoute';
 import AdminLayout from './components/layout/AdminLayout';
 import { useAuthData } from './hooks/useAuthData';
 
-// 2. Usar React.lazy para importar dinámicamente cada página
+// Usar React.lazy para importar dinámicamente cada página
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const UserManagement = React.lazy(() => import('./pages/UserManagement'));
 const UserProfile = React.lazy(() => import('./pages/UserProfile'));
@@ -24,6 +24,8 @@ const RegisterMaintenance = React.lazy(() => import('./pages/operator/RegisterMa
 const OperatorDashboard = React.lazy(() => import('./pages/operator/OperatorDashboard'));
 const OperationLogbook = React.lazy(() => import('./pages/operator/OperationLogbook'));
 const PrecipitationAnalysis = React.lazy(() => import('./pages/analyst/PrecipitationAnalysis'));
+// Importamos el nuevo dashboard del analista
+const AnalystDashboard = React.lazy(() => import('./pages/analyst/AnalystDashboard'));
 
 
 // Componente de redirección para la página de inicio según el rol
@@ -31,18 +33,23 @@ const DashboardRedirect = () => {
     const authData = useAuthData();
     if (!authData) return null;
     
+    // Lógica de redirección actualizada para incluir al analista
     if (authData.role === 'OPERARIO') {
         return <Navigate to="/operator/dashboard" replace />;
     }
+    if (authData.role === 'ANALISTA') {
+        return <Navigate to="/analyst/dashboard" replace />;
+    }
+    // El rol ADMIN (y cualquier otro por defecto) irá al dashboard general
     return <Dashboard />;
 };
 
-// 3. Componente simple para mostrar mientras se carga el código de una página
+// Componente simple para mostrar mientras se carga el código de una página
 const PageLoader = () => <div>Cargando página...</div>;
 
 function App() {
   return (
-    // 4. Envolver todas las rutas dentro de un componente Suspense
+    // Envolver todas las rutas dentro de un componente Suspense
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -59,7 +66,7 @@ function App() {
             }
           />
           
-          {/* --- NUEVA RUTA PARA EL DASHBOARD DEL OPERARIO --- */}
+          {/* --- DASHBOARD DEL OPERARIO --- */}
           <Route
             path="operator/dashboard"
             element={
@@ -68,6 +75,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* --- NUEVA RUTA: DASHBOARD DEL ANALISTA --- */}
+           <Route
+            path="analyst/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['ANALISTA']}>
+                <AnalystDashboard />
+              </ProtectedRoute>
+            }
+          />
+
           {/* --- Rutas del Operario --- */}
           <Route
             path="tasks"

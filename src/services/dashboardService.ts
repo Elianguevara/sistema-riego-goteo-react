@@ -2,12 +2,12 @@
 
 import authService from './authService';
 import type { KpiResponse, UserStatsResponse } from '../types/dashboard.types';
+// Importamos los nuevos tipos que crearemos en el siguiente paso
+import type { FarmStatus, WaterBalance, TaskSummary } from '../types/analyst.types';
 
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/dashboard`;
+const ANALYST_API_URL = `${API_URL}/analyst`;
 
-/**
- * Obtiene las cabeceras de autenticación necesarias para las peticiones.
- */
 const getAuthHeader = (): Record<string, string> => {
     const token = authService.getToken();
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -17,49 +17,64 @@ const getAuthHeader = (): Record<string, string> => {
     return headers;
 };
 
-/**
- * Obtiene los KPIs (Key Performance Indicators) desde la API.
- */
+// --- Funciones del Dashboard General ---
+
 const getKpis = async (): Promise<KpiResponse> => {
-    const response = await fetch(`${API_URL}/kpis`, {
-        method: 'GET',
-        headers: getAuthHeader(),
-    });
-
-    if (!response.ok) {
-        throw new Error('Error al obtener los KPIs del dashboard.');
-    }
-
+    const response = await fetch(`${API_URL}/kpis`, { headers: getAuthHeader() });
+    if (!response.ok) throw new Error('Error al obtener los KPIs del dashboard.');
     return await response.json();
 };
 
-/**
- * NUEVA FUNCIÓN
- * Obtiene las estadísticas de usuarios desde la API.
- * Endpoint: GET /api/admin/dashboard/user-stats
- */
 const getUserStats = async (): Promise<UserStatsResponse> => {
-    // Usamos la URL base del entorno y la ruta específica del endpoint
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard/user-stats`, {
-        method: 'GET',
-        headers: getAuthHeader(),
-    });
-
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard/user-stats`, { headers: getAuthHeader() });
     if (!response.ok) {
-        // Manejo específico para el error de autorización
-        if (response.status === 403) {
-            throw new Error('No tienes permiso para ver estas estadísticas.');
-        }
+        if (response.status === 403) throw new Error('No tienes permiso para ver estas estadísticas.');
         throw new Error('Error al obtener las estadísticas de usuarios.');
     }
-
     return await response.json();
 };
 
+
+// --- NUEVAS FUNCIONES PARA EL DASHBOARD DEL ANALISTA ---
+
+/**
+ * Obtiene el estado y geolocalización de todas las fincas.
+ * GET /api/dashboard/analyst/farm-statuses
+ */
+const getFarmStatuses = async (): Promise<FarmStatus[]> => {
+    const response = await fetch(`${ANALYST_API_URL}/farm-statuses`, { headers: getAuthHeader() });
+    if (!response.ok) throw new Error('Error al obtener el estado de las fincas.');
+    return response.json();
+};
+
+/**
+ * Obtiene el balance hídrico diario para una finca en un rango de fechas.
+ * GET /api/dashboard/analyst/water-balance/{farmId}
+ */
+const getWaterBalance = async (farmId: number, startDate: string, endDate: string): Promise<WaterBalance[]> => {
+    const queryParams = new URLSearchParams({ startDate, endDate });
+    const response = await fetch(`${ANALYST_API_URL}/water-balance/${farmId}?${queryParams}`, { headers: getAuthHeader() });
+    if (!response.ok) throw new Error('Error al obtener el balance hídrico.');
+    return response.json();
+};
+
+/**
+ * Obtiene un resumen del estado de las tareas creadas por el analista.
+ * GET /api/dashboard/analyst/task-summary
+ */
+const getTaskSummary = async (): Promise<TaskSummary> => {
+    const response = await fetch(`${ANALYST_API_URL}/task-summary`, { headers: getAuthHeader() });
+    if (!response.ok) throw new Error('Error al obtener el resumen de tareas.');
+    return response.json();
+};
 
 const dashboardService = {
     getKpis,
-    getUserStats, // 2. Exporta la nueva función
+    getUserStats,
+    // Exportamos las nuevas funciones
+    getFarmStatuses,
+    getWaterBalance,
+    getTaskSummary,
 };
 
 export default dashboardService;
