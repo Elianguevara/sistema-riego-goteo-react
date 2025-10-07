@@ -5,6 +5,13 @@ import type { Task, TaskPage, TaskStatusUpdateData, TaskCreateData } from '../ty
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/tasks`;
 
+// Define una interfaz para los filtros que podemos pasar
+export interface TaskFilters {
+    status?: string;
+    farmId?: string;
+    assignedToUserId?: string;
+}
+
 const getAuthHeader = (): Record<string, string> => {
     const token = authService.getToken();
     return {
@@ -20,14 +27,9 @@ const getMyTasks = async (): Promise<Task[]> => {
     const response = await fetch(`${API_BASE_URL}/assigned-to-me`, { headers: getAuthHeader() });
     if (!response.ok) throw new Error('Error al obtener las tareas asignadas.');
     
-    // Manejo robusto de la respuesta por si viene paginada o como array directo
     const data = await response.json();
-    if (data && Array.isArray(data.content)) {
-        return data.content;
-    }
-    if (data && Array.isArray(data)) {
-        return data;
-    }
+    if (data && Array.isArray(data.content)) return data.content;
+    if (data && Array.isArray(data)) return data;
     return [];
 };
 
@@ -45,10 +47,15 @@ const updateTaskStatus = async (taskId: number, data: TaskStatusUpdateData): Pro
 };
 
 /**
- * (ANALISTA) Obtiene las tareas creadas por el analista autenticado.
+ * (ANALISTA) Obtiene las tareas creadas por el analista autenticado, con filtros.
  */
-const getTasksCreatedByMe = async (): Promise<Task[]> => {
-    const response = await fetch(`${API_BASE_URL}/created-by-me`, {
+const getTasksCreatedByMe = async (filters: TaskFilters = {}): Promise<Task[]> => {
+    const queryParams = new URLSearchParams();
+    if (filters.status && filters.status !== 'TODOS') queryParams.append('status', filters.status);
+    if (filters.farmId && filters.farmId !== 'TODAS') queryParams.append('farmId', filters.farmId);
+    if (filters.assignedToUserId && filters.assignedToUserId !== 'TODOS') queryParams.append('userId', filters.assignedToUserId);
+
+    const response = await fetch(`${API_BASE_URL}/created-by-me?${queryParams.toString()}`, {
         headers: getAuthHeader(),
     });
     if (!response.ok) throw new Error('Error al obtener las tareas creadas.');

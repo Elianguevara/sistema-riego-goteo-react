@@ -19,6 +19,8 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
     const [formData, setFormData] = useState<Partial<TaskCreateData>>({});
     const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
 
+    // --- QUERIES PARA OBTENER DATOS ---
+
     const { data: farms = [], isLoading: isLoadingFarms } = useQuery<Farm[], Error>({
         queryKey: ['farms'],
         queryFn: farmService.getFarms
@@ -29,34 +31,32 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
         queryFn: () => farmService.getSectorsByFarm(selectedFarmId!),
         enabled: !!selectedFarmId,
     });
-
+    
+    // --- LÓGICA CORREGIDA PARA OBTENER OPERARIOS ---
     const { data: assignedUsers = [], isLoading: isLoadingUsers } = useQuery<UserResponse[], Error>({
         queryKey: ['assignedUsers', selectedFarmId],
         queryFn: () => farmService.getAssignedUsers(selectedFarmId!),
-        enabled: !!selectedFarmId,
+        enabled: !!selectedFarmId, // Solo se ejecuta si hay una finca seleccionada
     });
-
+    // Filtramos para obtener solo los operarios activos de la finca seleccionada
     const availableOperators = assignedUsers.filter(user => user.roleName === 'OPERARIO' && user.active);
+
 
     const createTaskMutation = useMutation({
         mutationFn: taskService.createTask,
         onSuccess: () => {
             toast.success("Tarea creada y asignada exitosamente.");
-            // Invalida la lista de tareas del analista (para que vea su nueva tarea creada)
             queryClient.invalidateQueries({ queryKey: ['tasksCreatedByMe'] });
-            
-            // --- ¡ESTA ES LA LÍNEA CLAVE DE LA SOLUCIÓN! ---
-            // También invalida la lista de tareas del operario.
             queryClient.invalidateQueries({ queryKey: ['myTasks'] });
-
+            queryClient.invalidateQueries({ queryKey: ['analystTaskSummary'] });
             onClose();
         },
         onError: (err: Error) => toast.error(err.message),
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        const parsedValue = ['farmId', 'sectorId', 'assignedToUserId'].includes(name) ? parseInt(value) : value;
+        const parsedValue = ['sectorId', 'assignedToUserId'].includes(name) ? parseInt(value) : value;
         setFormData(prev => ({ ...prev, [name]: parsedValue }));
     };
 
@@ -65,7 +65,6 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
         setSelectedFarmId(farmId);
         setFormData(prev => ({
             ...prev,
-            farmId,
             sectorId: undefined,
             assignedToUserId: undefined
         }));
@@ -73,8 +72,8 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.description || !formData.assignedToUserId || !formData.sectorId) {
-            toast.error("Por favor, completa la descripción y selecciona finca, operario y sector.");
+        if (!formData.description || !formData.assignedToUserId || !formData.sectorId || !selectedFarmId) {
+            toast.error("Por favor, completa todos los campos.");
             return;
         }
         createTaskMutation.mutate(formData as TaskCreateData);
@@ -85,27 +84,49 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
             <div className="modal-container task-form-container">
                 <h3>Crear Nueva Tarea</h3>
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Paso 1: Seleccionar Ubicación y Responsable</label>
-                        <div className='form-grid'>
-                            <select name="farmId" onChange={handleFarmChange} required>
-                                <option value="">{isLoadingFarms ? 'Cargando fincas...' : 'Seleccionar finca...'}</option>
-                                {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
-                            </select>
-                            <select name="sectorId" onChange={handleChange} required disabled={!selectedFarmId || isLoadingSectors}>
-                                <option value="">{isLoadingSectors ? 'Cargando...' : 'Seleccionar sector...'}</option>
-                                {sectors.map(sector => <option key={sector.id} value={sector.id}>{sector.name}</option>)}
-                            </select>
-                            <select name="assignedToUserId" onChange={handleChange} required disabled={!selectedFarmId || isLoadingUsers}>
-                                <option value="">{isLoadingUsers ? 'Cargando...' : 'Asignar a operario...'}</option>
-                                {availableOperators.map(op => <option key={op.id} value={op.id}>{op.name}</option>)}
-                            </select>
+                    <div className="task-form-step">
+                        <h4 className="step-header">
+                            <span className="step-number">1</span>
+                            Definir Ubicación y Responsable
+                        </h4>
+                        <div className="step-content">
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label htmlFor="farmId">Finca</label>
+                                    <select id="farmId" name="farmId" onChange={handleFarmChange} value={selectedFarmId || ''} required>
+                                        <option value="" disabled>{isLoadingFarms ? 'Cargando...' : 'Seleccionar...'}</option>
+                                        {farms.map(farm => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="sectorId">Sector</label>
+                                    <select id="sectorId" name="sectorId" onChange={handleChange} value={formData.sectorId || ''} required disabled={!selectedFarmId || isLoadingSectors}>
+                                        <option value="" disabled>{isLoadingSectors ? 'Cargando...' : 'Seleccionar...'}</option>
+                                        {sectors.map(sector => <option key={sector.id} value={sector.id}>{sector.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="assignedToUserId">Asignar a</label>
+                                    <select id="assignedToUserId" name="assignedToUserId" onChange={handleChange} value={formData.assignedToUserId || ''} required disabled={!selectedFarmId || isLoadingUsers}>
+                                        <option value="" disabled>{isLoadingUsers ? 'Cargando...' : 'Seleccionar operario...'}</option>
+                                        {availableOperators.map(op => <option key={op.id} value={op.id}>{op.name}</option>)}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="description">Paso 2: Descripción de la Tarea</label>
-                        <textarea id="description" name="description" onChange={handleChange} required placeholder='Ej: Revisar el sistema de goteo y limpiar filtros...' />
+
+                    <div className="task-form-step">
+                        <h4 className="step-header">
+                            <span className="step-number">2</span>
+                            Detallar la Tarea
+                        </h4>
+                        <div className="step-content">
+                            <div className="form-group">
+                                <label htmlFor="description">Descripción de la Tarea</label>
+                                <textarea id="description" name="description" onChange={handleChange} required placeholder='Ej: Revisar el sistema de goteo del Sector Malbec y limpiar filtros...' />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="modal-actions">

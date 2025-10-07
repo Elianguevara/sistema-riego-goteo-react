@@ -1,15 +1,102 @@
+/* Archivo: src/components/tasks/TaskForm.css */
+
 .task-form-container {
-    max-width: 600px;
+    width: 100%;
+    max-width: 650px;
 }
-.task-form-container .form-grid {
+
+.task-form-container h3 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.task-form-step {
+    background-color: #f8f9fa;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 15px 0;
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+}
+
+.step-number {
+    background-color: var(--color-primary);
+    color: var(--color-primary-text);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.step-content .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px;
 }
-.task-form-container textarea {
-    min-height: 80px;
-    width: 100%;
-    padding: 8px;
+
+.step-content .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.step-content label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+}
+
+.step-content select {
+    padding: 10px;
     border-radius: var(--border-radius-sm);
     border: 1px solid var(--color-border);
+    width: 100%;
+}
+
+.step-content textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+/* --- ESTILOS AÑADIDOS PARA BOTONES --- */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.btn-save { 
+  background-color: var(--color-primary); 
+  color: var(--color-primary-text); 
+}
+
+.btn-cancel { 
+  background-color: var(--color-text-light); 
+  color: var(--color-primary-text); 
+}
+
+.btn-save, .btn-cancel { 
+  border: none; 
+  padding: 10px 20px; 
+  border-radius: var(--border-radius-sm); 
+  cursor: pointer; 
+  font-weight: 600; 
 }
