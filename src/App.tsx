@@ -24,8 +24,9 @@ const RegisterMaintenance = React.lazy(() => import('./pages/operator/RegisterMa
 const OperatorDashboard = React.lazy(() => import('./pages/operator/OperatorDashboard'));
 const OperationLogbook = React.lazy(() => import('./pages/operator/OperationLogbook'));
 const PrecipitationAnalysis = React.lazy(() => import('./pages/analyst/PrecipitationAnalysis'));
-// Importamos el nuevo dashboard del analista
 const AnalystDashboard = React.lazy(() => import('./pages/analyst/AnalystDashboard'));
+// --- NUEVA IMPORTACIÓN ---
+const IrrigationAnalysis = React.lazy(() => import('./pages/analyst/IrrigationAnalysis'));
 
 
 // Componente de redirección para la página de inicio según el rol
@@ -76,11 +77,11 @@ function App() {
             }
           />
 
-          {/* --- NUEVA RUTA: DASHBOARD DEL ANALISTA --- */}
+          {/* --- DASHBOARD DEL ANALISTA --- */}
            <Route
             path="analyst/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['ANALISTA']}>
+              <ProtectedRoute allowedRoles={['ANALISTA', 'ADMIN']}>
                 <AnalystDashboard />
               </ProtectedRoute>
             }
@@ -132,7 +133,7 @@ function App() {
           <Route
             path="analyst/tasks"
             element={
-              <ProtectedRoute allowedRoles={['ANALISTA']}>
+              <ProtectedRoute allowedRoles={['ANALISTA', 'ADMIN']}>
                 <TaskManagement />
               </ProtectedRoute>
             }
@@ -140,8 +141,17 @@ function App() {
           <Route
             path="analyst/precipitation"
             element={
-              <ProtectedRoute allowedRoles={['ANALISTA']}>
+              <ProtectedRoute allowedRoles={['ANALISTA', 'ADMIN']}>
                 <PrecipitationAnalysis />
+              </ProtectedRoute>
+            }
+          />
+          {/* --- NUEVA RUTA AÑADIDA --- */}
+          <Route
+            path="analyst/irrigation-analysis"
+            element={
+              <ProtectedRoute allowedRoles={['ANALISTA', 'ADMIN']}>
+                <IrrigationAnalysis />
               </ProtectedRoute>
             }
           />

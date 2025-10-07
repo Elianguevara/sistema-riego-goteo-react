@@ -108,10 +108,10 @@ const WaterBalanceWidget = () => {
     
     const today = new Date();
     const endDate = today.toISOString().split('T')[0];
-    const startDate = new Date(today.setDate(today.getDate() - 30)).toISOString().split('T')[0];
+    const startDate = new Date(new Date().setDate(today.getDate() - 30)).toISOString().split('T')[0];
 
     const { data: waterBalance, isLoading } = useQuery<WaterBalance[], Error>({
-        queryKey: ['analystWaterBalance', selectedFarmId],
+        queryKey: ['analystWaterBalance', selectedFarmId, startDate, endDate],
         queryFn: () => dashboardService.getWaterBalance(selectedFarmId!, startDate, endDate),
         enabled: !!selectedFarmId,
     });
