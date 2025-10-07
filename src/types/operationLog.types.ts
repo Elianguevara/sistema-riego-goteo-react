@@ -1,17 +1,22 @@
 // Archivo: src/types/operationLog.types.ts
 
-// Lo que RECIBIMOS de la API (OperationLogResponse)
+// Lo que RECIBIMOS de la API
 export interface OperationLog {
   id: number;
   farmId: number;
   farmName: string;
-  logDate: string; // Formato YYYY-MM-DD
+  startDatetime: string; // Formato ISO 8601
+  endDatetime: string | null; // Puede ser nulo si la operación no ha terminado
   description: string;
   createdByUsername: string;
 }
 
-// Lo que ENVIAMOS a la API para crear un registro
+// Lo que ENVIAMOS a la API para CREAR un registro
 export interface OperationLogCreateData {
-  logDate: string; // Formato YYYY-MM-DD
+  startDatetime: string;
+  endDatetime?: string | null;
   description: string;
 }
+
+// Lo que ENVIAMOS a la API para ACTUALIZAR
+export interface OperationLogUpdateData extends OperationLogCreateData {}
