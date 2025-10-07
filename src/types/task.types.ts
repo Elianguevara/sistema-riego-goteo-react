@@ -2,12 +2,16 @@
 
 export type TaskStatus = 'PENDIENTE' | 'EN_PROGRESO' | 'COMPLETADA' | 'CANCELADA';
 export type TaskType = 'RIEGO' | 'MANTENIMIENTO' | 'FERTILIZACION' | 'OTRO';
+// --- NUEVO TIPO AÑADIDO ---
+export type TaskPriority = 'ALTA' | 'MEDIA' | 'BAJA';
 
 export interface Task {
   id: number;
   description: string;
   status: TaskStatus;
   taskType: TaskType;
+  // --- CAMPO AÑADIDO ---
+  priority: TaskPriority; 
   createdAt: string;
   updatedAt: string | null;
   dueDate: string | null;
@@ -21,6 +25,7 @@ export interface Task {
   assignedToUsername: string;
 }
 
+// ... resto del archivo sin cambios
 export interface TaskPage {
   content: Task[];
 }
@@ -29,13 +34,10 @@ export interface TaskStatusUpdateData {
   status: TaskStatus;
 }
 
-// --- INTERFAZ CORREGIDA ---
-// Ahora solo contiene los campos que el backend necesita para la creación.
 export interface TaskCreateData {
     description: string;
     assignedToUserId: number;
     sectorId: number;
-    // Campos que el formulario usa pero no se envían directamente en el body
     farmId?: number; 
     taskType?: TaskType;
 }

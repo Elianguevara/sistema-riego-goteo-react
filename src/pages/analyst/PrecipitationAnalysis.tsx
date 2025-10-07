@@ -1,122 +1,162 @@
 // Archivo: src/pages/analyst/PrecipitationAnalysis.tsx
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ChevronDown, CloudRain, Droplets, Filter, Download, Percent, CalendarDays } from 'lucide-react';
 import farmService from '../../services/farmService';
 import precipitationService from '../../services/precipitationService';
 import type { Farm } from '../../types/farm.types';
 import type { PrecipitationRecord, PrecipitationSummary } from '../../types/precipitation.types';
-import '../operator/RegisterIrrigation.css'; // Reutilizamos estilos
-import './PrecipitationAnalysis.css'; // Creamos estilos específicos
+import './PrecipitationAnalysis.css';
 
-// Componente para mostrar el historial
-const PrecipitationHistory = ({ farmId }: { farmId: number }) => {
-    const { data: records = [], isLoading } = useQuery<PrecipitationRecord[], Error>({
-        queryKey: ['precipitationHistory', farmId],
-        queryFn: () => precipitationService.getPrecipitationsByFarm(farmId),
-    });
-
-    if (isLoading) return <p>Cargando historial...</p>;
-
-    return (
-        <div className="analysis-card">
-            <h3>Historial de Registros</h3>
-            {records.length > 0 ? (
-                <div className="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Lluvia (mm)</th>
-                                <th>Lluvia Efectiva (mm)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {records.map(r => (
-                                <tr key={r.id}>
-                                    <td>{new Date(r.precipitationDate + 'T00:00:00').toLocaleDateString()}</td>
-                                    <td>{r.mmRain.toFixed(2)}</td>
-                                    <td>{r.mmEffectiveRain.toFixed(2)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : <p>No hay registros para esta finca.</p>}
-        </div>
-    );
+// --- Componente Personalizado para Tooltips ---
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="precipitation-tooltip">
+                <p className="tooltip-label">
+                    <CalendarDays size={14} /> {new Date(label + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+                {payload.map((pld: any, index: number) => (
+                    <div key={index} style={{ color: pld.color }}>
+                        {pld.name}: <strong>{pld.value.toFixed(1)} mm</strong>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+    return null;
 };
 
-// Componente para mostrar los resúmenes
-const PrecipitationSummaries = ({ farmId }: { farmId: number }) => {
+// --- Componente Principal ---
+const PrecipitationAnalysis = () => {
+    const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
+    const [showFilters, setShowFilters] = useState(true);
+
+    // --- Queries ---
+    const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['farms'], queryFn: farmService.getFarms });
+
+    useState(() => {
+        if (farms.length > 0 && !selectedFarmId) {
+            setSelectedFarmId(farms[0].id);
+        }
+    });
+    
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
-    const { data: annual, isLoading: isLoadingAnnual } = useQuery<PrecipitationSummary, Error>({
-        queryKey: ['annualSummary', farmId, currentYear],
-        queryFn: () => precipitationService.getAnnualSummary(farmId, currentYear),
+    const { data: annualSummary, isLoading: isLoadingAnnual } = useQuery<PrecipitationSummary, Error>({
+        queryKey: ['annualPrecipitationSummary', selectedFarmId, currentYear],
+        queryFn: () => precipitationService.getAnnualSummary(selectedFarmId!, currentYear),
+        enabled: !!selectedFarmId,
     });
 
-    const { data: monthly, isLoading: isLoadingMonthly } = useQuery<PrecipitationSummary, Error>({
-        queryKey: ['monthlySummary', farmId, currentYear, currentMonth],
-        queryFn: () => precipitationService.getMonthlySummary(farmId, currentYear, currentMonth),
+    const { data: monthlySummary, isLoading: isLoadingMonthly } = useQuery<PrecipitationSummary, Error>({
+        queryKey: ['monthlyPrecipitationSummary', selectedFarmId, currentYear, currentMonth],
+        queryFn: () => precipitationService.getMonthlySummary(selectedFarmId!, currentYear, currentMonth),
+        enabled: !!selectedFarmId,
     });
 
-    return (
-        <div className="summary-cards-container">
-            <div className="summary-card">
-                <h4>Resumen Campaña Actual ({currentYear}-{currentYear + 1})</h4>
-                {isLoadingAnnual ? <p>Cargando...</p> : (
-                    <>
-                        <div className="summary-value">{annual?.totalMmRain.toFixed(1) ?? 'N/A'} mm</div>
-                        <div className="summary-label">Total Lluvia</div>
-                        <div className="summary-value effective">{annual?.totalMmEffectiveRain.toFixed(1) ?? 'N/A'} mm</div>
-                        <div className="summary-label">Total Lluvia Efectiva</div>
-                    </>
-                )}
-            </div>
-             <div className="summary-card">
-                <h4>Resumen Mes Actual</h4>
-                 {isLoadingMonthly ? <p>Cargando...</p> : (
-                    <>
-                        <div className="summary-value">{monthly?.totalMmRain.toFixed(1) ?? 'N/A'} mm</div>
-                        <div className="summary-label">Total Lluvia</div>
-                        <div className="summary-value effective">{monthly?.totalMmEffectiveRain.toFixed(1) ?? 'N/A'} mm</div>
-                        <div className="summary-label">Total Lluvia Efectiva</div>
-                    </>
-                )}
-            </div>
-        </div>
-    );
-}
+    const { data: records = [], isLoading: isLoadingRecords } = useQuery<PrecipitationRecord[], Error>({
+        queryKey: ['precipitationHistory', selectedFarmId],
+        queryFn: () => precipitationService.getPrecipitationsByFarm(selectedFarmId!),
+        enabled: !!selectedFarmId,
+    });
 
-const PrecipitationAnalysis = () => {
-    const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
-    const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['farms'], queryFn: farmService.getFarms });
+    const effectiveness = useMemo(() => {
+        if (!annualSummary || annualSummary.totalMmRain === 0) return 0;
+        return (annualSummary.totalMmEffectiveRain / annualSummary.totalMmRain) * 100;
+    }, [annualSummary]);
 
-    useEffect(() => {
-        if (selectedFarmId || farms.length === 0) return;
-        setSelectedFarmId(farms[0].id);
-    }, [farms, selectedFarmId]);
+    const getEffectivenessBadge = (effectiveness: number) => {
+        if (effectiveness >= 85) return 'badge-high';
+        if (effectiveness > 0) return 'badge-medium';
+        return 'badge-low';
+    };
 
     return (
-        <div className="register-irrigation-page">
-            <h1>Análisis de Precipitaciones</h1>
-            <div className="filters-bar">
-                <select onChange={(e) => setSelectedFarmId(Number(e.target.value))} value={selectedFarmId || ''}>
-                    <option value="">Seleccione una Finca...</option>
-                    {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-                </select>
-            </div>
+        <div className="precipitation-analysis-page">
+            {/* Header */}
+            <header className="analysis-header">
+                <div className="analysis-title-group">
+                    <h1><CloudRain size={32} color="#3b82f6" /> Análisis de Precipitaciones</h1>
+                    <p>Visualización y seguimiento de los registros de lluvia.</p>
+                </div>
+                <div className="analysis-header-actions">
+                    <button onClick={() => setShowFilters(!showFilters)} className="header-btn">
+                        <Filter size={18} /> {showFilters ? 'Ocultar' : 'Mostrar'} Filtros
+                    </button>
+                    <button className="header-btn export-btn"><Download size={18} /> Exportar</button>
+                </div>
+            </header>
 
+            {/* Panel de Filtros */}
+            {showFilters && (
+                <div className="filters-panel">
+                    <div className="filter-group">
+                        <label>🏡 Finca</label>
+                        <select onChange={(e) => setSelectedFarmId(Number(e.target.value))} value={selectedFarmId || ''}>
+                            <option value="" disabled>Seleccione una finca...</option>
+                            {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                        </select>
+                    </div>
+                </div>
+            )}
+            
             {selectedFarmId ? (
-                <div className="analysis-layout">
-                    <PrecipitationSummaries farmId={selectedFarmId} />
-                    <PrecipitationHistory farmId={selectedFarmId} />
+                <div className="analysis-grid">
+                    {/* KPI Cards */}
+                    <div className="kpi-card-precip kpi-campaign-total"><Droplets size={24} /><div><span>Total Campaña</span><strong>{annualSummary?.totalMmRain.toFixed(1) ?? 'N/A'} mm</strong></div></div>
+                    <div className="kpi-card-precip kpi-campaign-effective"><Droplets size={24} /><div><span>Efectiva Campaña</span><strong>{annualSummary?.totalMmEffectiveRain.toFixed(1) ?? 'N/A'} mm</strong></div></div>
+                    <div className="kpi-card-precip kpi-month-total"><CalendarDays size={24} /><div><span>Total Mes Actual</span><strong>{monthlySummary?.totalMmRain.toFixed(1) ?? 'N/A'} mm</strong></div></div>
+                    <div className="kpi-card-precip kpi-effectiveness"><Percent size={24} /><div><span>Tasa Efectividad</span><strong>{effectiveness.toFixed(1)}%</strong></div></div>
+
+                    {/* Gráficos */}
+                    <div className="chart-card-precip full-width">
+                        <h3 className="chart-title">Evolución de Precipitaciones (Últimos 30 días)</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <AreaChart data={records.slice(-30)}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                                <XAxis dataKey="precipitationDate" tickFormatter={(date) => new Date(date+'T00:00:00').toLocaleDateString('es-AR', {day:'numeric', month:'short'})} />
+                                <YAxis />
+                                <Tooltip content={<CustomTooltip />} />
+                                <defs>
+                                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/></linearGradient>
+                                    <linearGradient id="colorEffective" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/><stop offset="95%" stopColor="#10b981" stopOpacity={0}/></linearGradient>
+                                </defs>
+                                <Area type="monotone" dataKey="mmRain" name="Lluvia Total" stroke="#3b82f6" fillOpacity={1} fill="url(#colorTotal)" />
+                                <Area type="monotone" dataKey="mmEffectiveRain" name="Lluvia Efectiva" stroke="#10b981" fillOpacity={1} fill="url(#colorEffective)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Historial de Registros */}
+                    <div className="history-card-precip full-width">
+                        <h3 className="history-title">Historial de Registros ({records.length})</h3>
+                        <div className="table-container">
+                            <table className="precipitation-table">
+                                <thead><tr><th>Fecha</th><th>Lluvia Total (mm)</th><th>Lluvia Efectiva (mm)</th><th>Efectividad</th></tr></thead>
+                                <tbody>
+                                    {records.map(r => {
+                                        const recordEffectiveness = r.mmRain > 0 ? (r.mmEffectiveRain / r.mmRain) * 100 : 0;
+                                        return (
+                                            <tr key={r.id}>
+                                                <td><CalendarDays size={14} />{new Date(r.precipitationDate + 'T00:00:00').toLocaleDateString('es-AR')}</td>
+                                                <td className="rain-total">{r.mmRain.toFixed(2)}</td>
+                                                <td className="rain-effective">{r.mmEffectiveRain.toFixed(2)}</td>
+                                                <td><span className={`badge ${getEffectivenessBadge(recordEffectiveness)}`}>{recordEffectiveness.toFixed(0)}%</span></td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             ) : (
-                 <div className="empty-state" style={{marginTop: '20px'}}>
-                    <p>Por favor, seleccione una finca para ver el análisis.</p>
+                <div className="empty-state">
+                    <h3>Seleccione una finca para comenzar el análisis.</h3>
                 </div>
             )}
         </div>

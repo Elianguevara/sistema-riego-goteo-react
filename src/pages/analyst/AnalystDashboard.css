@@ -1,110 +1,231 @@
 /* Archivo: src/pages/analyst/AnalystDashboard.css */
 
-.analyst-dashboard {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
+.analyst-dashboard-container {
+    min-height: 100vh;
+    background-color: #f9fafb;
+    padding: 24px;
 }
 
-/* Contenedor principal del grid */
-.dashboard-grid-analyst {
+.dashboard-header {
+    margin-bottom: 24px;
+}
+
+.dashboard-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-header p {
+    color: #6b7280;
+    margin: 0;
+    font-size: 14px;
+}
+
+.dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto 1fr; /* Fila auto para widgets, fila flexible para el resto */
-    gap: 25px;
-    height: 100%;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
 }
 
-/* Estilos de los Widgets (contenedores) */
-.dashboard-widget {
-    background-color: var(--color-content-bg);
+.kpi-card {
+    grid-column: span 3;
+    background-color: white;
+    border-radius: 12px;
     padding: 20px;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-main);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-left: 4px solid var(--border-color);
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.kpi-label {
+    color: #6b7280;
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+.kpi-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.kpi-percentage {
+    font-size: 14px;
+    margin: 8px 0 0 0;
+    font-weight: 500;
+}
+
+.kpi-icon {
+    border-radius: 12px;
+    padding: 12px;
 }
 
 .widget-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
     margin: 0 0 20px 0;
-    font-size: 1.1rem;
-    color: var(--color-text-dark);
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* Widgets específicos */
+.title-bar {
+    width: 4px;
+    height: 20px;
+    border-radius: 2px;
+}
+
 .map-widget {
-    grid-column: 1 / 3; /* Ocupa 2 de 3 columnas */
-    grid-row: 1 / 3; /* Ocupa 2 filas */
+    grid-column: span 8;
+    grid-row: span 2;
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    height: 100%;
     min-height: 500px;
 }
 
-.tasks-widget {
-    grid-column: 3 / 4;
-    grid-row: 1 / 2;
+.map-placeholder {
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    height: calc(100% - 60px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
 }
 
-.water-balance-widget {
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
+.map-placeholder p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
 }
 
-/* Estilos para el mapa */
-.leaflet-container {
-    height: 100%;
-    width: 100%;
-    border-radius: var(--border-radius-sm);
-}
-
-/* Estilos para el resumen de tareas */
-.task-summary-grid {
+.farm-status-cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.farm-status-card {
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.farm-status-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.farm-status-header strong {
+    font-size: 14px;
+    color: #111827;
+}
+
+.farm-status-text {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0;
+}
+
+.farm-alert-text {
+    font-size: 13px;
+    color: #ef4444;
+    margin: 4px 0;
+    font-weight: 500;
+}
+
+.task-distribution-widget,
+.water-balance-widget {
+    grid-column: span 4;
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.widget-footer {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
     text-align: center;
 }
 
-.task-summary-item .count {
-    font-size: 2.5rem;
-    font-weight: 700;
+.widget-button {
+    width: 100%;
+    padding: 10px 16px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.widget-button:hover {
+    background-color: #2563eb;
+}
+
+.farm-selector {
+    margin-bottom: 16px;
+}
+
+.farm-selector label {
     display: block;
-}
-.task-summary-item .label {
-    font-size: 0.9rem;
-    color: var(--color-text-light);
-}
-.task-summary-item .count.pending { color: var(--color-info); }
-.task-summary-item .count.in-progress { color: #f39c12; }
-.task-summary-item .count.completed { color: var(--color-success); }
-
-.widget-footer {
-    margin-top: auto; /* Empuja el footer hacia abajo */
-    padding-top: 15px;
-    border-top: 1px solid var(--color-border);
-    text-align: right;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
 }
 
-/* Estilos para el gráfico de balance hídrico */
-.water-balance-controls {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    align-items: center;
+.farm-selector select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
 }
 
-.water-balance-controls select {
-    flex-grow: 1;
+.custom-tooltip {
+    background-color: white;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
 }
 
-/* Responsividad */
-@media (max-width: 1200px) {
-    .dashboard-grid-analyst {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-    }
-    .map-widget, .tasks-widget, .water-balance-widget {
-        grid-column: auto;
-        grid-row: auto;
-    }
+.tooltip-label {
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.tooltip-item {
+    margin: 4px 0;
+    font-size: 14px;
 }
