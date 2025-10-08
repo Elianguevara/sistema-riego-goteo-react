@@ -50,7 +50,6 @@ const AdminLayout = () => {
             case 'ANALISTA':
                 return (
                     <>
-                        {/* --- MENÚ DEL ANALISTA ACTUALIZADO Y COMPLETO --- */}
                         <Link to="/analyst/dashboard" className={location.pathname === '/analyst/dashboard' ? 'active' : ''}>
                             <i className="fas fa-chart-bar"></i> Principal
                         </Link>
@@ -69,8 +68,9 @@ const AdminLayout = () => {
                         <Link to="/analyst/reports" className={location.pathname.startsWith('/analyst/reports') ? 'active' : ''}>
                             <i className="fas fa-file-alt"></i> Reportes
                         </Link>
-                         <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
-                            <i className="fas fa-users"></i> Usuarios
+                        {/* --- CAMBIO REALIZADO --- */}
+                        <Link to="/notifications" className={location.pathname === '/notifications' ? 'active' : ''}>
+                            <i className="fas fa-bell"></i> Notificaciones
                         </Link>
                     </>
                 );
@@ -131,3 +131,4 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
+

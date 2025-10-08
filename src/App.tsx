@@ -25,8 +25,8 @@ const OperatorDashboard = React.lazy(() => import('./pages/operator/OperatorDash
 const OperationLogbook = React.lazy(() => import('./pages/operator/OperationLogbook'));
 const PrecipitationAnalysis = React.lazy(() => import('./pages/analyst/PrecipitationAnalysis'));
 const AnalystDashboard = React.lazy(() => import('./pages/analyst/AnalystDashboard'));
-// --- NUEVA IMPORTACIÓN ---
 const IrrigationAnalysis = React.lazy(() => import('./pages/analyst/IrrigationAnalysis'));
+const Reports = React.lazy(() => import('./pages/analyst/Reports'));
 
 
 // Componente de redirección para la página de inicio según el rol
@@ -146,12 +146,19 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* --- NUEVA RUTA AÑADIDA --- */}
           <Route
             path="analyst/irrigation-analysis"
             element={
               <ProtectedRoute allowedRoles={['ANALISTA', 'ADMIN']}>
                 <IrrigationAnalysis />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="analyst/reports"
+            element={
+              <ProtectedRoute allowedRoles={['ANALISTA', 'ADMIN']}>
+                <Reports />
               </ProtectedRoute>
             }
           />
