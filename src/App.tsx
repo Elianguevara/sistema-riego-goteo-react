@@ -167,7 +167,7 @@ function App() {
           <Route
             path="users"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'ANALISTA']}>
+              <ProtectedRoute allowedRoles={['ADMIN']}>
                 <UserManagement />
               </ProtectedRoute>
             }
@@ -233,3 +233,4 @@ function App() {
 }
 
 export default App;
+

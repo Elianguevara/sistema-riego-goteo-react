@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import notificationService from '../services/notificationService';
 import type { Notification, NotificationPage } from '../types/notification.types';
@@ -26,8 +26,9 @@ const timeAgo = (dateString: string): string => {
 
 const NotificationHistory = () => {
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const [page, setPage] = useState(0);
-    const [size, ] = useState(6); // Tamaño de página fijado en 6
+    const [size, ] = useState(6);
     
     const historyQueryKey = ['notifications', 'history', page, size];
 
@@ -48,8 +49,6 @@ const NotificationHistory = () => {
             return { previousHistory };
         },
         onSuccess: () => {
-            // Se restaura el toast de éxito
-            toast.success("Notificación marcada como leída.");
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
         },
         onError: (err: Error, _vars, context) => {
@@ -59,10 +58,26 @@ const NotificationHistory = () => {
             }
         },
     });
+    
+    // --- LÓGICA DE NAVEGACIÓN CORREGIDA Y ROBUSTA ---
+    const handleNavigateAndMarkAsRead = (notification: Notification) => {
+        // La función interna se asegura de que el link existe antes de navegar
+        const navigateToLink = () => {
+            if (notification.link && notification.link !== '#') {
+                navigate(notification.link);
+            }
+        };
 
-    const handleMarkAsRead = (notification: Notification) => {
         if (!notification.isRead) {
-            markAsReadMutation.mutate(notification.id);
+            // Marcar como leída y, SOLO EN CASO DE ÉXITO, navegar.
+            markAsReadMutation.mutate(notification.id, {
+                onSuccess: () => {
+                    navigateToLink();
+                }
+            });
+        } else {
+            // Si ya está leída, simplemente navegar.
+            navigateToLink();
         }
     };
 
@@ -88,13 +103,17 @@ const NotificationHistory = () => {
                             <div className="item-content">
                                 <p className="item-message">{n.message}</p>
                                 <span className="item-time">{timeAgo(n.createdAt)}</span>
-                                {n.link && <Link to={n.link} className="item-link">Ver detalle</Link>}
+                                {n.link && (
+                                    <button className="item-link" onClick={() => handleNavigateAndMarkAsRead(n)}>
+                                        Ver detalle
+                                    </button>
+                                )}
                             </div>
                             
                             {!n.isRead && (
                                 <button
                                     className="btn-mark-read"
-                                    onClick={() => handleMarkAsRead(n)}
+                                    onClick={() => markAsReadMutation.mutate(n.id)}
                                     disabled={markAsReadMutation.isPending && markAsReadMutation.variables === n.id}
                                 >
                                     {markAsReadMutation.isPending && markAsReadMutation.variables === n.id 
@@ -127,3 +146,4 @@ const NotificationHistory = () => {
 };
 
 export default NotificationHistory;
+
