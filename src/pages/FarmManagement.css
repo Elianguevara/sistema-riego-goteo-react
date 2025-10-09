@@ -1,0 +1,260 @@
+/* src/pages/FarmManagement.css */
+
+.farm-management-page {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    padding: 1.5rem;
+}
+
+/* Header */
+.page-header {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.header-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+.header-subtitle {
+    color: #475569;
+}
+.create-farm-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-image: linear-gradient(to right, #059669, #0d9488);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+.create-farm-button:hover {
+    background-image: linear-gradient(to right, #047857, #0f766e);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+@media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.stat-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+.stat-card-info {
+    display: flex;
+    flex-direction: column;
+}
+.stat-card-label {
+    font-size: 0.875rem;
+    color: #475569;
+    margin-bottom: 0.25rem;
+}
+.stat-card-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+.stat-card-value.text-emerald-600 { color: #059669; }
+
+.stat-card-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+.from-emerald-500.to-teal-500 { background-image: linear-gradient(to bottom right, #10b981, #14b8a6); }
+.from-blue-500.to-cyan-500 { background-image: linear-gradient(to bottom right, #3b82f6, #06b6d4); }
+.from-purple-500.to-pink-500 { background-image: linear-gradient(to bottom right, #a855f7, #ec4899); }
+.from-amber-500.to-orange-500 { background-image: linear-gradient(to bottom right, #f59e0b, #f97316); }
+
+/* Filters Bar */
+.filters-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.search-wrapper {
+    flex: 1;
+    position: relative;
+}
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #94a3b8;
+}
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+}
+.search-input:focus {
+    outline: 2px solid transparent;
+    box-shadow: 0 0 0 2px #10b981;
+    border-color: transparent;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.25rem;
+}
+.view-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #475569;
+}
+.view-button:hover {
+    background-color: #f1f5f9;
+}
+.view-button.active {
+    background-color: #059669;
+    color: white;
+}
+
+/* Grid View */
+.farms-grid-view {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+}
+@media (min-width: 768px) { .farms-grid-view { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .farms-grid-view { grid-template-columns: repeat(3, 1fr); } }
+
+.farm-card-item {
+    background-color: white;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+.farm-card-item:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.farm-card-header {
+    background-image: linear-gradient(to right, #10b981, #14b8a6);
+    padding: 1.5rem;
+    position: relative;
+}
+.farm-card-header-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.1);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.farm-card-item:hover .farm-card-header-overlay { opacity: 1; }
+
+.farm-card-header-content {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.farm-card-title { font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
+.farm-card-location { color: rgba(255,255,255,0.9); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; }
+.status-badge-card {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-width: 1px;
+    background-color: white;
+}
+.status-active { color: #047857; border-color: #a7f3d0; background-color: #d1fae5; }
+.status-maintenance { color: #b45309; border-color: #fde68a; background-color: #fef3c7; }
+
+.farm-card-body { padding: 1.5rem; }
+.farm-card-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem; }
+.stat-label-card { font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; }
+.stat-value-card { font-weight: 600; color: #1e293b; }
+.farm-card-actions { display: flex; gap: 0.5rem; }
+.details-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background-color: #059669;
+    color: white;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+.details-button:hover { background-color: #047857; }
+.icon-button {
+    width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; color: #475569; border-radius: 0.5rem; transition: all 0.2s; border: 1px solid #e2e8f0; cursor: pointer;
+}
+.icon-button:hover { background-color: #f1f5f9; }
+.icon-button.danger { background-color: #fee2e2; color: #dc2626; border-color: #fecaca; }
+.icon-button.danger:hover { background-color: #fca5a5; color: white; }
+
+/* List View */
+.farms-list-view { display: flex; flex-direction: column; gap: 0.75rem; }
+.farm-list-item { background-color: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; padding: 1.25rem; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
+.farm-list-item:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+.farm-list-item-info { display: flex; align-items: center; gap: 1rem; flex: 1; }
+.farm-list-item-avatar { width: 4rem; height: 4rem; background-image: linear-gradient(to bottom right, #10b981, #14b8a6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.25rem; }
+.farm-list-item-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.farm-list-item-title { font-size: 1.125rem; font-weight: 700; color: #1e293b; }
+.status-badge-list { padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; border-width: 1px; }
+.farm-list-item-meta { display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; color: #475569; }
+.farm-list-item-meta span { display: flex; align-items: center; gap: 0.25rem; }
+.farm-list-item-actions { display: flex; gap: 0.5rem; margin-left: 1rem; }
+.details-button-list { padding: 0.5rem 1rem; background-color: #059669; color: white; border-radius: 0.5rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; transition: all 0.2s; }
+.details-button-list:hover { background-color: #047857; }
+.icon-button-list { width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; color: #475569; border-radius: 0.5rem; transition: all 0.2s; border: 1px solid #e2e8f0; cursor: pointer; }
+.icon-button-list:hover { background-color: #f1f5f9; }
+.icon-button-list.danger { background-color: #fee2e2; color: #dc2626; border-color: #fecaca; }
+.icon-button-list.danger:hover { background-color: #fca5a5; color: white; }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 3rem 0; }
+.empty-state-icon-wrapper { width: 4rem; height: 4rem; background-color: #f1f5f9; border-radius: 9999px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; }
+.empty-state-icon { width: 2rem; height: 2rem; color: #94a3b8; }
+.empty-state-title { color: #475569; font-size: 1.125rem; }
+.empty-state-subtitle { color: #64748b; font-size: 0.875rem; }
+.w-4 { width: 1rem; }
+.h-4 { height: 1rem; }
+.w-5 { width: 1.25rem; }
+.h-5 { height: 1.25rem; }
+.w-6 { width: 1.5rem; }
+.h-6 { height: 1.5rem; }

@@ -7,9 +7,11 @@ import dashboardService from '../../services/dashboardService';
 import farmService from '../../services/farmService';
 import type { FarmStatus, WaterBalance, TaskSummary } from '../../types/analyst.types';
 import type { Farm } from '../../types/farm.types';
+// --- 1. IMPORTACIONES DEL MAPA ---
+// Se importan los componentes necesarios de react-leaflet.
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css'; // Asegúrate de que los estilos de Leaflet se importen.
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import 'leaflet/dist/leaflet.css';
 import { TrendingUp, Clock, AlertCircle, CheckCircle, Calendar, MapPin } from 'lucide-react';
 import './AnalystDashboard.css';
 
@@ -70,6 +72,15 @@ const AnalystDashboard = () => {
     ];
 
     const totalTasks = taskSummary?.totalTasks ?? 0;
+    
+    // --- 2. LÓGICA DEL MAPA ---
+    // Filtramos las fincas que tienen coordenadas válidas para evitar errores.
+    const farmsWithCoords = farmStatuses?.filter(f => f.latitude != null && f.longitude != null) || [];
+    
+    // Calculamos una posición central para el mapa. Usamos la primera finca o un valor por defecto.
+    const mapCenter: [number, number] = farmsWithCoords.length > 0
+        ? [farmsWithCoords[0].latitude, farmsWithCoords[0].longitude]
+        : [-34.6037, -58.3816]; // Coordenadas de Buenos Aires por defecto.
 
     return (
         <div className="analyst-dashboard-container">
@@ -82,7 +93,7 @@ const AnalystDashboard = () => {
             </div>
 
             <div className="dashboard-grid">
-                {/* KPI Cards */}
+                {/* ... KPI Cards (sin cambios) ... */}
                 <div className="kpi-card" style={{ '--border-color': '#3b82f6' } as React.CSSProperties}>
                     <div>
                         <p className="kpi-label">Tareas Pendientes</p>
@@ -133,37 +144,32 @@ const AnalystDashboard = () => {
                     </div>
                 </div>
 
-                {/* Map Widget */}
+                {/* --- 3. WIDGET DEL MAPA CORREGIDO --- */}
                 <div className="map-widget">
                     <h3 className="widget-title">
                         <div className="title-bar" style={{ backgroundColor: '#3b82f6' }} />
                         Estado General de Fincas
                     </h3>
-                    <div className="map-placeholder">
-                        <MapPin size={48} color="#9ca3af" />
-                        <p>Mapa de ubicación de fincas</p>
-                        <div className="farm-status-cards">
-                            {farmStatuses?.map(farm => (
-                                <div key={farm.farmId} className="farm-status-card">
-                                    <div className="farm-status-header">
-                                        <MapPin size={16} color={farm.activeAlertsCount > 0 ? '#ef4444' : '#10b981'} />
-                                        <strong>{farm.name}</strong>
-                                    </div>
-                                    <p className="farm-status-text">
-                                        Estado: <span style={{ color: farm.status === 'OK' ? '#10b981' : '#f59e0b', fontWeight: '500' }}>{farm.status}</span>
-                                    </p>
-                                    {farm.activeAlertsCount > 0 && (
-                                        <p className="farm-alert-text">
-                                            ⚠️ {farm.activeAlertsCount} alertas activas
-                                        </p>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    {/* Se reemplaza el `map-placeholder` por el `MapContainer` */}
+                    <MapContainer center={mapCenter} zoom={8} scrollWheelZoom={false} style={{ height: 'calc(100% - 40px)', borderRadius: '8px' }}>
+                        <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        {/* Iteramos sobre las fincas con coordenadas para poner un marcador en el mapa */}
+                        {farmsWithCoords.map(farm => (
+                            <Marker key={farm.farmId} position={[farm.latitude, farm.longitude]}>
+                                <Popup>
+                                    <strong>{farm.name}</strong><br />
+                                    Estado: {farm.status} <br />
+                                    {farm.activeAlertsCount > 0 && `Alertas: ${farm.activeAlertsCount}`}
+                                </Popup>
+                            </Marker>
+                        ))}
+                    </MapContainer>
                 </div>
 
-                {/* Task Distribution */}
+                {/* Task Distribution (sin cambios) */}
                 <div className="task-distribution-widget">
                      <h3 className="widget-title">
                         <div className="title-bar" style={{ backgroundColor: '#8b5cf6' }} />
@@ -186,7 +192,7 @@ const AnalystDashboard = () => {
                     </div>
                 </div>
 
-                {/* Water Balance */}
+                {/* Water Balance (sin cambios) */}
                 <div className="water-balance-widget">
                     <h3 className="widget-title">
                         <div className="title-bar" style={{ backgroundColor: '#10b981' }} />
