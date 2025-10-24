@@ -34,7 +34,7 @@ const FarmDetail = () => {
     const farmIdNum = Number(farmId);
 
     const [activeTab, setActiveTab] = useState('waterSources');
-    
+
     // Estados para modales
     const [isSectorModalOpen, setIsSectorModalOpen] = useState(false);
     const [currentSector, setCurrentSector] = useState<Sector | null>(null);
@@ -56,7 +56,7 @@ const FarmDetail = () => {
     const { data: assignedUsers = [] } = useQuery<UserResponse[], Error>({ queryKey: ['assignedUsers', farmId], queryFn: () => farmService.getAssignedUsers(farmIdNum), enabled: !!farmIdNum });
     const { data: allUsersPage } = useQuery({ queryKey: ['allUsersForAssignment'], queryFn: () => adminService.getUsers({ page: 0, size: 1000 }), });
     const { data: weatherData } = useQuery<CurrentWeather, Error>({ queryKey: ['weather', farmId], queryFn: () => weatherService.getCurrentWeather(farmIdNum), enabled: !!farmIdNum && !!farm?.latitude && !!farm?.longitude, retry: false, });
-    
+
     // --- MUTACIONES ---
     const createSectorMutation = useMutation({ mutationFn: (data: SectorCreateData) => farmService.createSector(farmIdNum, data), onSuccess: () => { toast.success("Sector creado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const updateSectorMutation = useMutation({ mutationFn: (data: SectorUpdateData) => farmService.updateSector(farmIdNum, currentSector!.id, data), onSuccess: () => { toast.success("Sector actualizado."); queryClient.invalidateQueries({ queryKey: ['sectors', farmId] }); setIsSectorModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
@@ -81,10 +81,10 @@ const FarmDetail = () => {
     const handleOpenEditWaterSourceForm = (ws: WaterSource) => { setCurrentWaterSource(ws); setIsWaterSourceModalOpen(true); };
     const handleSaveWaterSource = (data: WaterSourceCreateData | WaterSourceUpdateData) => { if (currentWaterSource) { updateWaterSourceMutation.mutate(data as WaterSourceUpdateData); } else { createWaterSourceMutation.mutate(data as WaterSourceCreateData); } };
     const handleSaveUserAssignment = (userId: number) => { assignUserMutation.mutate(userId); };
-    
+
     const allUsers = allUsersPage?.content ?? [];
     const availableUsersToAssign = useMemo(() => { const assignedUserIds = new Set(assignedUsers.map(u => u.id)); return allUsers.filter(u => !assignedUserIds.has(u.id)); }, [allUsers, assignedUsers]);
-    
+
     const tabs = [
         { id: 'waterSources', label: 'Fuentes de Agua', icon: <Droplets className="w-4 h-4" />, number: 1, disabled: false },
         { id: 'equipments', label: 'Equipos', icon: <Wrench className="w-4 h-4" />, number: 2, disabled: waterSources.length === 0 },
@@ -102,8 +102,11 @@ const FarmDetail = () => {
         return colors[status] || 'status-slate';
     };
 
+    // Ajustado para recibir el valor ya convertido a hL/h si es necesario
     const getEfficiencyColor = (efficiency: number) => {
-        if (efficiency >= 90) return 'text-emerald-600';
+        // Asumiendo que el valor efficiency ya está en la escala deseada
+        // o que la lógica de colores se adapta a la escala original (L/h)
+        if (efficiency >= 90) return 'text-emerald-600'; // Ejemplo: 90 hL/h o 9000 L/h
         if (efficiency >= 80) return 'text-blue-600';
         if (efficiency >= 70) return 'text-amber-600';
         return 'text-red-600';
@@ -239,7 +242,7 @@ const FarmDetail = () => {
                             </div>
                         </div>
                     )}
-                    
+
                     {activeTab === 'equipments' && (
                          <div>
                             <div className="tab-header">
@@ -252,34 +255,39 @@ const FarmDetail = () => {
                                 </button>
                             </div>
                             <div className="list-container">
-                                {equipments.map((equipment) => (
-                                    <div key={equipment.id} className="list-item">
-                                        <div className="list-item-content">
-                                            <div className="list-item-icon-wrapper purple">
-                                                <Wrench className="list-item-icon purple" />
+                                {equipments.map((equipment) => {
+                                    // Convertir L/h a hL/h para mostrar
+                                    const measuredFlowHl = equipment.measuredFlow / 100;
+                                    return (
+                                        <div key={equipment.id} className="list-item">
+                                            <div className="list-item-content">
+                                                <div className="list-item-icon-wrapper purple">
+                                                    <Wrench className="list-item-icon purple" />
+                                                </div>
+                                                <div className="list-item-details">
+                                                    <h3 className="list-item-title">{equipment.name}</h3>
+                                                    <div className="list-item-meta">
+                                                        <span>Tipo: {equipment.equipmentType}</span>
+                                                        <span className={`status-badge ${getStatusColor(equipment.equipmentStatus)}`}>{equipment.equipmentStatus}</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="list-item-details">
-                                                <h3 className="list-item-title">{equipment.name}</h3>
-                                                <div className="list-item-meta">
-                                                    <span>Tipo: {equipment.equipmentType}</span>
-                                                    <span className={`status-badge ${getStatusColor(equipment.equipmentStatus)}`}>{equipment.equipmentStatus}</span>
+                                            <div className="list-item-actions wide">
+                                                <div className="efficiency-display">
+                                                    <p className="efficiency-label">Flujo Medido</p>
+                                                    {/* Mostrar valor convertido y unidad actualizada */}
+                                                    <p className={`efficiency-value ${getEfficiencyColor(measuredFlowHl)}`}>
+                                                        {measuredFlowHl.toFixed(2)} hL/h
+                                                    </p>
+                                                </div>
+                                                <div className="action-buttons-group">
+                                                    <button className="action-button" onClick={() => handleOpenEditEquipmentForm(equipment)}><Edit2 className="w-4 h-4" /></button>
+                                                    <button className="action-button danger" onClick={() => setEquipmentToDelete(equipment)}><Trash2 className="w-4 h-4" /></button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="list-item-actions wide">
-                                            <div className="efficiency-display">
-                                                <p className="efficiency-label">Flujo Medido</p>
-                                                <p className={`efficiency-value ${getEfficiencyColor(equipment.measuredFlow)}`}>
-                                                    {equipment.measuredFlow}
-                                                </p>
-                                            </div>
-                                            <div className="action-buttons-group">
-                                                <button className="action-button" onClick={() => handleOpenEditEquipmentForm(equipment)}><Edit2 className="w-4 h-4" /></button>
-                                                <button className="action-button danger" onClick={() => setEquipmentToDelete(equipment)}><Trash2 className="w-4 h-4" /></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -368,7 +376,7 @@ const FarmDetail = () => {
             {/* --- MODALES --- */}
             {isWaterSourceModalOpen && <WaterSourceForm currentWaterSource={currentWaterSource} onSave={handleSaveWaterSource} onCancel={() => setIsWaterSourceModalOpen(false)} isLoading={createWaterSourceMutation.isPending || updateWaterSourceMutation.isPending} />}
             {waterSourceToDelete && <ConfirmationModal message={`¿Seguro de eliminar la fuente de agua "${waterSourceToDelete.type}"?`} onConfirm={() => deleteWaterSourceMutation.mutate(waterSourceToDelete.id)} onCancel={() => setWaterSourceToDelete(null)} isLoading={deleteWaterSourceMutation.isPending} />}
-            
+
             {isEquipmentModalOpen && <EquipmentForm currentEquipment={currentEquipment} onSave={handleSaveEquipment} onCancel={() => setIsEquipmentModalOpen(false)} isLoading={createEquipmentMutation.isPending || updateEquipmentMutation.isPending} />}
             {equipmentToDelete && <ConfirmationModal message={`¿Seguro de eliminar el equipo "${equipmentToDelete.name}"?`} onConfirm={() => deleteEquipmentMutation.mutate(equipmentToDelete.id)} onCancel={() => setEquipmentToDelete(null)} isLoading={deleteEquipmentMutation.isPending} />}
 

@@ -86,7 +86,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
                             </select>
                         </div>
                          <div className="form-group">
-                            <label htmlFor="measuredFlow">Flujo Medido (L/h)</label>
+                            <label htmlFor="measuredFlow">Flujo Medido (hL/h)</label>
                             {/* Corregido: type="text" y inputMode="decimal" */}
                             <input type="text" inputMode="decimal" id="measuredFlow" name="measuredFlow" value={formData.measuredFlow} onChange={handleChange} required />
                         </div>
