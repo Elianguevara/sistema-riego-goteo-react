@@ -76,7 +76,15 @@ const FarmDetail = () => {
     const handleSaveSector = (data: SectorCreateData | SectorUpdateData) => { if (currentSector) { updateSectorMutation.mutate(data as SectorUpdateData); } else { createSectorMutation.mutate(data as SectorCreateData); } };
     const handleOpenCreateEquipmentForm = () => { setCurrentEquipment(null); setIsEquipmentModalOpen(true); };
     const handleOpenEditEquipmentForm = (equipment: IrrigationEquipment) => { setCurrentEquipment(equipment); setIsEquipmentModalOpen(true); };
-    const handleSaveEquipment = (data: EquipmentCreateData | EquipmentUpdateData) => { if (currentEquipment) { updateEquipmentMutation.mutate(data as EquipmentUpdateData); } else { createEquipmentMutation.mutate(data as EquipmentCreateData); } };
+    // **MODIFICADO**: Asume que `data` ya viene en hL/h desde el form
+    const handleSaveEquipment = (data: EquipmentCreateData | EquipmentUpdateData) => {
+        // No se necesita conversión si el form ya maneja hL/h y la API espera hL/h
+        if (currentEquipment) {
+            updateEquipmentMutation.mutate({ ...data, id: currentEquipment.id } as unknown as EquipmentUpdateData); // Asegúrate de incluir el ID si es necesario para la mutación
+        } else {
+            createEquipmentMutation.mutate(data as EquipmentCreateData);
+        }
+    };
     const handleOpenCreateWaterSourceForm = () => { setCurrentWaterSource(null); setIsWaterSourceModalOpen(true); };
     const handleOpenEditWaterSourceForm = (ws: WaterSource) => { setCurrentWaterSource(ws); setIsWaterSourceModalOpen(true); };
     const handleSaveWaterSource = (data: WaterSourceCreateData | WaterSourceUpdateData) => { if (currentWaterSource) { updateWaterSourceMutation.mutate(data as WaterSourceUpdateData); } else { createWaterSourceMutation.mutate(data as WaterSourceCreateData); } };
@@ -102,13 +110,12 @@ const FarmDetail = () => {
         return colors[status] || 'status-slate';
     };
 
-    // Ajustado para recibir el valor ya convertido a hL/h si es necesario
-    const getEfficiencyColor = (efficiency: number) => {
-        // Asumiendo que el valor efficiency ya está en la escala deseada
-        // o que la lógica de colores se adapta a la escala original (L/h)
-        if (efficiency >= 90) return 'text-emerald-600'; // Ejemplo: 90 hL/h o 9000 L/h
-        if (efficiency >= 80) return 'text-blue-600';
-        if (efficiency >= 70) return 'text-amber-600';
+    // **MODIFICADO**: Asume que `efficiency` viene en hL/h
+    const getEfficiencyColor = (efficiencyInHl: number) => {
+        // La lógica de colores se mantiene, pero ahora compara con valores en hL/h
+        if (efficiencyInHl >= 90) return 'text-emerald-600';
+        if (efficiencyInHl >= 80) return 'text-blue-600';
+        if (efficiencyInHl >= 70) return 'text-amber-600';
         return 'text-red-600';
     };
 
@@ -117,7 +124,8 @@ const FarmDetail = () => {
 
     return (
         <div className="farm-detail-improved">
-            <div className="farm-header-card">
+            {/* ... (Farm Header Card y Weather Widget sin cambios) ... */}
+             <div className="farm-header-card">
                 <div className="farm-header-gradient">
                     <div className="farm-header-content">
                         <div className="farm-header-info">
@@ -188,8 +196,10 @@ const FarmDetail = () => {
                 </div>
             )}
 
+
             <div className="tabs-container">
-                <div className="tabs-nav">
+                {/* ... (Tabs Nav sin cambios) ... */}
+                 <div className="tabs-nav">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
@@ -207,7 +217,9 @@ const FarmDetail = () => {
                     ))}
                 </div>
 
+
                 <div className="tab-content">
+                    {/* ... (Tab Water Sources sin cambios) ... */}
                     {activeTab === 'waterSources' && (
                         <div>
                             <div className="tab-header">
@@ -243,9 +255,11 @@ const FarmDetail = () => {
                         </div>
                     )}
 
+
                     {activeTab === 'equipments' && (
                          <div>
-                            <div className="tab-header">
+                            {/* ... (Tab Header Equipments sin cambios) ... */}
+                             <div className="tab-header">
                                 <div>
                                     <h2 className="tab-title">Equipos de Riego</h2>
                                     <p className="tab-subtitle">Administra los equipos de irrigación</p>
@@ -254,13 +268,15 @@ const FarmDetail = () => {
                                     <Plus className="w-5 h-5" /> Añadir Equipo
                                 </button>
                             </div>
+
                             <div className="list-container">
                                 {equipments.map((equipment) => {
-                                    // Convertir L/h a hL/h para mostrar
-                                    const measuredFlowHl = equipment.measuredFlow / 100;
+                                    // **MODIFICADO**: Asume que equipment.measuredFlow ahora viene en hL/h
+                                    const measuredFlowHl = equipment.measuredFlow;
                                     return (
                                         <div key={equipment.id} className="list-item">
-                                            <div className="list-item-content">
+                                            {/* ... (list-item-content sin cambios) ... */}
+                                             <div className="list-item-content">
                                                 <div className="list-item-icon-wrapper purple">
                                                     <Wrench className="list-item-icon purple" />
                                                 </div>
@@ -272,18 +288,21 @@ const FarmDetail = () => {
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div className="list-item-actions wide">
                                                 <div className="efficiency-display">
                                                     <p className="efficiency-label">Flujo Medido</p>
-                                                    {/* Mostrar valor convertido y unidad actualizada */}
+                                                    {/* **MODIFICADO**: Muestra el valor y unidad en hL/h */}
                                                     <p className={`efficiency-value ${getEfficiencyColor(measuredFlowHl)}`}>
                                                         {measuredFlowHl.toFixed(2)} hL/h
                                                     </p>
                                                 </div>
-                                                <div className="action-buttons-group">
+                                                {/* ... (action-buttons-group sin cambios) ... */}
+                                                 <div className="action-buttons-group">
                                                     <button className="action-button" onClick={() => handleOpenEditEquipmentForm(equipment)}><Edit2 className="w-4 h-4" /></button>
                                                     <button className="action-button danger" onClick={() => setEquipmentToDelete(equipment)}><Trash2 className="w-4 h-4" /></button>
                                                 </div>
+
                                             </div>
                                         </div>
                                     );
@@ -292,6 +311,7 @@ const FarmDetail = () => {
                         </div>
                     )}
 
+                    {/* ... (Tab Sectors y Tab Users sin cambios) ... */}
                     {activeTab === 'sectors' && (
                          <div>
                             <div className="tab-header">
@@ -370,10 +390,11 @@ const FarmDetail = () => {
                             </div>
                         </div>
                     )}
+
                 </div>
             </div>
 
-            {/* --- MODALES --- */}
+            {/* --- MODALES (sin cambios, asumen que EquipmentForm ya maneja hL/h) --- */}
             {isWaterSourceModalOpen && <WaterSourceForm currentWaterSource={currentWaterSource} onSave={handleSaveWaterSource} onCancel={() => setIsWaterSourceModalOpen(false)} isLoading={createWaterSourceMutation.isPending || updateWaterSourceMutation.isPending} />}
             {waterSourceToDelete && <ConfirmationModal message={`¿Seguro de eliminar la fuente de agua "${waterSourceToDelete.type}"?`} onConfirm={() => deleteWaterSourceMutation.mutate(waterSourceToDelete.id)} onCancel={() => setWaterSourceToDelete(null)} isLoading={deleteWaterSourceMutation.isPending} />}
 

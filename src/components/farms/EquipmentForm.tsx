@@ -17,7 +17,7 @@ const EQUIPMENT_STATUSES = ['ACTIVO', 'INACTIVO', 'MANTENIMIENTO'];
 const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave, onCancel, isLoading }) => {
     const [formData, setFormData] = useState({
         name: '',
-        measuredFlow: '0', // Como string
+        measuredFlow: '0', // Como string, ahora representa hL/h
         hasFlowMeter: false,
         equipmentType: 'OTRO',
         equipmentStatus: 'ACTIVO',
@@ -29,7 +29,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
         if (isEditing && currentEquipment) {
             setFormData({
                 name: currentEquipment.name,
-                measuredFlow: String(currentEquipment.measuredFlow), // Convertido a string
+                // Asume que currentEquipment.measuredFlow ahora viene en hL/h
+                measuredFlow: String(currentEquipment.measuredFlow),
                 hasFlowMeter: currentEquipment.hasFlowMeter,
                 equipmentType: currentEquipment.equipmentType,
                 equipmentStatus: currentEquipment.equipmentStatus,
@@ -37,34 +38,31 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
         }
     }, [currentEquipment, isEditing]);
 
-    // --- INICIO DE LA CORRECCIÓN ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-        const numberRegex = /^[0-9]*\.?[0-9]*$/; // Regex para validar números decimales positivos
+        const numberRegex = /^[0-9]*\.?[0-9]*$/;
 
         if (type === 'checkbox') {
             const { checked } = e.target as HTMLInputElement;
             setFormData(prev => ({ ...prev, [name]: checked }));
         } else if (name === 'measuredFlow') {
-            // Solo actualiza si el valor es válido
             if (numberRegex.test(value)) {
                 setFormData(prev => ({ ...prev, [name]: value }));
             }
         } else {
-            // Para todos los demás campos, actualiza directamente
             setFormData(prev => ({
                 ...prev,
                 [name]: value,
             }));
         }
     };
-    // --- FIN DE LA CORRECCIÓN ---
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const dataToSave = {
             ...formData,
-            measuredFlow: parseFloat(formData.measuredFlow) || 0, // Conversión a número
+            // Envía el valor directamente como hL/h
+            measuredFlow: parseFloat(formData.measuredFlow) || 0,
         };
         onSave(dataToSave);
     };
@@ -86,8 +84,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
                             </select>
                         </div>
                          <div className="form-group">
+                            {/* Etiqueta actualizada */}
                             <label htmlFor="measuredFlow">Flujo Medido (hL/h)</label>
-                            {/* Corregido: type="text" y inputMode="decimal" */}
                             <input type="text" inputMode="decimal" id="measuredFlow" name="measuredFlow" value={formData.measuredFlow} onChange={handleChange} required />
                         </div>
                         <div className="form-group">

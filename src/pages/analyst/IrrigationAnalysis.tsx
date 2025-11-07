@@ -1,15 +1,14 @@
+// src/pages/analyst/IrrigationAnalysis.tsx
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Droplets, Clock, TrendingUp, Filter, Download } from 'lucide-react';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'; // Removido PieChart, Pie, Cell si no se usan
+import { Droplets, Clock, /* TrendingUp, */ Filter, Download } from 'lucide-react'; // Removido TrendingUp si no se usa
 import farmService from '../../services/farmService';
 import analyticsService from '../../services/analyticsService';
 import type { Farm, Sector } from '../../types/farm.types';
 import './IrrigationAnalysis.css';
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-
-// Componente Personalizado para Tooltips de Gráficos
+// Componente Personalizado para Tooltips de Gráficos (sin cambios)
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
@@ -17,6 +16,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 <p className="tooltip-label">{label}</p>
                 {payload.map((entry: any, index: number) => (
                     <p key={index} className="tooltip-item" style={{ color: entry.color }}>
+                        {/* Asume que entry.value ya viene en hL */}
                         {entry.name}: <strong>{entry.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</strong>
                     </p>
                 ))}
@@ -28,10 +28,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 
 const IrrigationAnalysis = () => {
+    // ... (estados de filtros sin cambios)
     const today = new Date();
     const thirtyDaysAgo = new Date(new Date().setDate(today.getDate() - 30));
-
-    // Estados para los filtros
     const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
     const [selectedSectorIds, setSelectedSectorIds] = useState<string[]>([]);
     const [dateRange, setDateRange] = useState({
@@ -40,14 +39,16 @@ const IrrigationAnalysis = () => {
     });
     const [showFilters, setShowFilters] = useState(true);
 
-    // Queries para obtener datos del backend
+
+    // --- Queries (sin cambios en llamadas, pero asumen que la API devuelve hL) ---
     const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['farms'], queryFn: farmService.getFarms });
     const { data: sectors = [] } = useQuery<Sector[]>({
         queryKey: ['sectors', selectedFarmId],
         queryFn: () => farmService.getSectorsByFarm(selectedFarmId!),
         enabled: !!selectedFarmId,
     });
-    
+
+    // Asume que la API ahora devuelve totalWaterAmount en hL
     const { data: summaryData = [], isLoading: isLoadingSummary } = useQuery({
         queryKey: ['irrigationSummary', selectedFarmId, dateRange, selectedSectorIds],
         queryFn: () => analyticsService.getIrrigationSummary({
@@ -59,6 +60,7 @@ const IrrigationAnalysis = () => {
         enabled: !!selectedFarmId,
     });
 
+    // Asume que la API ahora devuelve waterAmount en hL
     const { data: timeseriesData, isLoading: isLoadingTimeseries } = useQuery({
         queryKey: ['irrigationTimeseries', selectedSectorIds, dateRange],
         queryFn: () => analyticsService.getIrrigationTimeseries({
@@ -69,28 +71,27 @@ const IrrigationAnalysis = () => {
         enabled: selectedSectorIds.length === 1,
     });
 
-    // Manejadores de eventos para los filtros
+    // --- Manejadores de filtros (sin cambios) ---
     const handleFarmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedFarmId(Number(e.target.value));
         setSelectedSectorIds([]);
     };
-
     const handleSectorToggle = (sectorId: string) => {
-        setSelectedSectorIds(prev => 
-            prev.includes(sectorId) 
+        setSelectedSectorIds(prev =>
+            prev.includes(sectorId)
                 ? prev.filter(id => id !== sectorId)
                 : [...prev, sectorId]
         );
     };
 
-    // Cálculos para las tarjetas KPI
+    // --- Cálculos KPI (asumen que summaryData tiene hL) ---
     const totalWater = summaryData.reduce((sum, item) => sum + item.totalWaterAmount, 0);
     const totalHours = summaryData.reduce((sum, item) => sum + item.totalIrrigationHours, 0);
-    
+
     return (
         <div className="analysis-page">
-            {/* Header */}
-            <header className="analysis-header">
+            {/* ... (Header sin cambios) */}
+             <header className="analysis-header">
                 <div className="analysis-title-group">
                     <h1>
                         <Droplets size={32} color="#3b82f6" />
@@ -110,8 +111,8 @@ const IrrigationAnalysis = () => {
                 </div>
             </header>
 
-            {/* Panel de Filtros */}
-            {showFilters && (
+            {/* ... (Panel de Filtros sin cambios) */}
+             {showFilters && (
                 <div className="filters-panel">
                     <div className="filters-grid">
                         <div className="filter-group">
@@ -152,16 +153,17 @@ const IrrigationAnalysis = () => {
                 </div>
             )}
 
-            {/* Contenido principal: KPIs y Gráficos */}
+
             {selectedFarmId ? (
                 <>
-                    {/* Tarjetas KPI */}
+                    {/* Tarjetas KPI con unidad actualizada */}
                     <div className="kpi-grid">
                         <div className="kpi-card kpi-card-water">
                             <div>
                                 <p className="kpi-label">Consumo Total de Agua</p>
-                                <h2 className="kpi-value">{totalWater.toLocaleString()}</h2>
-                                <p className="kpi-unit water">m³</p>
+                                <h2 className="kpi-value">{totalWater.toLocaleString(undefined, { maximumFractionDigits: 1 })}</h2>
+                                {/* Unidad actualizada */}
+                                <p className="kpi-unit water">hL</p>
                             </div>
                             <div className="kpi-card-icon water"><Droplets size={24} color="#3b82f6" /></div>
                         </div>
@@ -175,7 +177,7 @@ const IrrigationAnalysis = () => {
                         </div>
                     </div>
 
-                    {/* Gráficos */}
+                    {/* Gráficos con nombres de 'dataKey' y 'name' actualizados */}
                     <div className="charts-grid">
                         <div className="chart-card">
                             <h3 className="chart-title">
@@ -188,12 +190,14 @@ const IrrigationAnalysis = () => {
                                     <XAxis dataKey="sectorName" tick={{ fill: '#6b7280', fontSize: 12 }} />
                                     <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} />
                                     <Tooltip content={<CustomTooltip />} />
-                                    <Bar dataKey="totalWaterAmount" fill="#3b82f6" radius={[8, 8, 0, 0]} name="Agua (m³)" />
+                                     {/* Nombre actualizado */}
+                                    <Bar dataKey="totalWaterAmount" fill="#3b82f6" radius={[8, 8, 0, 0]} name="Agua (hL)" />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                         <div className="chart-card">
-                            <h3 className="chart-title">
+                             {/* ... (Gráfico de horas sin cambios) ... */}
+                             <h3 className="chart-title">
                                 <span className="chart-title-bar" style={{backgroundColor: '#10b981'}} />
                                 Horas de Riego por Sector
                             </h3>
@@ -223,7 +227,8 @@ const IrrigationAnalysis = () => {
                                     <YAxis yAxisId="right" orientation="right" tick={{ fill: '#6b7280', fontSize: 12 }} />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Legend />
-                                    <Line yAxisId="left" type="monotone" dataKey="waterAmount" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} name="Agua (m³)" />
+                                    {/* Nombre actualizado */}
+                                    <Line yAxisId="left" type="monotone" dataKey="waterAmount" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} name="Agua (hL)" />
                                     <Line yAxisId="right" type="monotone" dataKey="irrigationHours" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name="Horas" />
                                 </LineChart>
                             </ResponsiveContainer>
@@ -232,13 +237,14 @@ const IrrigationAnalysis = () => {
 
                 </>
             ) : (
-                <div className="empty-state">
+                // ... (Empty state sin cambios)
+                 <div className="empty-state">
                     <Droplets size={48} color="#9ca3af" />
                     <h3>Seleccione una finca para comenzar</h3>
                     <p>Use los filtros superiores para seleccionar una finca y visualizar los datos de riego.</p>
                 </div>
             )}
-            
+
             <style>{`@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         </div>
     );

@@ -26,7 +26,8 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
 
     const [startTime, setStartTime] = useState('08:00');
     const [irrigationHours, setIrrigationHours] = useState('1');
-    const [waterAmount, setWaterAmount] = useState('10');
+    // Estado ahora representa hectolitros directamente
+    const [waterAmount, setWaterAmount] = useState('1'); // Renombrado de waterAmountHl para simplicidad
     const [selectedEquipmentId, setSelectedEquipmentId] = useState<string>(sector.equipmentId?.toString() || '');
 
     useEffect(() => {
@@ -36,11 +37,12 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
     }, [sector]);
 
     const { startDateTime, endDateTime } = useMemo(() => {
+        // ... (lógica de cálculo de fechas sin cambios)
         const hours = parseFloat(irrigationHours);
         if (!date || !startTime || !hours || hours <= 0) {
             return { startDateTime: null, endDateTime: null };
         }
-        
+
         const start = new Date(`${date}T${startTime}`);
         const finalStartDateTime = `${date}T${startTime}:00`;
 
@@ -68,20 +70,18 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
         onError: (err: Error) => toast.error(err.message),
     });
 
-    // --- INICIO DE LA CORRECCIÓN ---
     const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const numberRegex = /^[0-9]*\.?[0-9]*$/; // Regex para validar números decimales positivos
+        const numberRegex = /^[0-9]*\.?[0-9]*$/;
 
         if (numberRegex.test(value)) {
             if (name === 'irrigationHours') {
                 setIrrigationHours(value);
-            } else if (name === 'waterAmount') {
+            } else if (name === 'waterAmount') { // Usa el estado renombrado
                 setWaterAmount(value);
             }
         }
     };
-    // --- FIN DE LA CORRECCIÓN ---
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -93,6 +93,7 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
         const formData: IrrigationCreateData = {
             startDateTime,
             endDateTime,
+            // Envía el valor directamente como hL
             waterAmount: parseFloat(waterAmount) || 0,
             irrigationHours: parseFloat(irrigationHours) || 0,
             sectorId: sector.id,
@@ -114,7 +115,6 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
                         </div>
                         <div className="form-group">
                             <label htmlFor="irrigationHours">Horas de Riego</label>
-                            {/* Corregido: type="text" y inputMode="decimal", se usa el nuevo handler */}
                             <input type="text" inputMode="decimal" step="0.5" name="irrigationHours" value={irrigationHours} onChange={handleNumericChange} required />
                         </div>
                          <div className="form-group">
@@ -131,8 +131,9 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
                             )}
                         </div>
                         <div className="form-group">
-                            <label htmlFor="waterAmount">Cantidad de Agua (m³)</label>
-                            {/* Corregido: type="text" y inputMode="decimal", se usa el nuevo handler */}
+                             {/* Etiqueta actualizada */}
+                            <label htmlFor="waterAmount">Cantidad de Agua (hL)</label>
+                            {/* Input actualizado */}
                             <input type="text" inputMode="decimal" step="0.1" name="waterAmount" value={waterAmount} onChange={handleNumericChange} required />
                         </div>
                     </div>
