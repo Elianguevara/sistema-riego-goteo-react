@@ -1,15 +1,26 @@
 /* src/components/ui/ConfirmationModal.css */
 
 .confirmation-modal p {
-  margin: 20px 0;
+  margin: 24px 0;
   line-height: 1.6;
+  color: var(--color-text-muted);
+  font-size: 15px;
 }
 
 .confirmation-modal .btn-delete {
   background-color: var(--color-danger);
-  color: var(--color-primary-text);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.2);
 }
 
 .confirmation-modal .btn-delete:hover {
   background-color: var(--color-danger-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(244, 63, 94, 0.3);
 }

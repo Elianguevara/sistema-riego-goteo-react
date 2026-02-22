@@ -5,105 +5,168 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-container {
-  background-color: var(--color-content-bg);
-  padding: 30px;
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  background-color: white;
+  padding: 32px;
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 550px; /* Un poco más de espacio para formularios complejos */
+  max-width: 550px;
+  border: 1px solid var(--color-border);
+  animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .modal-container h3 {
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  font-family: var(--font-headers);
+  font-size: 22px;
+  font-weight: 700;
   color: var(--color-text-dark);
 }
 
 /* Estilos para el contenido del formulario */
-.form-grid { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-  gap: 20px; 
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
-.form-group { 
-  display: flex; 
-  flex-direction: column; 
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
 }
 
-.form-group label { 
-  margin-bottom: 5px; 
-  font-weight: 600; 
-  font-size: 14px; 
-  color: var(--color-text-dark); 
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-light);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.form-group input, 
+.form-group input,
 .form-group select,
-.form-group textarea { 
-  padding: 10px; 
-  border: 1px solid var(--color-border); 
-  border-radius: var(--border-radius-sm); 
-  font-size: 14px; 
+.form-group textarea {
   width: 100%;
-  box-sizing: border-box;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-app-bg);
+  font-family: var(--font-main);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  color: var(--color-text-dark);
 }
 
-.form-group input:disabled { 
-  background-color: #f0f0f0; 
-  cursor: not-allowed; 
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  background-color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+}
+
+.form-group input:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
 }
 
 /* Estilos para los botones de acción del modal */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 25px;
+  gap: 12px;
+  margin-top: 32px;
 }
 
-.btn-save { 
-  background-color: var(--color-primary); 
-  color: var(--color-primary-text); 
+.btn-save {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
 }
 
-.btn-cancel { 
-  background-color: var(--color-text-light); 
-  color: var(--color-primary-text); 
+.btn-save:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.3);
 }
 
-.btn-save, .btn-cancel { 
-  border: none; 
-  padding: 10px 20px; 
-  border-radius: var(--border-radius-sm); 
-  cursor: pointer; 
-  font-weight: 600; 
+.btn-cancel {
+  background-color: white;
+  color: var(--color-text-dark);
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
-/* Añadir al final de src/components/users/UserForm.css */
+
+.btn-cancel:hover {
+  background-color: var(--color-app-bg);
+  border-color: var(--color-text-light);
+}
 
 .location-picker-map {
-    height: 300px;
-    width: 100%;
-    border-radius: var(--border-radius-md);
-    margin-top: 5px;
-    z-index: 1; /* Asegura que el mapa se vea correctamente en el modal */
+  height: 250px;
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 8px;
+  z-index: 1;
+  border: 1px solid var(--color-border);
 }
 
 .coords-display {
-    display: flex;
-    gap: 15px;
-    font-size: 12px;
-    color: var(--color-text-light);
-    margin-top: 8px;
-    background-color: #f8f9fa;
-    padding: 5px 10px;
-    border-radius: var(--border-radius-sm);
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin-top: 12px;
+  background-color: var(--color-app-bg);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
 }

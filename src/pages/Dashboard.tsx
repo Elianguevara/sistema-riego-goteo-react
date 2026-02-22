@@ -34,7 +34,7 @@ const TableSkeleton = ({ columns, rows = 5 }: { columns: number, rows?: number }
 // --- TABLA DE USUARIOS CON DATOS LIMITADOS ---
 const UserTable = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    
+
     const { data: usersPage, isLoading, isError, error } = useQuery<Page<UserResponse>, Error>({
         queryKey: ['usersDashboard'],
         queryFn: () => adminService.getUsers({ page: 0, size: 5, sort: 'lastLogin,desc' }),
@@ -86,7 +86,7 @@ const UserTable = () => {
                             <td>{user.username}</td>
                             <td>{user.email}</td>
                             <td>{user.roleName}</td>
-                            <td><StatusToggle isActive={user.active} isLoading={false} onChange={() => {}} /></td>
+                            <td><StatusToggle isActive={user.active} isLoading={false} onChange={() => { }} /></td>
                         </tr>
                     ))}
                 </tbody>
@@ -204,18 +204,18 @@ const UserStatsDisplay = () => {
     if (isLoading) {
         return <TableSkeleton columns={2} rows={4} />;
     }
-    
+
     if (isError) {
         return (
             <div className="dashboard-table-container">
-                 <div className="table-header">
+                <div className="table-header">
                     <h2 className="table-title">Estadísticas de Usuarios</h2>
                 </div>
                 <p className="error-text">{error.message}</p>
             </div>
         );
     }
-    
+
     return (
         <div className="dashboard-table-container">
             <div className="table-header">
@@ -241,9 +241,9 @@ const UserStatsDisplay = () => {
                     <div className="role-item" key={role}>
                         <span className="role-name">{role}</span>
                         <div className="role-bar-container">
-                            <div 
-                                className="role-bar" 
-                                style={{ width: `${(count / (userStats.totalUsers || 1)) * 100}%`}}
+                            <div
+                                className="role-bar"
+                                style={{ width: `${(count / (userStats.totalUsers || 1)) * 100}%` }}
                             ></div>
                         </div>
                         <span className="role-count">{count}</span>
@@ -257,86 +257,86 @@ const UserStatsDisplay = () => {
 
 // --- COMPONENTE PRINCIPAL DEL DASHBOARD ---
 const Dashboard = () => {
-  const [activeTable, setActiveTable] = useState<'users' | 'farms' | 'sectors' | 'alerts' | 'user-stats'>('users');
+    const [activeTable, setActiveTable] = useState<'users' | 'farms' | 'sectors' | 'alerts' | 'user-stats'>('users');
 
-  const { data: kpis, isLoading, isError, error } = useQuery<KpiResponse, Error>({
-    queryKey: ['dashboardKpis'],
-    queryFn: dashboardService.getKpis,
-  });
+    const { data: kpis, isLoading, isError, error } = useQuery<KpiResponse, Error>({
+        queryKey: ['dashboardKpis'],
+        queryFn: dashboardService.getKpis,
+    });
 
-  if (isLoading) {
-    return <div className="dashboard-page"><p>Cargando dashboard...</p></div>;
-  }
-
-  if (isError) {
-    return <div className="dashboard-page"><p className="error-text">Error al cargar el dashboard: {error.message}</p></div>;
-  }
-
-  const renderActiveTable = () => {
-    switch (activeTable) {
-        case 'users':
-            return <UserTable />;
-        case 'farms':
-            return <FarmsTable />;
-        case 'sectors':
-            return <SectorsTable />;
-        case 'alerts':
-            return <AlertsTable />;
-        case 'user-stats':
-            return <UserStatsDisplay />;
-        default:
-            return <UserTable />;
+    if (isLoading) {
+        return <div className="dashboard-page"><p>Cargando dashboard...</p></div>;
     }
-  };
 
-  return (
-    <div>
-      <div className="stats-cards-grid">
-        <div className={`stat-card ${activeTable === 'users' ? 'active' : ''}`} onClick={() => setActiveTable('users')}>
-          <div className="card-icon blue"><i className="fas fa-users"></i></div>
-          <div className="card-info">
-            <span className="card-value">{kpis?.totalUsers ?? 'N/A'}</span>
-            <span className="card-label">Total de Usuarios</span>
-          </div>
-        </div>
-        <div className={`stat-card ${activeTable === 'farms' ? 'active' : ''}`} onClick={() => setActiveTable('farms')}>
-          <div className="card-icon green"><i className="fas fa-seedling"></i></div>
-          <div className="card-info">
-            <span className="card-value">{kpis?.totalFarms ?? 'N/A'}</span>
-            <span className="card-label">Total de Fincas</span>
-          </div>
-        </div>
-        <div className={`stat-card ${activeTable === 'sectors' ? 'active' : ''}`} onClick={() => setActiveTable('sectors')}>
-          <div className="card-icon cyan"><i className="fas fa-th-large"></i></div>
-          <div className="card-info">
-            <span className="card-value">{kpis?.activeSectors ?? 'N/A'}</span>
-            <span className="card-label">Sectores Activos</span>
-          </div>
-        </div>
-        <div className={`stat-card ${activeTable === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTable('alerts')}>
-          <div className="card-icon red"><i className="fas fa-exclamation-triangle"></i></div>
-          <div className="card-info">
-            <span className="card-value">{kpis?.activeAlerts ?? 'N/A'}</span>
-            <span className="card-label">Alertas Activas</span>
-          </div>
-        </div>
-        <div 
-          className={`stat-card ${activeTable === 'user-stats' ? 'active' : ''}`} 
-          onClick={() => setActiveTable('user-stats')}
-        >
-            <div className="card-icon purple"><i className="fas fa-chart-pie"></i></div>
-            <div className="card-info">
-                <span className="card-value">Ver</span>
-                <span className="card-label">Estadísticas de Usuarios</span>
+    if (isError) {
+        return <div className="dashboard-page"><p className="error-text">Error al cargar el dashboard: {error.message}</p></div>;
+    }
+
+    const renderActiveTable = () => {
+        switch (activeTable) {
+            case 'users':
+                return <UserTable />;
+            case 'farms':
+                return <FarmsTable />;
+            case 'sectors':
+                return <SectorsTable />;
+            case 'alerts':
+                return <AlertsTable />;
+            case 'user-stats':
+                return <UserStatsDisplay />;
+            default:
+                return <UserTable />;
+        }
+    };
+
+    return (
+        <div className="dashboard-page-container">
+            <div className="stats-cards-grid">
+                <div className={`stat-card ${activeTable === 'users' ? 'active' : ''}`} onClick={() => setActiveTable('users')}>
+                    <div className="card-icon blue"><i className="fas fa-users-viewfinder"></i></div>
+                    <div className="card-info">
+                        <span className="card-value">{kpis?.totalUsers ?? 'N/A'}</span>
+                        <span className="card-label">Usuarios</span>
+                    </div>
+                </div>
+                <div className={`stat-card ${activeTable === 'farms' ? 'active' : ''}`} onClick={() => setActiveTable('farms')}>
+                    <div className="card-icon green"><i className="fas fa-mountain-sun"></i></div>
+                    <div className="card-info">
+                        <span className="card-value">{kpis?.totalFarms ?? 'N/A'}</span>
+                        <span className="card-label">Fincas</span>
+                    </div>
+                </div>
+                <div className={`stat-card ${activeTable === 'sectors' ? 'active' : ''}`} onClick={() => setActiveTable('sectors')}>
+                    <div className="card-icon cyan"><i className="fas fa-microchip"></i></div>
+                    <div className="card-info">
+                        <span className="card-value">{kpis?.activeSectors ?? 'N/A'}</span>
+                        <span className="card-label">Sectores</span>
+                    </div>
+                </div>
+                <div className={`stat-card ${activeTable === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTable('alerts')}>
+                    <div className="card-icon red"><i className="fas fa-sensor-triangle-exclamation"></i></div>
+                    <div className="card-info">
+                        <span className="card-value">{kpis?.activeAlerts ?? 'N/A'}</span>
+                        <span className="card-label">Alertas</span>
+                    </div>
+                </div>
+                <div
+                    className={`stat-card ${activeTable === 'user-stats' ? 'active' : ''}`}
+                    onClick={() => setActiveTable('user-stats')}
+                >
+                    <div className="card-icon purple"><i className="fas fa-chart-mixed"></i></div>
+                    <div className="card-info">
+                        <span className="card-value">Ver</span>
+                        <span className="card-label">Analíticas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="table-display-area">
+                {renderActiveTable()}
             </div>
         </div>
-      </div>
-      
-      <div className="table-display-area">
-        {renderActiveTable()}
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Dashboard;

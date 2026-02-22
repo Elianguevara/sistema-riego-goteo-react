@@ -1,110 +1,135 @@
 .profile-page {
     max-width: 800px;
     margin: 0 auto;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .profile-header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 30px;
+    gap: 16px;
+    margin-bottom: 32px;
 }
 
 .profile-avatar-lg {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: var(--color-primary);
-    color: var(--color-primary-text);
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--color-primary), #059669);
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 36px;
-    font-weight: bold;
+    font-size: 48px;
+    font-weight: 700;
+    font-family: var(--font-headers);
+    box-shadow: var(--shadow-main);
 }
 
 .profile-header h2 {
+    font-family: var(--font-headers);
     font-size: 28px;
+    font-weight: 700;
     color: var(--color-text-dark);
     margin: 0;
 }
 
 .profile-card {
-    background-color: var(--color-content-bg);
-    padding: 30px;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-main);
+    background-color: white;
+    padding: 32px;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
 }
 
 .profile-card h3 {
     margin-top: 0;
-    margin-bottom: 25px;
+    margin-bottom: 24px;
+    font-family: var(--font-headers);
     font-size: 20px;
-    padding-bottom: 15px;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--color-border);
 }
 
 .profile-details {
     display: grid;
     grid-template-columns: 200px 1fr;
-    gap: 20px 15px;
+    gap: 20px 24px;
     align-items: center;
 }
 
-/* --- ESTA ES LA SECCIÓN CORREGIDA --- */
 .detail-item {
-    /* La propiedad va aquí, en el contenedor de cada fila */
     display: contents;
 }
 
 .detail-item .detail-label {
-    /* Quitamos 'display: contents' de aquí */
+    font-size: 13px;
     font-weight: 600;
     color: var(--color-text-light);
-    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .detail-item .detail-value {
+    font-size: 15px;
+    font-weight: 500;
     color: var(--color-text-dark);
-    text-align: left;
 }
-/* --- FIN DE LA SECCIÓN CORREGIDA --- */
-
 
 .profile-actions {
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 32px;
+    padding-top: 24px;
     border-top: 1px solid var(--color-border);
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-}
-
-.btn-primary, .btn-secondary {
-    border: none;
-    padding: 10px 20px;
-    border-radius: var(--border-radius-md);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    gap: 12px;
 }
 
 .btn-primary {
     background-color: var(--color-primary);
-    color: var(--color-primary-text);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
 }
 
 .btn-primary:hover {
     background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .btn-secondary {
-    background-color: var(--color-border);
+    background-color: white;
     color: var(--color-text-dark);
+    border: 1px solid var(--color-border);
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-    background-color: #e0e0e0;
+    background-color: var(--color-app-bg);
+    border-color: var(--color-text-light);
 }

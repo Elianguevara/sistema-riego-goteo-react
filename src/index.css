@@ -1,45 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
+
 :root {
-  /* Paleta de Colores Principal */
-  --color-primary: #2eaf7d;
-  --color-primary-rgb: 46, 175, 125;
-  --color-primary-hover: #258a62;
+  /* Paleta de Colores Moderna (Agrotech) */
+  --color-primary: #10b981;
+  /* Esmeralda Tech */
+  --color-primary-rgb: 16, 185, 129;
+  --color-primary-hover: #059669;
   --color-primary-text: #ffffff;
-  
+
+  --color-secondary: #6366f1;
+  /* Pizarra Lavanda / Indigo */
+  --color-secondary-rgb: 99, 102, 241;
+
   /* Colores de Layout */
-  --color-sidebar-bg: #0b1f3d;
-  --color-sidebar-hover: #2c3e50;
-  --color-sidebar-text: #bdc3c7;
-  --color-app-bg: #f4f7fa;
+  --color-app-bg: #f8fafc;
+  /* Niebla de Perla */
   --color-content-bg: #ffffff;
-  
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-hover: #f1f5f9;
+  --color-sidebar-text: #475569;
+  --color-sidebar-active-bg: #f0fdf4;
+  --color-sidebar-active-text: #10b981;
+
   /* Colores de Texto */
-  --color-text-dark: #34495e;
-  --color-text-light: #7f8c8d;
-  --color-text-disabled: #95a5a6;
+  --color-text-dark: #1e293b;
+  /* Pizarra Carbón */
+  --color-text-light: #64748b;
+  /* Niebla de Plata */
+  --color-text-disabled: #94a3b8;
 
-  /* Colores Semánticos (Estado y Acciones) */
-  --color-success: #2ecc71;
-  --color-success-bg: #eafaf1;
-  --color-danger: #e74c3c;
-  --color-danger-rgb: 231, 76, 60;
-  --color-danger-hover: #c0392b;
-  --color-danger-bg: #fceeee;
-  --color-info: #3498db;
+  /* Colores Semánticos */
+  --color-success: #10b981;
+  --color-success-bg: #ecfdf5;
+  --color-danger: #f43f5e;
+  /* Brasa de Rosa */
+  --color-danger-rgb: 244, 63, 94;
+  --color-danger-hover: #e11d48;
+  --color-danger-bg: #fff1f2;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-info: #0ea5e9;
+  /* Azul Cielo */
+  --color-info-bg: #f0f9ff;
 
-  /* Bordes y Sombras */
-  --color-border: #ecf0f1;
-  --shadow-main: 0 4px 12px rgba(0, 0, 0, 0.05);
-  
-  /* Proporciones */
-  --border-radius-lg: 10px;
-  --border-radius-md: 8px;
-  --border-radius-sm: 5px;
+  /* Bordes y Sombras Modernas */
+  --color-border: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-main: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Proporciones Bento */
+  --border-radius-xl: 20px;
+  --border-radius-lg: 16px;
+  --border-radius-md: 12px;
+  --border-radius-sm: 8px;
+
+  /* Fuentes */
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-headers: 'Outfit', sans-serif;
 }
 
-html, body, #root {
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #c8cbcf; /* Un color de fondo suave para toda la app */
+  font-family: var(--font-main);
+  background-color: var(--color-app-bg);
+  color: var(--color-text-dark);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-headers);
+}
+
+/* Scrollbar Moderno */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Botones Globales */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  font-family: var(--font-main);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--color-text-dark);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-app-bg);
+  border-color: var(--color-text-light);
+}
+
+/* Form Elements Globales */
+.form-field {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background-color: white;
+  font-family: var(--font-main);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  color: var(--color-text-dark);
+}
+
+.form-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-light);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
