@@ -31,17 +31,17 @@ const Reports = () => {
     const [isDownloading, setIsDownloading] = useState(false);
 
     // --- Queries para obtener datos reales ---
-    const { data: farms = [] } = useQuery<Farm[], Error>({ 
-        queryKey: ['farms'], 
-        queryFn: farmService.getFarms 
+    const { data: farms = [] } = useQuery<Farm[], Error>({
+        queryKey: ['farms'],
+        queryFn: farmService.getFarms
     });
-    
+
     const { data: sectors = [] } = useQuery<Sector[], Error>({
         queryKey: ['sectors', farmId],
         queryFn: () => farmService.getSectorsByFarm(Number(farmId)),
         enabled: !!farmId,
     });
-    
+
     const { data: users = [] } = useQuery<UserResponse[], Error>({
         queryKey: ['assignedUsersForReport', farmId],
         queryFn: () => farmService.getAssignedUsers(Number(farmId)),
@@ -84,16 +84,16 @@ const Reports = () => {
             if (operationType) params.append('operationType', operationType);
             if (userId) params.append('userId', userId);
         }
-        
+
         try {
             await reportService.downloadReport(params);
         } catch (error) {
-            // El servicio ya muestra un toast de error, pero podrías añadir lógica extra aquí si es necesario.
+            // El servicio ya muestra un toast de error, el error se relanza para limpiar el estado
         } finally {
             setIsDownloading(false);
         }
     };
-    
+
     const selectedReport = reportTypes.find(r => r.value === reportType)!;
 
     return (

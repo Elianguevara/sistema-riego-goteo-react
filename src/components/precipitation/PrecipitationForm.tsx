@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import precipitationService from '../../services/precipitationService';
 import type { PrecipitationCreateData } from '../../types/precipitation.types';
+import PrecipitationList from './PrecipitationList';
 import '../users/UserForm.css';
 
 interface Props {
@@ -15,7 +16,7 @@ interface Props {
 
 const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
     const queryClient = useQueryClient();
-    
+
     const [formState, setFormState] = useState({
         precipitationDate: date,
         mmRain: '10',
@@ -27,6 +28,9 @@ const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
             toast.success('Precipitación registrada correctamente.');
             queryClient.invalidateQueries({ queryKey: ['irrigations'] });
             queryClient.invalidateQueries({ queryKey: ['precipitationHistory', farmId] });
+            // No cerramos el modal inmediatamente si queremos ver el historial, 
+            // pero el requerimiento original dice onClose(). 
+            // Podríamos dejarlo así o cambiarlo. Mantendré onClose() por ahora.
             onClose();
         },
         onError: (err: Error) => toast.error(err.message),
@@ -35,7 +39,7 @@ const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
     // --- INICIO DE LA CORRECCIÓN ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        
+
         // Expresión regular para validar números (enteros o decimales)
         const numberRegex = /^[0-9]*\.?[0-9]*$/;
 
@@ -81,6 +85,8 @@ const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
                         </button>
                     </div>
                 </form>
+
+                <PrecipitationList farmId={farmId} />
             </div>
         </div>
     );

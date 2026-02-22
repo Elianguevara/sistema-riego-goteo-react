@@ -20,29 +20,31 @@ interface DailyViewProps {
     weatherError: Error | null;
 }
 
-const getWeatherIcon = (main: string) => {
-    switch (main.toLowerCase()) {
-        case 'rain': return 'fas fa-cloud-showers-heavy';
-        case 'clouds': return 'fas fa-cloud';
-        case 'clear': return 'fas fa-sun';
-        case 'snow': return 'fas fa-snowflake';
-        case 'drizzle': return 'fas fa-cloud-rain';
-        case 'thunderstorm': return 'fas fa-bolt';
-        default: return 'fas fa-smog';
+const getWeatherInfo = (main: string) => {
+    const lowerMain = main.toLowerCase();
+    switch (lowerMain) {
+        case 'rain': return { icon: 'fas fa-cloud-showers-heavy', colorClass: 'weather-rainy' };
+        case 'clouds': return { icon: 'fas fa-cloud', colorClass: 'weather-cloudy' };
+        case 'clear': return { icon: 'fas fa-sun', colorClass: 'weather-sunny' };
+        case 'snow': return { icon: 'fas fa-snowflake', colorClass: 'weather-snow' };
+        case 'drizzle': return { icon: 'fas fa-cloud-rain', colorClass: 'weather-rainy' };
+        case 'thunderstorm': return { icon: 'fas fa-bolt', colorClass: 'weather-rainy' };
+        default: return { icon: 'fas fa-smog', colorClass: 'weather-cloudy' };
     }
 };
 
 const MiniWeatherDisplay = ({ isLoading, error, data }: { isLoading: boolean, error: Error | null, data: CurrentWeather | undefined }) => {
-    if (isLoading) return <><i className="fas fa-spinner fa-spin"></i> Cargando...</>;
-    if (error) return <><i className="fas fa-exclamation-circle" title={error.message}></i> Clima no disponible</>;
+    if (isLoading) return <div className="current-weather-display"><i className="fas fa-spinner fa-spin"></i> Cargando...</div>;
+    if (error) return <div className="current-weather-display"><i className="fas fa-exclamation-circle"></i> Clima N/A</div>;
     if (data?.main && data.weather?.[0]) {
         const weatherInfo = data.weather[0];
+        const { icon, colorClass } = getWeatherInfo(weatherInfo.main);
         return (
-            <>
-                <i className={getWeatherIcon(weatherInfo.main)}></i>
+            <div className="current-weather-display" title={weatherInfo.description}>
+                <i className={`${icon} ${colorClass}`}></i>
                 <strong>{Math.round(data.main.temp)}°C</strong>
                 <span className="weather-description">{weatherInfo.description}</span>
-            </>
+            </div>
         );
     }
     return null;
@@ -73,11 +75,15 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
         Object.entries(sectorView.dailyIrrigations).forEach(([day, details]) => {
             irrigationMap.set(`${sectorView.sectorId}-${day}`, details);
         });
-        // Llenar mapa de precipitación (si existe)
+        // Llenar mapa de precipitación (robusto)
         if (sectorView.dailyPrecipitations) {
-             Object.entries(sectorView.dailyPrecipitations).forEach(([day, details]) => {
-                // Usamos solo el día como clave ya que la lluvia es por finca, no por sector específico en este modelo
-                precipitationMap.set(String(day), details);
+            Object.entries(sectorView.dailyPrecipitations).forEach(([key, details]) => {
+                // Extraer el número del día independientemente del formato (día solo o fecha completa)
+                const dayNumMatch = key.match(/(\d+)$/);
+                const dayNum = dayNumMatch ? parseInt(dayNumMatch[1]) : parseInt(key);
+                if (!isNaN(dayNum)) {
+                    precipitationMap.set(String(dayNum), details);
+                }
             });
         }
     });
@@ -91,42 +97,37 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
             <div className="daily-view-container">
                 {daysArray.map(day => {
                     const date = new Date(year, month - 1, day);
-                    const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`; // Formato YYYY-MM-DD
-                    // Determinar si el día es pasado, presente o futuro
+                    const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     let dayClass = date < todayDate ? 'past' : (date.getTime() === todayDate.getTime() ? 'today' : 'future');
 
-                    // Obtener datos de precipitación para el día
                     const dailyPrecipitation = precipitationMap.get(String(day));
                     const totalRain = dailyPrecipitation?.reduce((sum, rec) => sum + (rec?.mmRain || 0), 0) || 0;
 
                     return (
-                        // Contenedor principal de la tarjeta del día
                         <div key={day} className={`day-card ${dayClass}`} ref={dayClass === 'today' ? todayRef : null}>
-                            {/* Cabecera de la tarjeta */}
                             <div className="day-card-header">
-                                {/* Nombre del día y número */}
-                                <span>{date.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric' })}</span>
-                                {/* Acciones en la cabecera */}
-                                <div className="header-actions">
-                                    {/* Mostrar clima solo para el día de hoy */}
-                                    {dayClass === 'today' && <MiniWeatherDisplay isLoading={isLoadingWeather} error={weatherError} data={weatherData} />}
-                                    {/* Mostrar lluvia si hubo */}
+                                <div className="date-display">
+                                    <span className="day-name">{date.toLocaleDateString('es-AR', { weekday: 'long' })}</span>
+                                    <span className="day-number">{day}</span>
+                                </div>
+
+                                <div className="header-status-group">
                                     {totalRain > 0 && (
                                         <div className="daily-precipitation-display">
                                             <i className="fas fa-cloud-showers-heavy"></i>
                                             <span>{totalRain.toFixed(1)} mm</span>
                                         </div>
                                     )}
-                                    {/* Botón para añadir registro de lluvia */}
-                                    <button className="btn-add-precipitation" onClick={() => setPrecipitationModalDate(dateString)}>
-                                        <i className="fas fa-cloud-rain"></i> Añadir Lluvia
+                                    {dayClass === 'today' && <MiniWeatherDisplay isLoading={isLoadingWeather} error={weatherError} data={weatherData} />}
+
+                                    <button className="btn-add-precipitation" onClick={() => setPrecipitationModalDate(dateString)} title="Añadir lluvia">
+                                        <i className="fas fa-plus"></i> <i className="fas fa-cloud-rain"></i>
                                     </button>
                                 </div>
                             </div>
-                            {/* Lista de sectores para este día */}
+
                             <div className="sector-list">
                                 {sectors.map(sector => {
-                                    // Obtener registros de riego para este sector y día
                                     const dailyRecords = irrigationMap.get(`${sector.id}-${day}`);
                                     // Calcular totales (agua en m³, luego convertir a hL)
                                     const totalWaterM3 = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;

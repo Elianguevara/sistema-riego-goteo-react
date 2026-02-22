@@ -67,38 +67,38 @@
 
 /* --- HEADER DE LA TARJETA --- */
 .day-card-header {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
-    padding: 16px 20px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: #1f2937;
+    padding: 12px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.day-card.today .day-card-header {
-    background: rgba(220, 252, 231, 0.7);
-    color: #065f46;
+.date-display {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
 }
 
-.day-card.past .day-card-header {
-    background: rgba(249, 250, 251, 0.7);
-    color: #6b7280;
+.day-name {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    opacity: 0.7;
 }
 
-.day-card.future .day-card-header {
-    background: rgba(219, 234, 254, 0.7);
-    color: #1e40af;
+.day-number {
+    font-size: 1.4rem;
+    font-weight: 800;
 }
 
-.day-card-header > span {
-    text-transform: capitalize;
+.header-status-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 /* --- ACCIONES DEL HEADER --- */
@@ -113,71 +113,116 @@
 .current-weather-display {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-    border-radius: 10px;
+    gap: 10px;
+    font-size: 0.88rem;
+    padding: 6px 14px;
+    background: white;
+    border-radius: 12px;
     color: #374151;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .current-weather-display i {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+/* Colores dinámicos para clima */
+.current-weather-display i.weather-sunny {
     color: #f59e0b;
-    font-size: 1rem;
+}
+
+.current-weather-display i.weather-cloudy {
+    color: #94a3b8;
+}
+
+.current-weather-display i.weather-rainy {
+    color: #0ea5e9;
+    /* Celeste para nubes de lluvia */
+}
+
+.current-weather-display i.weather-snow {
+    color: #94a3b8;
 }
 
 .current-weather-display strong {
-    color: #1f2937;
+    color: #111827;
+    font-weight: 700;
 }
 
 .current-weather-display .weather-description {
     text-transform: capitalize;
-    color: #6b7280;
-    font-size: 0.8rem;
+    color: #4b5563;
+    font-size: 0.82rem;
     font-weight: 500;
 }
 
-/* Display de precipitación */
+/* Display de precipitación - ESTILO CELESTE MEJORADO */
 .daily-precipitation-display {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #1e40af;
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    padding: 6px 12px;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.2);
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0369a1;
+    background: #e0f2fe;
+    padding: 8px 16px;
+    border-radius: 14px;
+    border: 2px solid #bae6fd;
+    box-shadow: 0 2px 4px rgba(14, 165, 233, 0.1);
+    animation: fadeInScale 0.3s ease-out;
 }
 
 .daily-precipitation-display i {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
+    color: #0ea5e9;
+    /* Celeste vibrante */
 }
 
-/* Botón añadir lluvia */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Botón añadir lluvia - Compacto */
 .btn-add-precipitation {
-    background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
-    color: #1e40af;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
+    background: white;
+    color: #0ea5e9;
+    border: 2px solid #bae6fd;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-add-precipitation i:first-child {
+    font-size: 0.7rem;
+    margin-right: -2px;
+    margin-top: -8px;
+}
+
+.btn-add-precipitation i:last-child {
+    font-size: 1rem;
 }
 
 .btn-add-precipitation:hover {
-    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    background: #f0f9ff;
+    border-color: #0ea5e9;
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
 }
 
 .btn-add-precipitation:active {
@@ -354,6 +399,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -364,11 +410,25 @@
     animation: fadeInUp 0.4s ease-out backwards;
 }
 
-.day-card:nth-child(1) { animation-delay: 0.05s; }
-.day-card:nth-child(2) { animation-delay: 0.1s; }
-.day-card:nth-child(3) { animation-delay: 0.15s; }
-.day-card:nth-child(4) { animation-delay: 0.2s; }
-.day-card:nth-child(5) { animation-delay: 0.25s; }
+.day-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.day-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.day-card:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.day-card:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.day-card:nth-child(5) {
+    animation-delay: 0.25s;
+}
 
 /* Estados de carga */
 .btn-add-irrigation:disabled,
