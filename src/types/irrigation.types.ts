@@ -1,7 +1,5 @@
 // Archivo: src/types/irrigation.types.ts
 
-import type { PrecipitationRecord } from './precipitation.types';
-
 // --- INTERFACES PARA LA VISTA MENSUAL ---
 
 export interface DailyIrrigationDetail {
@@ -20,7 +18,7 @@ export interface MonthlyIrrigationSectorView {
   dailyIrrigations: DailyIrrigationMap;
   // --- CAMPO AÑADIDO ---
   // El backend ahora también nos enviará las precipitaciones por día.
-  dailyPrecipitations?: Record<string, PrecipitationRecord[]>; 
+  dailyPrecipitations?: Record<string, number>;
 }
 
 
@@ -36,13 +34,13 @@ export interface IrrigationCreateData {
 }
 
 export interface IrrigationRecord {
-    id: number;
-    startDateTime: string;
-    endDateTime: string;
-    waterAmount: number;
-    irrigationHours: number;
-    sectorId: number;
-    sectorName: string;
-    equipmentId: number;
-    equipmentName: string;
+  id: number;
+  startDateTime: string;
+  endDateTime: string;
+  waterAmount: number;
+  irrigationHours: number;
+  sectorId: number;
+  sectorName: string;
+  equipmentId: number;
+  equipmentName: string;
 }

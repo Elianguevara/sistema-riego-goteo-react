@@ -68,22 +68,17 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
 
     // Mapas para acceder rápidamente a los datos de riego y precipitación por día/sector
     const irrigationMap = new Map<string, any[]>();
-    const precipitationMap = new Map<string, any[]>();
+    const precipitationMap = new Map<string, number>();
 
     monthlyData.forEach(sectorView => {
         // Llenar mapa de riego
         Object.entries(sectorView.dailyIrrigations).forEach(([day, details]) => {
             irrigationMap.set(`${sectorView.sectorId}-${day}`, details);
         });
-        // Llenar mapa de precipitación (robusto)
+        // Llenar mapa de precipitación (nuevo formato simple)
         if (sectorView.dailyPrecipitations) {
-            Object.entries(sectorView.dailyPrecipitations).forEach(([key, details]) => {
-                // Extraer el número del día independientemente del formato (día solo o fecha completa)
-                const dayNumMatch = key.match(/(\d+)$/);
-                const dayNum = dayNumMatch ? parseInt(dayNumMatch[1]) : parseInt(key);
-                if (!isNaN(dayNum)) {
-                    precipitationMap.set(String(dayNum), details);
-                }
+            Object.entries(sectorView.dailyPrecipitations).forEach(([day, totalMm]) => {
+                precipitationMap.set(String(day), Number(totalMm));
             });
         }
     });
@@ -100,8 +95,7 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                     const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     let dayClass = date < todayDate ? 'past' : (date.getTime() === todayDate.getTime() ? 'today' : 'future');
 
-                    const dailyPrecipitation = precipitationMap.get(String(day));
-                    const totalRain = dailyPrecipitation?.reduce((sum, rec) => sum + (rec?.mmRain || 0), 0) || 0;
+                    const totalRain = precipitationMap.get(String(day)) || 0;
 
                     return (
                         <div key={day} className={`day-card ${dayClass}`} ref={dayClass === 'today' ? todayRef : null}>
