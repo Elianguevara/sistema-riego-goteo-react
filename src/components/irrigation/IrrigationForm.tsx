@@ -106,23 +106,23 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
         <div className="modal-overlay">
             <div className="modal-container">
                 <h3>Registrar Riego para {sector.name}</h3>
-                <p><strong>Fecha:</strong> {new Date(date + 'T00:00:00').toLocaleDateString('es-AR', {day: '2-digit', month: '2-digit', year: 'numeric'})}</p>
+                <p><strong>Fecha:</strong> {new Date(date + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="startTime">Hora Inicio</label>
-                            <input type="time" name="startTime" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+                            <input type="time" id="startTime" name="startTime" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
                         </div>
                         <div className="form-group">
                             <label htmlFor="irrigationHours">Horas de Riego</label>
-                            <input type="text" inputMode="decimal" step="0.5" name="irrigationHours" value={irrigationHours} onChange={handleNumericChange} required />
+                            <input type="text" id="irrigationHours" inputMode="decimal" step="0.5" name="irrigationHours" value={irrigationHours} onChange={handleNumericChange} required />
                         </div>
-                         <div className="form-group">
+                        <div className="form-group">
                             <label htmlFor="equipmentId">Equipo</label>
                             {sector.equipmentId ? (
                                 <input type="text" value={sector.equipmentName || `Equipo ID: ${sector.equipmentId}`} disabled />
                             ) : (
-                                <select name="equipmentId" value={selectedEquipmentId} onChange={(e) => setSelectedEquipmentId(e.target.value)} required disabled={isLoadingEquipment}>
+                                <select id="equipmentId" name="equipmentId" value={selectedEquipmentId} onChange={(e) => setSelectedEquipmentId(e.target.value)} required disabled={isLoadingEquipment}>
                                     <option value="">{isLoadingEquipment ? 'Cargando...' : 'Seleccione equipo'}</option>
                                     {allEquipment.map(eq => (
                                         <option key={eq.id} value={eq.id}>{eq.name}</option>
@@ -131,13 +131,13 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
                             )}
                         </div>
                         <div className="form-group">
-                             {/* Etiqueta actualizada */}
+                            {/* Etiqueta actualizada */}
                             <label htmlFor="waterAmount">Cantidad de Agua (hL)</label>
                             {/* Input actualizado */}
-                            <input type="text" inputMode="decimal" step="0.1" name="waterAmount" value={waterAmount} onChange={handleNumericChange} required />
+                            <input type="text" id="waterAmount" inputMode="decimal" step="0.1" name="waterAmount" value={waterAmount} onChange={handleNumericChange} required />
                         </div>
                     </div>
-                     <div className="form-group calculated-field">
+                    <div className="form-group calculated-field">
                         <label>Fecha y Hora de Fin (Calculada)</label>
                         <input type="text" value={endDateTime ? new Date(endDateTime).toLocaleString('es-AR') : ''} disabled />
                     </div>
