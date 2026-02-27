@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import notificationService from '../../services/notificationService';
 import type { Notification, NotificationPage } from '../../types/notification.types';
+import { useAuthData } from '../../hooks/useAuthData';
+import { resolveNotificationUrl } from '../../utils/notificationNavigation';
 import './NotificationBell.css';
 
 const timeAgo = (dateString: string): string => {
@@ -26,6 +28,7 @@ const timeAgo = (dateString: string): string => {
 const NotificationBell = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate(); // Hook para navegación programática
+    const authData = useAuthData();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -48,27 +51,22 @@ const NotificationBell = () => {
         },
     });
 
-    // --- LÓGICA DE NAVEGACIÓN MEJORADA Y ROBUSTA ---
-    const handleNotificationClick = (notification: Notification) => {
-        const navigateToLink = () => {
-            if (notification.link && notification.link !== '#') {
-                navigate(notification.link);
-            }
-        };
+    const handleNotificationClick = async (notification: Notification) => {
+        const targetUrl = resolveNotificationUrl(notification, authData?.role);
 
         // Cerrar el dropdown inmediatamente para una mejor experiencia de usuario
         setIsOpen(false);
 
         if (!notification.isRead) {
-            // Marcar como leída y, en caso de éxito, navegar.
-            markAsReadMutation.mutate(notification.id, {
-                onSuccess: () => {
-                    navigateToLink();
-                }
-            });
-        } else {
-            // Si ya está leída, simplemente navegar.
-            navigateToLink();
+            try {
+                await markAsReadMutation.mutateAsync(notification.id);
+            } catch {
+                // Si falla el marcado, igual continuamos con la navegación.
+            }
+        }
+
+        if (targetUrl) {
+            navigate(targetUrl);
         }
     };
 
@@ -99,17 +97,21 @@ const NotificationBell = () => {
                     </div>
                     <div className="notification-list">
                         {notifications.length > 0 ? (
-                            notifications.map(n => (
-                                <div
-                                    key={n.id}
-                                    className={`notification-item ${n.isRead ? 'read' : ''}`}
-                                    onClick={() => handleNotificationClick(n)}
-                                    style={{ cursor: n.link ? 'pointer' : 'default' }}
-                                >
-                                    <p className="notification-message">{n.message}</p>
-                                    <span className="notification-time">{timeAgo(n.createdAt)}</span>
-                                </div>
-                            ))
+                            notifications.map(n => {
+                                const canNavigate = Boolean(resolveNotificationUrl(n, authData?.role));
+
+                                return (
+                                    <div
+                                        key={n.id}
+                                        className={`notification-item ${n.isRead ? 'read' : ''}`}
+                                        onClick={() => handleNotificationClick(n)}
+                                        style={{ cursor: canNavigate || !n.isRead ? 'pointer' : 'default' }}
+                                    >
+                                        <p className="notification-message">{n.message}</p>
+                                        <span className="notification-time">{timeAgo(n.createdAt)}</span>
+                                    </div>
+                                );
+                            })
                         ) : (
                             <div className="empty-notifications">
                                 No tienes notificaciones.

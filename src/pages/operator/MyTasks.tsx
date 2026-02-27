@@ -7,6 +7,8 @@ import taskService from '../../services/taskService';
 import type { Task, TaskStatus } from '../../types/task.types';
 import TaskDetailModal from '../../components/tasks/TaskDetailModal';
 import './MyTasks.css';
+import LoadingState from '../../components/ui/LoadingState';
+import ErrorState from '../../components/ui/ErrorState';
 
 
 // --- COMPONENTE TaskCard MODIFICADO ---
@@ -115,8 +117,8 @@ const MyTasks = () => {
         updateStatusMutation.mutate({ taskId, status });
     };
 
-    if (isLoading) return <div className="tasks-page"><p>Cargando tareas...</p></div>;
-    if (isError) return <div className="tasks-page"><p className="error-text">Error: {error.message}</p></div>;
+    if (isLoading) return <LoadingState message="Cargando tareas..." />;
+    if (isError) return <ErrorState message={error.message} />;
 
     if (!Array.isArray(tasks)) {
         return (

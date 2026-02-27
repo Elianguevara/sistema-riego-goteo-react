@@ -1,0 +1,51 @@
+/* src/components/ui/ErrorState.css */
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3, 12px);
+  padding: var(--state-padding, 40px);
+  text-align: center;
+}
+
+.error-state__icon {
+  color: var(--color-danger, #f43f5e);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.error-state__title {
+  margin: 0;
+  font-family: var(--font-headers, system-ui);
+  font-size: var(--text-lg, 17px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-dark, #1e293b);
+}
+
+.error-state__message {
+  margin: 0;
+  font-size: var(--text-sm, 13px);
+  color: var(--color-text-light, #64748b);
+  max-width: 360px;
+  line-height: var(--leading-relaxed, 1.625);
+}
+
+.error-state__retry {
+  margin-top: var(--space-2, 8px);
+  padding: var(--space-2, 8px) var(--space-5, 20px);
+  background: var(--color-danger-bg, #fff1f2);
+  color: var(--color-danger, #f43f5e);
+  border: 1px solid rgba(var(--color-danger-rgb, 244, 63, 94), 0.25);
+  border-radius: var(--border-radius-sm, 8px);
+  font-size: var(--text-sm, 13px);
+  font-weight: var(--font-semibold, 600);
+  font-family: var(--font-main, system-ui);
+  cursor: pointer;
+  transition: background var(--duration-base, 200ms) var(--ease-default, ease);
+}
+
+.error-state__retry:hover {
+  background: rgba(var(--color-danger-rgb, 244, 63, 94), 0.12);
+}

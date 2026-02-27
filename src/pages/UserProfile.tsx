@@ -7,6 +7,8 @@ import EditProfileModal from '../components/profile/EditProfileModal'; // Creare
 import ChangeSelfPasswordModal from '../components/profile/ChangeSelfPasswordModal'; // Crearemos este
 import './UserProfile.css'; // Crearemos este
 import { useAuthData } from '../hooks/useAuthData'; // Reutilizamos el hook
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
 
 const UserProfile = () => {
     const queryClient = useQueryClient();
@@ -39,8 +41,8 @@ const UserProfile = () => {
         onError: (err: Error) => toast.error(err.message || 'Error al cambiar contraseña.'),
     });
 
-    if (isLoading) return <p>Cargando perfil...</p>;
-    if (isError) return <p className="error-text">Error: {error.message}</p>;
+    if (isLoading) return <LoadingState message="Cargando perfil..." />;
+    if (isError) return <ErrorState message={error.message} />;
 
     return (
         <div className="profile-page">

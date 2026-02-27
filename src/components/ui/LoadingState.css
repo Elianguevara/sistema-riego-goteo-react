@@ -1,0 +1,35 @@
+/* src/components/ui/LoadingState.css */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4, 16px);
+  padding: var(--state-padding, 40px);
+}
+
+.loading-state--full-page {
+  min-height: 100vh;
+}
+
+.loading-state__ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border, #e2e8f0);
+  border-top-color: var(--color-primary, #10b981);
+  border-radius: 50%;
+  animation: ls-rotate 0.7s linear infinite;
+}
+
+@keyframes ls-rotate {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state__message {
+  margin: 0;
+  font-size: var(--text-sm, 13px);
+  font-weight: var(--font-medium, 500);
+  font-family: var(--font-main, system-ui);
+  color: var(--color-text-light, #64748b);
+}

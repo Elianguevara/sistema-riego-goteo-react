@@ -9,6 +9,7 @@ import precipitationService from '../../services/precipitationService';
 import type { Farm } from '../../types/farm.types';
 import type { PrecipitationRecord, PrecipitationSummary } from '../../types/precipitation.types';
 import './PrecipitationAnalysis.css';
+import EmptyState from '../../components/ui/EmptyState';
 
 // --- Componente Personalizado para Tooltips ---
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -155,9 +156,10 @@ const PrecipitationAnalysis = () => {
                     </div>
                 </div>
             ) : (
-                <div className="empty-state">
-                    <h3>Seleccione una finca para comenzar el análisis.</h3>
-                </div>
+                <EmptyState
+                    icon={<Filter size={24} />}
+                    title="Seleccione una finca para comenzar el análisis"
+                />
             )}
         </div>
     );

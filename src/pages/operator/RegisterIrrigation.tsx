@@ -13,6 +13,7 @@ import IrrigationScheduler from '../../components/irrigation/IrrigationScheduler
 import type { CurrentWeather } from '../../types/weather.types';
 import type { Sector } from '../../types/farm.types';
 import './RegisterIrrigation.css';
+import LoadingState from '../../components/ui/LoadingState';
 
 const RegisterIrrigation = () => {
     const today = new Date();
@@ -70,9 +71,7 @@ const RegisterIrrigation = () => {
     const monthName = new Date(year, month - 1).toLocaleString('es-AR', { month: 'long' });
 
     const renderContent = () => {
-        if (isLoadingFarms) {
-            return <p>Cargando fincas asignadas...</p>;
-        }
+        if (isLoadingFarms) return <LoadingState message="Cargando fincas asignadas..." />;
         if (farms.length === 0) {
             return (
                 <div className="empty-state">

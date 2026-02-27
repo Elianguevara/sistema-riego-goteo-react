@@ -1,0 +1,49 @@
+/* src/components/ui/PageHeader.css */
+
+.ui-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4, 16px);
+  margin-bottom: var(--space-8, 32px);
+  flex-wrap: wrap;
+}
+
+.ui-page-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  min-width: 0;
+}
+
+.ui-page-header__title {
+  margin: 0;
+  font-family: var(--font-headers, system-ui);
+  font-size: var(--text-3xl, 30px);
+  font-weight: var(--font-bold, 700);
+  color: var(--color-text-dark, #1e293b);
+  letter-spacing: -0.5px;
+  line-height: var(--leading-tight, 1.25);
+}
+
+.ui-page-header__subtitle {
+  margin: 0;
+  font-size: var(--text-base, 15px);
+  color: var(--color-text-light, #64748b);
+  line-height: var(--leading-normal, 1.5);
+}
+
+.ui-page-header__action {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .ui-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ui-page-header__action {
+    align-self: flex-start;
+  }
+}

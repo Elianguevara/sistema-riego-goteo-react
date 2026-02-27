@@ -6,7 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import notificationService from '../services/notificationService';
 import type { Notification, NotificationPage } from '../types/notification.types';
+import { useAuthData } from '../hooks/useAuthData';
+import { resolveNotificationUrl } from '../utils/notificationNavigation';
 import './NotificationHistory.css';
+import { BellOff } from 'lucide-react';
+import LoadingState from '../components/ui/LoadingState';
+import EmptyState from '../components/ui/EmptyState';
 
 const timeAgo = (dateString: string): string => {
     const date = new Date(dateString);
@@ -27,6 +32,7 @@ const timeAgo = (dateString: string): string => {
 const NotificationHistory = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const authData = useAuthData();
     const [page, setPage] = useState(0);
     const [size, ] = useState(6);
     
@@ -59,30 +65,24 @@ const NotificationHistory = () => {
         },
     });
     
-    // --- LÓGICA DE NAVEGACIÓN CORREGIDA Y ROBUSTA ---
-    const handleNavigateAndMarkAsRead = (notification: Notification) => {
-        // La función interna se asegura de que el link existe antes de navegar
-        const navigateToLink = () => {
-            if (notification.link && notification.link !== '#') {
-                navigate(notification.link);
-            }
-        };
+    const handleNotificationClick = async (notification: Notification) => {
+        const targetUrl = resolveNotificationUrl(notification, authData?.role);
 
         if (!notification.isRead) {
-            // Marcar como leída y, SOLO EN CASO DE ÉXITO, navegar.
-            markAsReadMutation.mutate(notification.id, {
-                onSuccess: () => {
-                    navigateToLink();
-                }
-            });
-        } else {
-            // Si ya está leída, simplemente navegar.
-            navigateToLink();
+            try {
+                await markAsReadMutation.mutateAsync(notification.id);
+            } catch {
+                // Si falla el marcado, igual continuamos con la navegación.
+            }
+        }
+
+        if (targetUrl) {
+            navigate(targetUrl);
         }
     };
 
     if (isLoading) {
-        return <div className="notification-history-page">Cargando historial...</div>;
+        return <LoadingState message="Cargando historial..." />;
     }
 
     const notifications = notificationPage?.content ?? [];
@@ -95,38 +95,44 @@ const NotificationHistory = () => {
 
             <div className="history-list-container">
                 {notifications.length > 0 ? (
-                    notifications.map(n => (
-                        <div key={n.id} className={`history-item ${n.isRead ? 'read' : 'unread'}`}>
-                            <div className="item-icon">
-                                <i className={`fas ${n.isRead ? 'fa-check-circle' : 'fa-bell'}`}></i>
-                            </div>
-                            <div className="item-content">
-                                <p className="item-message">{n.message}</p>
-                                <span className="item-time">{timeAgo(n.createdAt)}</span>
-                                {n.link && (
-                                    <button className="item-link" onClick={() => handleNavigateAndMarkAsRead(n)}>
-                                        Ver detalle
+                    notifications.map(n => {
+                        const canNavigate = Boolean(resolveNotificationUrl(n, authData?.role));
+
+                        return (
+                            <div key={n.id} className={`history-item ${n.isRead ? 'read' : 'unread'}`}>
+                                <div className="item-icon">
+                                    <i className={`fas ${n.isRead ? 'fa-check-circle' : 'fa-bell'}`}></i>
+                                </div>
+                                <div className="item-content">
+                                    <p className="item-message">{n.message}</p>
+                                    <span className="item-time">{timeAgo(n.createdAt)}</span>
+                                    {canNavigate && (
+                                        <button className="item-link" onClick={() => handleNotificationClick(n)}>
+                                            Ver detalle
+                                        </button>
+                                    )}
+                                </div>
+                                
+                                {!n.isRead && (
+                                    <button
+                                        className="btn-mark-read"
+                                        onClick={() => markAsReadMutation.mutate(n.id)}
+                                        disabled={markAsReadMutation.isPending && markAsReadMutation.variables === n.id}
+                                    >
+                                        {markAsReadMutation.isPending && markAsReadMutation.variables === n.id 
+                                            ? 'Marcando...' 
+                                            : 'Marcar como leída'}
                                     </button>
                                 )}
                             </div>
-                            
-                            {!n.isRead && (
-                                <button
-                                    className="btn-mark-read"
-                                    onClick={() => markAsReadMutation.mutate(n.id)}
-                                    disabled={markAsReadMutation.isPending && markAsReadMutation.variables === n.id}
-                                >
-                                    {markAsReadMutation.isPending && markAsReadMutation.variables === n.id 
-                                        ? 'Marcando...' 
-                                        : 'Marcar como leída'}
-                                </button>
-                            )}
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
-                    <div className="empty-history">
-                        <p>No hay notificaciones para mostrar.</p>
-                    </div>
+                    <EmptyState
+                        icon={<BellOff size={24} />}
+                        title="No hay notificaciones"
+                        subtitle="Cuando recibas notificaciones, aparecerán aquí."
+                    />
                 )}
             </div>
 

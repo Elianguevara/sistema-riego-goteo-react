@@ -12,6 +12,8 @@ import ActionsMenu, { type ActionMenuItem } from '../components/ui/ActionsMenu';
 import ChangePasswordModal from '../components/users/ChangePasswordModal';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import './UserManagement.css';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
 
 // Tipo para la configuración del ordenamiento
 type SortConfig = {
@@ -130,8 +132,8 @@ const UserManagement = () => {
         return <i className="fas fa-sort-down sort-icon"></i>;
     };
 
-    if (isLoading) return <div className="user-management-page"><p>Cargando usuarios...</p></div>;
-    if (isError) return <div className="user-management-page"><p className="error-text">Error: {error.message}</p></div>;
+    if (isLoading) return <LoadingState message="Cargando usuarios..." />;
+    if (isError) return <ErrorState message={error.message} />;
     
     const users = usersPage?.content ?? [];
 

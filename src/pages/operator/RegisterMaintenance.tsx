@@ -10,6 +10,9 @@ import MaintenanceForm from '../../components/maintenance/MaintenanceForm';
 import ActionsMenu, { type ActionMenuItem } from '../../components/ui/ActionsMenu';
 import './RegisterIrrigation.css';
 import './RegisterMaintenance.css'; // <-- Importamos los nuevos estilos
+import LoadingState from '../../components/ui/LoadingState';
+import EmptyState from '../../components/ui/EmptyState';
+import { Wrench } from 'lucide-react';
 
 // --- COMPONENTE MEJORADO PARA LA LISTA DE MANTENIMIENTOS ---
 
@@ -24,7 +27,7 @@ const MaintenanceList = ({ farmId, equipmentId }: { farmId: number, equipmentId:
         { label: 'Editar', action: () => alert(`Editando mantenimiento #${record.id}`) },
     ];
     
-    if (isLoading) return <p>Cargando historial de mantenimiento...</p>;
+    if (isLoading) return <LoadingState message="Cargando historial de mantenimiento..." />;
 
     return (
         <div className="maintenance-list-container">
@@ -50,9 +53,11 @@ const MaintenanceList = ({ farmId, equipmentId }: { farmId: number, equipmentId:
                     </div>
                 ))
             ) : (
-                <div className="empty-state">
-                    <p>No hay registros de mantenimiento para este equipo.</p>
-                </div>
+                <EmptyState
+                    icon={<Wrench size={24} />}
+                    title="Sin registros de mantenimiento"
+                    subtitle="No hay registros de mantenimiento para este equipo."
+                />
             )}
         </div>
     );

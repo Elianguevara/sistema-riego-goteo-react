@@ -23,8 +23,11 @@ import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { Plus, MapPin, Edit2, Trash2, Search, Grid3x3, Users, TrendingUp, ChevronRight } from 'lucide-react';
 
 // Styles
-import './FarmManagement.css'; 
+import './FarmManagement.css';
 import '../components/users/UserForm.css';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
+import EmptyState from '../components/ui/EmptyState';
 
 const FarmManagement = () => {
     const queryClient = useQueryClient();
@@ -115,8 +118,8 @@ const FarmManagement = () => {
         totalArea: farms.reduce((sum, f) => sum + f.farmSize, 0),
     }), [farms]);
 
-    if (isLoading) return <div className="loading-state">Cargando fincas...</div>;
-    if (isError) return <div className="error-state">Error: {error.message}</div>;
+    if (isLoading) return <LoadingState message="Cargando fincas..." />;
+    if (isError) return <ErrorState message={error.message} />;
 
     return (
         <div className="farm-management-page">
@@ -263,13 +266,11 @@ const FarmManagement = () => {
             )}
 
             {filteredFarms.length === 0 && (
-                <div className="empty-state">
-                    <div className="empty-state-icon-wrapper">
-                        <Search className="empty-state-icon" />
-                    </div>
-                    <p className="empty-state-title">No se encontraron fincas</p>
-                    <p className="empty-state-subtitle">Intenta con otros términos de búsqueda</p>
-                </div>
+                <EmptyState
+                    icon={<Search size={24} />}
+                    title="No se encontraron fincas"
+                    subtitle="Intenta con otros términos de búsqueda"
+                />
             )}
 
             {isFormModalOpen && (

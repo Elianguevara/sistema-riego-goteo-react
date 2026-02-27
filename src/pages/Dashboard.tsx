@@ -10,6 +10,8 @@ import type { Farm, Sector } from '../types/farm.types';
 import type { Page } from '../types/audit.types';
 import StatusToggle from '../components/ui/StatusToggle';
 import './Dashboard.css';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
 
 // --- COMPONENTE REUTILIZABLE: SKELETON LOADER PARA TABLAS ---
 const TableSkeleton = ({ columns, rows = 5 }: { columns: number, rows?: number }) => (
@@ -52,7 +54,7 @@ const UserTable = () => {
     }, [users, searchTerm]);
 
     if (isLoading) return <TableSkeleton columns={5} />;
-    if (isError) return <p className="error-text">Error al cargar usuarios: {error.message}</p>;
+    if (isError) return <ErrorState message={error.message} />;
 
     return (
         <div className="dashboard-table-container">
@@ -104,7 +106,7 @@ const FarmsTable = () => {
     });
 
     if (isLoading) return <TableSkeleton columns={4} />;
-    if (isError) return <p className="error-text">Error al cargar fincas: {error.message}</p>;
+    if (isError) return <ErrorState message={error.message} />;
 
     return (
         <div className="dashboard-table-container">
@@ -149,7 +151,7 @@ const SectorsTable = () => {
     });
 
     if (isLoading) return <TableSkeleton columns={4} />;
-    if (isError) return <p className="error-text">Error al cargar sectores: {error.message}</p>;
+    if (isError) return <ErrorState message={error.message} />;
 
     return (
         <div className="dashboard-table-container">
@@ -264,13 +266,8 @@ const Dashboard = () => {
         queryFn: dashboardService.getKpis,
     });
 
-    if (isLoading) {
-        return <div className="dashboard-page"><p>Cargando dashboard...</p></div>;
-    }
-
-    if (isError) {
-        return <div className="dashboard-page"><p className="error-text">Error al cargar el dashboard: {error.message}</p></div>;
-    }
+    if (isLoading) return <LoadingState message="Cargando dashboard..." />;
+    if (isError) return <ErrorState message={error.message} />;
 
     const renderActiveTable = () => {
         switch (activeTable) {

@@ -11,6 +11,9 @@ import FertilizationForm from '../../components/fertilization/FertilizationForm'
 // 1. CORRECCIÓN: Se eliminó la 'l' extra en la ruta.
 import FertilizationList from '../../components/fertilization/FertilizationList';
 import './RegisterIrrigation.css';
+import LoadingState from '../../components/ui/LoadingState';
+import EmptyState from '../../components/ui/EmptyState';
+import { MapPinOff, MapPin } from 'lucide-react';
 
 const RegisterFertilization = () => {
     const queryClient = useQueryClient();
@@ -66,13 +69,14 @@ const RegisterFertilization = () => {
     };
 
     const renderContent = () => {
-        if (isLoadingFarms) return <p>Cargando fincas asignadas...</p>;
+        if (isLoadingFarms) return <LoadingState message="Cargando fincas asignadas..." />;
         if (farms.length === 0) {
             return (
-                <div className="empty-state">
-                    <h3>No tienes fincas asignadas</h3>
-                    <p>Contacta a un administrador para que te asigne a una finca.</p>
-                </div>
+                <EmptyState
+                    icon={<MapPinOff size={24} />}
+                    title="No tienes fincas asignadas"
+                    subtitle="Contacta a un administrador para que te asigne a una finca."
+                />
             );
         }
 
@@ -117,11 +121,11 @@ const RegisterFertilization = () => {
                 )}
 
                 {!selectedFarmId && (
-                     <div className="empty-state">
-                        <i className="fas fa-hand-pointer empty-icon"></i>
-                        <h3>Seleccione una Finca</h3>
-                        <p>Por favor, elija una finca y un sector para ver el historial y registrar aplicaciones.</p>
-                    </div>
+                    <EmptyState
+                        icon={<MapPin size={24} />}
+                        title="Seleccione una Finca"
+                        subtitle="Por favor, elija una finca y un sector para ver el historial y registrar aplicaciones."
+                    />
                 )}
             </>
         );

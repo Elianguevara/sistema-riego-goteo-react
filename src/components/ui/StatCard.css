@@ -1,0 +1,174 @@
+/* src/components/ui/StatCard.css */
+
+/* ── BASE ─────────────────────────────────────────────────────────────────── */
+
+.ui-stat-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-5, 20px);
+  padding: var(--card-padding, 24px);
+  background-color: var(--card-bg, #ffffff);
+  border-radius: var(--border-radius-lg, 16px);
+  border: 1px solid var(--card-border, #e2e8f0);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,.05));
+  overflow: hidden;
+  transition:
+    transform var(--duration-base, 200ms) var(--ease-default, ease),
+    box-shadow var(--duration-base, 200ms) var(--ease-default, ease),
+    border-color var(--duration-base, 200ms) var(--ease-default, ease);
+}
+
+/* Borde de acento a la izquierda (visible en estado activo) */
+.ui-stat-card::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 4px;
+  background-color: transparent;
+  transition: background-color var(--duration-base, 200ms) var(--ease-default, ease);
+}
+
+/* ── DISPOSICIÓN DEL ÍCONO ────────────────────────────────────────────────── */
+
+/* Ícono a la derecha (default) — texto primero, ícono al final */
+.ui-stat-card--icon-right {
+  justify-content: space-between;
+}
+
+/* Ícono a la izquierda — ícono primero, texto después */
+.ui-stat-card--icon-left {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.ui-stat-card--icon-left .ui-stat-card__icon {
+  order: -1;
+  flex-shrink: 0;
+}
+
+/* ── TEXTO ────────────────────────────────────────────────────────────────── */
+
+.ui-stat-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+  min-width: 0;
+}
+
+.ui-stat-card__label {
+  margin: 0;
+  font-size: var(--text-xs, 11px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-light, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ui-stat-card__value {
+  margin: 0;
+  font-family: var(--font-headers, system-ui);
+  font-size: var(--text-2xl, 24px);
+  font-weight: var(--font-bold, 700);
+  color: var(--color-text-dark, #1e293b);
+  line-height: 1.1;
+}
+
+.ui-stat-card__subtitle {
+  margin: 0;
+  font-size: var(--text-xs, 11px);
+  color: var(--color-text-light, #64748b);
+  font-weight: var(--font-medium, 500);
+}
+
+/* ── ÍCONO — CONTENEDOR ───────────────────────────────────────────────────── */
+
+.ui-stat-card__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-md, 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+/* ── ÍCONO — VARIANTES DEGRADADO ─────────────────────────────────────────── */
+
+.ui-stat-card__icon--primary {
+  background: linear-gradient(135deg, var(--color-primary, #10b981), var(--color-teal, #14b8a6));
+}
+.ui-stat-card__icon--info {
+  background: linear-gradient(135deg, var(--color-chart-blue, #3b82f6), var(--color-info, #0ea5e9));
+}
+.ui-stat-card__icon--warning {
+  background: linear-gradient(135deg, var(--color-warning, #f59e0b), #d97706);
+}
+.ui-stat-card__icon--danger {
+  background: linear-gradient(135deg, var(--color-danger, #f43f5e), var(--color-danger-hover, #e11d48));
+}
+.ui-stat-card__icon--accent {
+  background: linear-gradient(135deg, var(--color-accent, #8b5cf6), var(--color-accent-hover, #7c3aed));
+}
+.ui-stat-card__icon--cyan {
+  background: linear-gradient(135deg, var(--color-cyan, #06b6d4), #0891b2);
+}
+
+/* ── ÍCONO — VARIANTE SUAVE (light) ──────────────────────────────────────── */
+/* Sobreescribe el degradado y colorea el ícono con el color semántico */
+
+.ui-stat-card__icon--light.ui-stat-card__icon--primary {
+  background: var(--color-success-bg, #ecfdf5);
+  color: var(--color-primary, #10b981);
+}
+.ui-stat-card__icon--light.ui-stat-card__icon--info {
+  background: var(--color-chart-blue-bg, #eff6ff);
+  color: var(--color-chart-blue, #3b82f6);
+}
+.ui-stat-card__icon--light.ui-stat-card__icon--warning {
+  background: var(--color-warning-bg, #fffbeb);
+  color: var(--color-warning, #f59e0b);
+}
+.ui-stat-card__icon--light.ui-stat-card__icon--danger {
+  background: var(--color-danger-bg, #fff1f2);
+  color: var(--color-danger, #f43f5e);
+}
+.ui-stat-card__icon--light.ui-stat-card__icon--accent {
+  background: var(--color-accent-bg, #f5f3ff);
+  color: var(--color-accent, #8b5cf6);
+}
+.ui-stat-card__icon--light.ui-stat-card__icon--cyan {
+  background: var(--color-cyan-bg, #ecfeff);
+  color: var(--color-cyan, #06b6d4);
+}
+
+/* ── ESTADO INTERACTIVO ───────────────────────────────────────────────────── */
+
+.ui-stat-card--interactive {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ui-stat-card--interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,.1));
+  border-color: rgba(var(--color-primary-rgb, 16, 185, 129), 0.3);
+}
+
+.ui-stat-card--interactive:focus-visible {
+  outline: 2px solid var(--color-primary, #10b981);
+  outline-offset: 2px;
+}
+
+/* ── ESTADO ACTIVO ────────────────────────────────────────────────────────── */
+
+.ui-stat-card--active {
+  border-color: var(--color-primary, #10b981);
+  background-color: var(--color-sidebar-active-bg, #f0fdf4);
+}
+
+.ui-stat-card--active::before {
+  background-color: var(--color-primary, #10b981);
+}

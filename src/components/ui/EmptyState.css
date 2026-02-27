@@ -1,0 +1,43 @@
+/* src/components/ui/EmptyState.css */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3, 12px);
+  padding: var(--state-padding, 40px);
+  text-align: center;
+}
+
+.empty-state__icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--state-icon-size, 48px);
+  height: var(--state-icon-size, 48px);
+  border-radius: var(--border-radius-md, 12px);
+  background: var(--color-neutral-100, #f1f5f9);
+  color: var(--color-text-disabled, #94a3b8);
+  flex-shrink: 0;
+}
+
+.empty-state__title {
+  margin: 0;
+  font-family: var(--font-headers, system-ui);
+  font-size: var(--text-base, 15px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-dark, #1e293b);
+}
+
+.empty-state__subtitle {
+  margin: 0;
+  font-size: var(--text-sm, 13px);
+  color: var(--color-text-light, #64748b);
+  max-width: 320px;
+  line-height: var(--leading-relaxed, 1.625);
+}
+
+.empty-state__action {
+  margin-top: var(--space-2, 8px);
+}

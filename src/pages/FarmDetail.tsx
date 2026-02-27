@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 
 // Services
 import farmService from '../services/farmService';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
 import adminService from '../services/adminService';
 import weatherService from '../services/weatherService';
 
@@ -119,8 +121,8 @@ const FarmDetail = () => {
         return 'text-red-600';
     };
 
-    if (isLoadingFarm) return <div>Cargando...</div>;
-    if (isError) return <div className="error-text">Error: {error.message}</div>;
+    if (isLoadingFarm) return <LoadingState message="Cargando finca..." />;
+    if (isError) return <ErrorState message={error.message} />;
 
     return (
         <div className="farm-detail-improved">

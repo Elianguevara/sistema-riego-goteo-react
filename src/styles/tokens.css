@@ -1,0 +1,134 @@
+/**
+ * Design tokens — src/styles/tokens.css
+ *
+ * Complementa src/index.css. NO redefine variables existentes.
+ * Actualmente no está importado en ningún lado.
+ * Activación: agregar import './styles/tokens.css' en main.tsx (paso separado).
+ */
+
+:root {
+  /* ── ESPACIADO ────────────────────────────────────────────────────── */
+  --space-px:  1px;
+  --space-0-5: 2px;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   28px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+
+  /* ── TIPOGRAFÍA ───────────────────────────────────────────────────── */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-lg:   17px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  30px;
+  --text-4xl:  36px;
+
+  --leading-tight:   1.25;
+  --leading-snug:    1.375;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  /* ── Z-INDEX ──────────────────────────────────────────────────────── */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+
+  /* ── MOTION ───────────────────────────────────────────────────────── */
+  --duration-fast:   120ms;
+  --duration-base:   200ms;
+  --duration-slow:   350ms;
+  --ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:         cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:        cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── COLORES COMPLEMENTARIOS ──────────────────────────────────────── */
+
+  /* Acento / violeta — para rol Analista y KPIs accent */
+  --color-accent:       #8b5cf6;
+  --color-accent-hover: #7c3aed;
+  --color-accent-bg:    #f5f3ff;
+  --color-accent-rgb:   139, 92, 246;
+
+  /*
+   * Azul chart — valor hardcodeado en AnalystDashboard (#3b82f6).
+   * Es distinto de --color-info (#0ea5e9) que ya existe en index.css.
+   */
+  --color-chart-blue:     #3b82f6;
+  --color-chart-blue-bg:  #eff6ff;
+  --color-chart-blue-rgb: 59, 130, 246;
+
+  /* Cyan — sectores / equipos */
+  --color-cyan:     #06b6d4;
+  --color-cyan-bg:  #ecfeff;
+  --color-cyan-rgb: 6, 182, 212;
+
+  /* Teal — complemento del emerald primary */
+  --color-teal:    #14b8a6;
+  --color-teal-bg: #f0fdfa;
+
+  /* Escala neutral completa */
+  --color-neutral-50:  #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* ── TOKENS DE COMPONENTES ────────────────────────────────────────── */
+
+  /* Modal */
+  --modal-overlay-bg: rgba(15, 23, 42, 0.55);
+  --modal-backdrop:   blur(4px);
+  --modal-padding:    var(--space-6);
+  --modal-shadow:     0 20px 60px -10px rgba(0, 0, 0, 0.25);
+  --modal-max-w-sm:   420px;
+  --modal-max-w-md:   560px;
+  --modal-max-w-lg:   720px;
+
+  /* Card genérica */
+  --card-padding: var(--space-6);
+  --card-bg:      var(--color-content-bg, #ffffff);
+  --card-border:  var(--color-border, #e2e8f0);
+
+  /* Tabla */
+  --table-header-bg:    var(--color-neutral-50);
+  --table-row-hover-bg: #f8faff;
+  --table-cell-padding: var(--space-3) var(--space-4);
+
+  /* Feedback states — LoadingState, ErrorState, EmptyState */
+  --state-padding:   var(--space-10);
+  --state-icon-size: 48px;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 64px;
+
+  /* Input */
+  --input-height:     42px;
+  --input-radius:     var(--border-radius-md, 12px);
+  --input-focus-ring: rgba(var(--color-primary-rgb, 16, 185, 129), 0.15);
+}

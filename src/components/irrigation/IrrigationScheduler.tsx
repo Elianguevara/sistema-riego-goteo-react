@@ -5,6 +5,7 @@ import type { MonthlyIrrigationSectorView } from '../../types/irrigation.types';
 import type { Sector } from '../../types/farm.types';
 import IrrigationForm from './IrrigationForm';
 import './IrrigationScheduler.css';
+import EmptyState from '../ui/EmptyState';
 
 interface SchedulerProps {
     farmId: number;
@@ -131,10 +132,11 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                         ))}
                     </tbody>
                 </table>
-                 {validMonthlyData.length === 0 && (
-                    <div className="empty-state" style={{marginTop: '20px'}}>
-                        <p>No se encontraron sectores con datos de riego para esta finca.</p>
-                    </div>
+                {validMonthlyData.length === 0 && (
+                    <EmptyState
+                        title="Sin datos de riego"
+                        subtitle="No se encontraron sectores con datos de riego para esta finca."
+                    />
                 )}
             </div>
             

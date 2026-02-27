@@ -4,6 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import fertilizationService from '../../services/fertilizationService';
 import type { FertilizationRecord } from '../../types/fertilization.types';
 import './FertilizationList.css'; // Crearemos este archivo a continuación
+import { FileText } from 'lucide-react';
+import LoadingState from '../../components/ui/LoadingState';
+import ErrorState from '../../components/ui/ErrorState';
+import EmptyState from '../../components/ui/EmptyState';
 
 interface Props {
     sectorId: number;
@@ -16,21 +20,15 @@ const FertilizationList = ({ sectorId }: Props) => {
         enabled: !!sectorId,
     });
 
-    if (isLoading) {
-        return <p>Cargando historial de fertilización...</p>;
-    }
-
-    if (isError) {
-        return <p className="error-text">Error al cargar el historial: {error.message}</p>;
-    }
-
+    if (isLoading) return <LoadingState message="Cargando historial de fertilización..." />;
+    if (isError) return <ErrorState message={error.message} />;
     if (records.length === 0) {
         return (
-            <div className="empty-state">
-                <i className="fas fa-file-alt empty-icon"></i>
-                <h3>No hay registros</h3>
-                <p>Aún no se han registrado aplicaciones de fertilizante para este sector.</p>
-            </div>
+            <EmptyState
+                icon={<FileText size={24} />}
+                title="No hay registros"
+                subtitle="Aún no se han registrado aplicaciones de fertilizante para este sector."
+            />
         );
     }
 

@@ -7,6 +7,7 @@ import farmService from '../../services/farmService';
 import analyticsService from '../../services/analyticsService';
 import type { Farm, Sector } from '../../types/farm.types';
 import './IrrigationAnalysis.css';
+import EmptyState from '../../components/ui/EmptyState';
 
 // Componente Personalizado para Tooltips de Gráficos (sin cambios)
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -237,12 +238,11 @@ const IrrigationAnalysis = () => {
 
                 </>
             ) : (
-                // ... (Empty state sin cambios)
-                 <div className="empty-state">
-                    <Droplets size={48} color="#9ca3af" />
-                    <h3>Seleccione una finca para comenzar</h3>
-                    <p>Use los filtros superiores para seleccionar una finca y visualizar los datos de riego.</p>
-                </div>
+                <EmptyState
+                    icon={<Droplets size={24} />}
+                    title="Seleccione una finca para comenzar"
+                    subtitle="Use los filtros superiores para seleccionar una finca y visualizar los datos de riego."
+                />
             )}
 
             <style>{`@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }`}</style>

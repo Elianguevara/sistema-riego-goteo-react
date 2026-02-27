@@ -11,6 +11,9 @@ import ActionsMenu, { type ActionMenuItem } from '../../components/ui/ActionsMen
 import { useDebounce } from '../../hooks/useDebounce';
 import './RegisterIrrigation.css';
 import './OperationLogbook.css';
+import LoadingState from '../../components/ui/LoadingState';
+import EmptyState from '../../components/ui/EmptyState';
+import { ClipboardList } from 'lucide-react';
 
 // --- FUNCIONES HELPER PARA FECHAS ---
 
@@ -55,7 +58,7 @@ const LogList = ({ farmId, filterType, onEdit }: { farmId: number, filterType: s
         }, {} as Record<string, OperationLog[]>);
     }, [logs]);
 
-    if (isLoading) return <p>Cargando bitácora...</p>;
+    if (isLoading) return <LoadingState message="Cargando bitácora..." />;
     const dateGroups = Object.keys(groupedLogs);
 
     return (
@@ -83,7 +86,13 @@ const LogList = ({ farmId, filterType, onEdit }: { farmId: number, filterType: s
                         ))}
                     </div>
                 ))
-            ) : <div className="empty-state"><p>No se encontraron entradas para los filtros seleccionados.</p></div>}
+            ) : (
+                <EmptyState
+                    icon={<ClipboardList size={24} />}
+                    title="No se encontraron entradas"
+                    subtitle="No hay registros para los filtros seleccionados."
+                />
+            )}
         </div>
     );
 };

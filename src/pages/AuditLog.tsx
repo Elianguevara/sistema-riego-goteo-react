@@ -8,6 +8,10 @@ import { useDebounce } from '../hooks/useDebounce';
 import type { ChangeHistoryRequestParams, ChangeHistoryResponse, Page } from '../types/audit.types';
 import type { UserResponse } from '../types/user.types';
 import './AuditLog.css';
+import { FileSearch } from 'lucide-react';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
+import EmptyState from '../components/ui/EmptyState';
 
 // --- HELPERS (Funciones de Ayuda) ---
 
@@ -146,16 +150,16 @@ const AuditLog = () => {
     };
     
     const renderContent = () => {
-        if (isLoading && !historyPage) return <p>Cargando historial de auditoría...</p>;
-        if (isError) return <p className="error-text">Error al cargar: {error.message}</p>;
+        if (isLoading && !historyPage) return <LoadingState message="Cargando historial de auditoría..." />;
+        if (isError) return <ErrorState message={error.message} />;
         const groups = Object.keys(groupedLogs);
         if (!isFetching && groups.length === 0) {
             return (
-                <div className="empty-state">
-                    <i className="fas fa-file-alt empty-icon"></i>
-                    <h3>No se encontraron registros</h3>
-                    <p>No hay datos de auditoría que coincidan con los filtros actuales.</p>
-                </div>
+                <EmptyState
+                    icon={<FileSearch size={24} />}
+                    title="No se encontraron registros"
+                    subtitle="No hay datos de auditoría que coincidan con los filtros actuales."
+                />
             );
         }
 
