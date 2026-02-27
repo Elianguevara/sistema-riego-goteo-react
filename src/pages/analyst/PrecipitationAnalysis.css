@@ -203,16 +203,6 @@
 .rain-total { color: #3b82f6; font-weight: 500; }
 .rain-effective { color: #10b981; font-weight: 500; }
 
-.badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    color: white;
-}
-.badge-high { background-color: #10b981; }
-.badge-medium { background-color: #f59e0b; }
-.badge-low { background-color: #ef4444; }
 
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }

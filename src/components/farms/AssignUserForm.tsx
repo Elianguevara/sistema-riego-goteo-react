@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { UserResponse } from '../../types/user.types';
 import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface AssignUserFormProps {
     // Lista de usuarios que aún NO están asignados a la finca
@@ -26,40 +27,38 @@ const AssignUserForm: React.FC<AssignUserFormProps> = ({ availableUsers, onSave,
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
-                <h3>Asignar Usuario a Finca</h3>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="userId">Usuario</label>
-                        <select 
-                            id="userId" 
-                            name="userId" 
-                            value={selectedUserId || ''} 
-                            onChange={(e) => setSelectedUserId(Number(e.target.value))}
-                        >
-                            {availableUsers.length > 0 ? (
-                                availableUsers.map(user => (
-                                    <option key={user.id} value={user.id}>
-                                        {user.name} ({user.username})
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>No hay usuarios disponibles para asignar</option>
-                            )}
-                        </select>
-                    </div>
-                    <div className="modal-actions">
-                        <button type="button" className="btn-cancel" onClick={onCancel} disabled={isLoading}>
-                            Cancelar
-                        </button>
-                        <button type="submit" className="btn-save" disabled={!selectedUserId || isLoading}>
-                            {isLoading ? 'Asignando...' : 'Asignar'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <Modal isOpen={true} onClose={onCancel}>
+            <h3>Asignar Usuario a Finca</h3>
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label htmlFor="userId">Usuario</label>
+                    <select
+                        id="userId"
+                        name="userId"
+                        value={selectedUserId || ''}
+                        onChange={(e) => setSelectedUserId(Number(e.target.value))}
+                    >
+                        {availableUsers.length > 0 ? (
+                            availableUsers.map(user => (
+                                <option key={user.id} value={user.id}>
+                                    {user.name} ({user.username})
+                                </option>
+                            ))
+                        ) : (
+                            <option value="" disabled>No hay usuarios disponibles para asignar</option>
+                        )}
+                    </select>
+                </div>
+                <div className="modal-actions">
+                    <button type="button" className="btn-cancel" onClick={onCancel} disabled={isLoading}>
+                        Cancelar
+                    </button>
+                    <button type="submit" className="btn-save" disabled={!selectedUserId || isLoading}>
+                        {isLoading ? 'Asignando...' : 'Asignar'}
+                    </button>
+                </div>
+            </form>
+        </Modal>
     );
 };
 

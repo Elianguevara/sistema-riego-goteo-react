@@ -12,6 +12,8 @@ import StatusToggle from '../components/ui/StatusToggle';
 import './Dashboard.css';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState from '../components/ui/ErrorState';
+import StatCard from '../components/ui/StatCard';
+import { Search, Users, Mountain, Cpu, AlertTriangle, BarChart2 } from 'lucide-react';
 
 // --- COMPONENTE REUTILIZABLE: SKELETON LOADER PARA TABLAS ---
 const TableSkeleton = ({ columns, rows = 5 }: { columns: number, rows?: number }) => (
@@ -61,7 +63,7 @@ const UserTable = () => {
             <div className="table-header">
                 <h2 className="table-title">Usuarios Recientes</h2>
                 <div className="search-container">
-                    <i className="fas fa-search search-icon"></i>
+                    <Search size={16} className="search-icon" />
                     <input
                         type="text"
                         placeholder="Buscar usuario..."
@@ -289,44 +291,11 @@ const Dashboard = () => {
     return (
         <div className="dashboard-page-container">
             <div className="stats-cards-grid">
-                <div className={`stat-card ${activeTable === 'users' ? 'active' : ''}`} onClick={() => setActiveTable('users')}>
-                    <div className="card-icon blue"><i className="fas fa-users-viewfinder"></i></div>
-                    <div className="card-info">
-                        <span className="card-value">{kpis?.totalUsers ?? 'N/A'}</span>
-                        <span className="card-label">Usuarios</span>
-                    </div>
-                </div>
-                <div className={`stat-card ${activeTable === 'farms' ? 'active' : ''}`} onClick={() => setActiveTable('farms')}>
-                    <div className="card-icon green"><i className="fas fa-mountain-sun"></i></div>
-                    <div className="card-info">
-                        <span className="card-value">{kpis?.totalFarms ?? 'N/A'}</span>
-                        <span className="card-label">Fincas</span>
-                    </div>
-                </div>
-                <div className={`stat-card ${activeTable === 'sectors' ? 'active' : ''}`} onClick={() => setActiveTable('sectors')}>
-                    <div className="card-icon cyan"><i className="fas fa-microchip"></i></div>
-                    <div className="card-info">
-                        <span className="card-value">{kpis?.activeSectors ?? 'N/A'}</span>
-                        <span className="card-label">Sectores</span>
-                    </div>
-                </div>
-                <div className={`stat-card ${activeTable === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTable('alerts')}>
-                    <div className="card-icon red"><i className="fas fa-sensor-triangle-exclamation"></i></div>
-                    <div className="card-info">
-                        <span className="card-value">{kpis?.activeAlerts ?? 'N/A'}</span>
-                        <span className="card-label">Alertas</span>
-                    </div>
-                </div>
-                <div
-                    className={`stat-card ${activeTable === 'user-stats' ? 'active' : ''}`}
-                    onClick={() => setActiveTable('user-stats')}
-                >
-                    <div className="card-icon purple"><i className="fas fa-chart-mixed"></i></div>
-                    <div className="card-info">
-                        <span className="card-value">Ver</span>
-                        <span className="card-label">Analíticas</span>
-                    </div>
-                </div>
+                <StatCard label="Usuarios" value={kpis?.totalUsers ?? 'N/A'} icon={<Users size={20} />} variant="info" iconPosition="left" isActive={activeTable === 'users'} onClick={() => setActiveTable('users')} />
+                <StatCard label="Fincas" value={kpis?.totalFarms ?? 'N/A'} icon={<Mountain size={20} />} variant="primary" iconPosition="left" isActive={activeTable === 'farms'} onClick={() => setActiveTable('farms')} />
+                <StatCard label="Sectores" value={kpis?.activeSectors ?? 'N/A'} icon={<Cpu size={20} />} variant="cyan" iconPosition="left" isActive={activeTable === 'sectors'} onClick={() => setActiveTable('sectors')} />
+                <StatCard label="Alertas" value={kpis?.activeAlerts ?? 'N/A'} icon={<AlertTriangle size={20} />} variant="danger" iconPosition="left" isActive={activeTable === 'alerts'} onClick={() => setActiveTable('alerts')} />
+                <StatCard label="Analíticas" value="Ver" icon={<BarChart2 size={20} />} variant="accent" iconPosition="left" isActive={activeTable === 'user-stats'} onClick={() => setActiveTable('user-stats')} />
             </div>
 
             <div className="table-display-area">

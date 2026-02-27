@@ -9,9 +9,10 @@ import type { Notification, NotificationPage } from '../types/notification.types
 import { useAuthData } from '../hooks/useAuthData';
 import { resolveNotificationUrl } from '../utils/notificationNavigation';
 import './NotificationHistory.css';
-import { BellOff } from 'lucide-react';
+import { BellOff, Bell, CheckCircle } from 'lucide-react';
 import LoadingState from '../components/ui/LoadingState';
 import EmptyState from '../components/ui/EmptyState';
+import PageHeader from '../components/ui/PageHeader';
 
 const timeAgo = (dateString: string): string => {
     const date = new Date(dateString);
@@ -89,9 +90,7 @@ const NotificationHistory = () => {
 
     return (
         <div className="notification-history-page">
-            <div className="page-header">
-                <h1>Historial de Notificaciones</h1>
-            </div>
+            <PageHeader title="Historial de Notificaciones" />
 
             <div className="history-list-container">
                 {notifications.length > 0 ? (
@@ -101,7 +100,7 @@ const NotificationHistory = () => {
                         return (
                             <div key={n.id} className={`history-item ${n.isRead ? 'read' : 'unread'}`}>
                                 <div className="item-icon">
-                                    <i className={`fas ${n.isRead ? 'fa-check-circle' : 'fa-bell'}`}></i>
+                                    {n.isRead ? <CheckCircle size={16} /> : <Bell size={16} />}
                                 </div>
                                 <div className="item-content">
                                     <p className="item-message">{n.message}</p>

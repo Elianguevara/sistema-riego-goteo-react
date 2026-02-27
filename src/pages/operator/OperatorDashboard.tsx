@@ -9,7 +9,8 @@ import type { Task } from '../../types/task.types';
 import type { Farm } from '../../types/farm.types';
 import type { CurrentWeather } from '../../types/weather.types';
 import WeatherWidget from '../../components/weather/WeatherWidget';
-import './OperatorDashboard.css'; // Crearemos este archivo a continuación
+import './OperatorDashboard.css';
+import { Droplet, FlaskConical, Wrench, BookOpen, MapPin } from 'lucide-react';
 
 const OperatorDashboard = () => {
     // 1. OBTENER DATOS
@@ -59,19 +60,19 @@ const OperatorDashboard = () => {
                         <h3>Accesos Rápidos</h3>
                         <div className="actions-grid">
                             <Link to="/operator/irrigation" className="action-button">
-                                <i className="fas fa-tint"></i>
+                                <Droplet size={20} />
                                 <span>Registrar Riego</span>
                             </Link>
                              <Link to="/operator/fertilization" className="action-button">
-                                <i className="fas fa-vial"></i>
+                                <FlaskConical size={20} />
                                 <span>Registrar Fertilización</span>
                             </Link>
                             <Link to="/operator/maintenance" className="action-button">
-                                <i className="fas fa-tools"></i>
+                                <Wrench size={20} />
                                 <span>Registrar Mantenimiento</span>
                             </Link>
                              <Link to="/operator/logbook" className="action-button">
-                                <i className="fas fa-book"></i>
+                                <BookOpen size={20} />
                                 <span>Ver Bitácora</span>
                             </Link>
                         </div>
@@ -83,7 +84,7 @@ const OperatorDashboard = () => {
                         <div className="farm-info-card">
                             <h3>Tu Finca Principal</h3>
                             <div className="farm-details">
-                                <i className="fas fa-map-marker-alt"></i>
+                                <MapPin size={18} />
                                 <div>
                                     <strong>{primaryFarm.name}</strong>
                                     <p>{primaryFarm.location}</p>

@@ -6,6 +6,7 @@ import type { Sector } from '../../types/farm.types';
 import IrrigationForm from './IrrigationForm';
 import './IrrigationScheduler.css';
 import EmptyState from '../ui/EmptyState';
+import { CloudRain, Clock, Plus } from 'lucide-react';
 
 interface SchedulerProps {
     farmId: number;
@@ -85,7 +86,7 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                                     const dailyPrecipitations = sectorData.dailyPrecipitations?.[day];
                                     
                                     const totalHours = dailyIrrigations?.reduce((sum, rec) => sum + (rec?.irrigationHours || 0), 0) || 0;
-                                    const totalRain = dailyPrecipitations?.reduce((sum, rec) => sum + (rec?.mmRain || 0), 0) || 0;
+                                    const totalRain = dailyPrecipitations || 0;
 
                                     const date = new Date(year, month - 1, day);
                                     const dayClass = date < todayDate ? 'past' : (date.getTime() === todayDate.getTime() ? 'today' : 'future');
@@ -107,7 +108,7 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                                                 <div className="cell-header">
                                                     {totalRain > 0 && (
                                                         <span className="precipitation-badge">
-                                                            <i className="fas fa-cloud-rain"></i> {totalRain.toFixed(1)} mm
+                                                            <CloudRain size={12} /> {totalRain.toFixed(1)} mm
                                                         </span>
                                                     )}
                                                 </div>
@@ -115,11 +116,11 @@ const IrrigationScheduler = ({ farmId, monthlyData, year, month }: SchedulerProp
                                                 <div className="irrigation-details">
                                                     {totalHours > 0 ? (
                                                         <span className="irrigation-time">
-                                                          <i className="fas fa-clock"></i>
+                                                          <Clock size={12} />
                                                           {totalHours.toFixed(1)} hs
                                                         </span>
                                                     ) : (
-                                                        <i className="fas fa-plus"></i>
+                                                        <Plus size={14} />
                                                     )}
                                                 </div>
                                                 

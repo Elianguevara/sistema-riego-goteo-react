@@ -15,8 +15,6 @@ vi.mock('./authService', () => ({
 }));
 
 describe('farmService', () => {
-    const MOCK_API_URL = 'http://api.test.com';
-
     beforeEach(() => {
         vi.clearAllMocks();
     });

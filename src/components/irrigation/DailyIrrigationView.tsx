@@ -8,6 +8,8 @@ import type { CurrentWeather } from '../../types/weather.types';
 import IrrigationForm from './IrrigationForm';
 import PrecipitationForm from '../precipitation/PrecipitationForm';
 import './DailyIrrigationView.css';
+import { CloudRain, Cloud, Sun, Snowflake, Zap, Wind, Loader2, AlertTriangle, Plus } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface DailyViewProps {
     farmId: number;
@@ -20,28 +22,28 @@ interface DailyViewProps {
     weatherError: Error | null;
 }
 
-const getWeatherInfo = (main: string) => {
+const getWeatherInfo = (main: string): { icon: LucideIcon, colorClass: string } => {
     const lowerMain = main.toLowerCase();
     switch (lowerMain) {
-        case 'rain': return { icon: 'fas fa-cloud-showers-heavy', colorClass: 'weather-rainy' };
-        case 'clouds': return { icon: 'fas fa-cloud', colorClass: 'weather-cloudy' };
-        case 'clear': return { icon: 'fas fa-sun', colorClass: 'weather-sunny' };
-        case 'snow': return { icon: 'fas fa-snowflake', colorClass: 'weather-snow' };
-        case 'drizzle': return { icon: 'fas fa-cloud-rain', colorClass: 'weather-rainy' };
-        case 'thunderstorm': return { icon: 'fas fa-bolt', colorClass: 'weather-rainy' };
-        default: return { icon: 'fas fa-smog', colorClass: 'weather-cloudy' };
+        case 'rain': return { icon: CloudRain, colorClass: 'weather-rainy' };
+        case 'clouds': return { icon: Cloud, colorClass: 'weather-cloudy' };
+        case 'clear': return { icon: Sun, colorClass: 'weather-sunny' };
+        case 'snow': return { icon: Snowflake, colorClass: 'weather-snow' };
+        case 'drizzle': return { icon: CloudRain, colorClass: 'weather-rainy' };
+        case 'thunderstorm': return { icon: Zap, colorClass: 'weather-rainy' };
+        default: return { icon: Wind, colorClass: 'weather-cloudy' };
     }
 };
 
 const MiniWeatherDisplay = ({ isLoading, error, data }: { isLoading: boolean, error: Error | null, data: CurrentWeather | undefined }) => {
-    if (isLoading) return <div className="current-weather-display"><i className="fas fa-spinner fa-spin"></i> Cargando...</div>;
-    if (error) return <div className="current-weather-display"><i className="fas fa-exclamation-circle"></i> Clima N/A</div>;
+    if (isLoading) return <div className="current-weather-display"><Loader2 size={14} /> Cargando...</div>;
+    if (error) return <div className="current-weather-display"><AlertTriangle size={14} /> Clima N/A</div>;
     if (data?.main && data.weather?.[0]) {
         const weatherInfo = data.weather[0];
-        const { icon, colorClass } = getWeatherInfo(weatherInfo.main);
+        const { icon: WeatherIcon, colorClass } = getWeatherInfo(weatherInfo.main);
         return (
             <div className="current-weather-display" title={weatherInfo.description}>
-                <i className={`${icon} ${colorClass}`}></i>
+                <WeatherIcon size={16} className={colorClass} />
                 <strong>{Math.round(data.main.temp)}°C</strong>
                 <span className="weather-description">{weatherInfo.description}</span>
             </div>
@@ -108,14 +110,14 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                                 <div className="header-status-group">
                                     {totalRain > 0 && (
                                         <div className="daily-precipitation-display">
-                                            <i className="fas fa-cloud-showers-heavy"></i>
+                                            <CloudRain size={14} />
                                             <span>{totalRain.toFixed(1)} mm</span>
                                         </div>
                                     )}
                                     {dayClass === 'today' && <MiniWeatherDisplay isLoading={isLoadingWeather} error={weatherError} data={weatherData} />}
 
                                     <button className="btn-add-precipitation" onClick={() => setPrecipitationModalDate(dateString)} title="Añadir lluvia">
-                                        <i className="fas fa-plus"></i> <i className="fas fa-cloud-rain"></i>
+                                        <Plus size={12} /> <CloudRain size={14} />
                                     </button>
                                 </div>
                             </div>
@@ -146,7 +148,7 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                                             ) : (
                                                 /* Botón para añadir riego */
                                                 <button className="btn-add-irrigation" onClick={() => setIrrigationModal({ sector, date: dateString })}>
-                                                    <i className="fas fa-plus"></i> Añadir Riego
+                                                    <Plus size={14} /> Añadir Riego
                                                 </button>
                                             )}
                                         </div>

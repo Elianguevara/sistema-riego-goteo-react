@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { PasswordUpdateData } from '../../types/user.types';
-import './ChangePasswordModal.css';
+import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -22,13 +23,8 @@ const ChangePasswordModal = ({ isOpen, onClose, onSave, isLoading, userName }: C
     onSave({ newPassword });
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
+    <Modal isOpen={isOpen} onClose={onClose} size="sm">
         <h3>Cambiar Contraseña para {userName}</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -51,8 +47,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSave, isLoading, userName }: C
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 };
 

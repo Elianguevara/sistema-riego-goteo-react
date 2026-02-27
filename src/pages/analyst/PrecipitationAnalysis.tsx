@@ -2,14 +2,16 @@
 
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { ChevronDown, CloudRain, Droplets, Filter, Download, Percent, CalendarDays } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { CloudRain, Droplets, Filter, Download, Percent, CalendarDays } from 'lucide-react';
 import farmService from '../../services/farmService';
 import precipitationService from '../../services/precipitationService';
 import type { Farm } from '../../types/farm.types';
 import type { PrecipitationRecord, PrecipitationSummary } from '../../types/precipitation.types';
 import './PrecipitationAnalysis.css';
 import EmptyState from '../../components/ui/EmptyState';
+import Badge from '../../components/ui/Badge';
+import type { BadgeVariant } from '../../components/ui/Badge';
 
 // --- Componente Personalizado para Tooltips ---
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -47,19 +49,19 @@ const PrecipitationAnalysis = () => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
-    const { data: annualSummary, isLoading: isLoadingAnnual } = useQuery<PrecipitationSummary, Error>({
+    const { data: annualSummary } = useQuery<PrecipitationSummary, Error>({
         queryKey: ['annualPrecipitationSummary', selectedFarmId, currentYear],
         queryFn: () => precipitationService.getAnnualSummary(selectedFarmId!, currentYear),
         enabled: !!selectedFarmId,
     });
 
-    const { data: monthlySummary, isLoading: isLoadingMonthly } = useQuery<PrecipitationSummary, Error>({
+    const { data: monthlySummary } = useQuery<PrecipitationSummary, Error>({
         queryKey: ['monthlyPrecipitationSummary', selectedFarmId, currentYear, currentMonth],
         queryFn: () => precipitationService.getMonthlySummary(selectedFarmId!, currentYear, currentMonth),
         enabled: !!selectedFarmId,
     });
 
-    const { data: records = [], isLoading: isLoadingRecords } = useQuery<PrecipitationRecord[], Error>({
+    const { data: records = [] } = useQuery<PrecipitationRecord[], Error>({
         queryKey: ['precipitationHistory', selectedFarmId],
         queryFn: () => precipitationService.getPrecipitationsByFarm(selectedFarmId!),
         enabled: !!selectedFarmId,
@@ -70,10 +72,10 @@ const PrecipitationAnalysis = () => {
         return (annualSummary.totalMmEffectiveRain / annualSummary.totalMmRain) * 100;
     }, [annualSummary]);
 
-    const getEffectivenessBadge = (effectiveness: number) => {
-        if (effectiveness >= 85) return 'badge-high';
-        if (effectiveness > 0) return 'badge-medium';
-        return 'badge-low';
+    const getEffectivenessBadge = (effectiveness: number): BadgeVariant => {
+        if (effectiveness >= 85) return 'success';
+        if (effectiveness > 0) return 'warning';
+        return 'danger';
     };
 
     return (
@@ -146,7 +148,7 @@ const PrecipitationAnalysis = () => {
                                                 <td><CalendarDays size={14} />{new Date(r.precipitationDate + 'T00:00:00').toLocaleDateString('es-AR')}</td>
                                                 <td className="rain-total">{r.mmRain.toFixed(2)}</td>
                                                 <td className="rain-effective">{r.mmEffectiveRain.toFixed(2)}</td>
-                                                <td><span className={`badge ${getEffectivenessBadge(recordEffectiveness)}`}>{recordEffectiveness.toFixed(0)}%</span></td>
+                                                <td><Badge variant={getEffectivenessBadge(recordEffectiveness)}>{recordEffectiveness.toFixed(0)}%</Badge></td>
                                             </tr>
                                         )
                                     })}

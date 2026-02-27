@@ -12,7 +12,7 @@ import './RegisterIrrigation.css';
 import './RegisterMaintenance.css'; // <-- Importamos los nuevos estilos
 import LoadingState from '../../components/ui/LoadingState';
 import EmptyState from '../../components/ui/EmptyState';
-import { Wrench } from 'lucide-react';
+import { Wrench, Clock, X, Plus } from 'lucide-react';
 
 // --- COMPONENTE MEJORADO PARA LA LISTA DE MANTENIMIENTOS ---
 
@@ -35,7 +35,7 @@ const MaintenanceList = ({ farmId, equipmentId }: { farmId: number, equipmentId:
             {records.length > 0 ? (
                 records.map(record => (
                     <div key={record.id} className="maintenance-card">
-                        <div className="maintenance-card-icon"><i className="fas fa-tools"></i></div>
+                        <div className="maintenance-card-icon"><Wrench size={18} /></div>
                         <div className="maintenance-card-content">
                             <div className="maintenance-card-header">
                                 <span className="maintenance-date">
@@ -47,7 +47,7 @@ const MaintenanceList = ({ farmId, equipmentId }: { farmId: number, equipmentId:
                             </div>
                             <p className="maintenance-description">{record.description}</p>
                             <div className="maintenance-meta">
-                                <span><i className="fas fa-clock"></i> Horas de Trabajo: <strong>{record.workHours || 'No especificado'}</strong></span>
+                                <span><Clock size={14} /> Horas de Trabajo: <strong>{record.workHours || 'No especificado'}</strong></span>
                             </div>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ const RegisterMaintenance = () => {
                 </select>
 
                 <button className="create-user-btn" onClick={() => setIsFormOpen(!isFormOpen)} disabled={!selectedEquipmentId}>
-                     <i className={`fas ${isFormOpen ? 'fa-times' : 'fa-plus'}`}></i>
+                     {isFormOpen ? <X size={16} /> : <Plus size={16} />}
                      {isFormOpen ? 'Cancelar' : 'Nuevo Mantenimiento'}
                 </button>
             </div>

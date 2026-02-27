@@ -7,7 +7,8 @@ import irrigationService from '../../services/irrigationService';
 import farmService from '../../services/farmService';
 import type { IrrigationCreateData, IrrigationRecord } from '../../types/irrigation.types';
 import type { IrrigationEquipment, Sector } from '../../types/farm.types';
-import '../users/ChangePasswordModal.css';
+import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface IrrigationFormProps {
     farmId: number;
@@ -103,8 +104,7 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
+        <Modal isOpen={true} onClose={onClose}>
                 <h3>Registrar Riego para {sector.name}</h3>
                 <p><strong>Fecha:</strong> {new Date(date + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                 <form onSubmit={handleSubmit}>
@@ -148,8 +148,7 @@ const IrrigationForm = ({ farmId, sector, date, onClose }: IrrigationFormProps) 
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

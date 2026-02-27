@@ -50,7 +50,7 @@ const IrrigationAnalysis = () => {
     });
 
     // Asume que la API ahora devuelve totalWaterAmount en hL
-    const { data: summaryData = [], isLoading: isLoadingSummary } = useQuery({
+    const { data: summaryData = [] } = useQuery({
         queryKey: ['irrigationSummary', selectedFarmId, dateRange, selectedSectorIds],
         queryFn: () => analyticsService.getIrrigationSummary({
             farmId: selectedFarmId!,
@@ -62,7 +62,7 @@ const IrrigationAnalysis = () => {
     });
 
     // Asume que la API ahora devuelve waterAmount en hL
-    const { data: timeseriesData, isLoading: isLoadingTimeseries } = useQuery({
+    const { data: timeseriesData } = useQuery({
         queryKey: ['irrigationTimeseries', selectedSectorIds, dateRange],
         queryFn: () => analyticsService.getIrrigationTimeseries({
             sectorId: Number(selectedSectorIds[0]),

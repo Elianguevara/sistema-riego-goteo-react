@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { WaterSource, WaterSourceCreateData, WaterSourceUpdateData } from '../../types/farm.types';
 import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface WaterSourceFormProps {
     currentWaterSource: WaterSource | null;
@@ -37,8 +38,7 @@ const WaterSourceForm: React.FC<WaterSourceFormProps> = ({ currentWaterSource, o
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
+        <Modal isOpen={true} onClose={onCancel} size="sm">
                 <h3>{isEditing ? 'Editar Fuente de Agua' : 'Añadir Fuente de Agua'}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -56,8 +56,7 @@ const WaterSourceForm: React.FC<WaterSourceFormProps> = ({ currentWaterSource, o
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

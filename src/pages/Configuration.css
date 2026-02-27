@@ -4,17 +4,6 @@
   gap: 20px;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.page-header h1 {
-  margin: 0;
-  font-size: 28px;
-}
-
 .config-card {
   background-color: var(--color-content-bg);
   padding: 30px;

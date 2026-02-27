@@ -1,7 +1,8 @@
 // src/components/ui/ActionsMenu.tsx
 
 import { useState, useRef, useEffect } from 'react';
-import './ActionsMenu.css'; // Crearemos este archivo a continuación
+import './ActionsMenu.css';
+import { MoreVertical } from 'lucide-react';
 
 // Definimos el tipo para cada item del menú
 export interface ActionMenuItem {
@@ -37,7 +38,7 @@ const ActionsMenu = ({ items }: ActionsMenuProps) => {
   return (
     <div className="actions-menu" ref={menuRef}>
       <button className="actions-menu-button" onClick={() => setIsOpen(!isOpen)} aria-label="Abrir menú de acciones">
-        <i className="fas fa-ellipsis-v"></i>
+        <MoreVertical size={16} />
       </button>
       {isOpen && (
         <div className="dropdown-content">

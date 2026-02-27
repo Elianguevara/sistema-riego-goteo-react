@@ -7,6 +7,7 @@ import precipitationService from '../../services/precipitationService';
 import type { PrecipitationCreateData } from '../../types/precipitation.types';
 import PrecipitationList from './PrecipitationList';
 import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface Props {
     farmId: number;
@@ -64,8 +65,7 @@ const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
+        <Modal isOpen={true} onClose={onClose}>
                 <h3>Registrar Precipitación para el {new Date(date + 'T00:00:00').toLocaleDateString()}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
@@ -87,8 +87,7 @@ const PrecipitationForm = ({ farmId, date, onClose }: Props) => {
                 </form>
 
                 <PrecipitationList farmId={farmId} />
-            </div>
-        </div>
+        </Modal>
     );
 };
 

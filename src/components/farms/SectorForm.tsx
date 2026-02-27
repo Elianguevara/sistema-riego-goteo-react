@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment } from '../../types/farm.types';
 import '../users/UserForm.css'; // Reutilizamos estilos
+import Modal from '../ui/Modal';
 
 interface SectorFormProps {
     currentSector: Sector | null;
@@ -43,8 +44,7 @@ const SectorForm: React.FC<SectorFormProps> = ({ currentSector, availableEquipme
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
+        <Modal isOpen={true} onClose={onCancel}>
                 <h3>{isEditing ? 'Editar Sector' : 'Añadir Sector'}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -71,8 +71,7 @@ const SectorForm: React.FC<SectorFormProps> = ({ currentSector, availableEquipme
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

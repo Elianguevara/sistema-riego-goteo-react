@@ -1,5 +1,6 @@
 // src/components/ui/ConfirmationModal.tsx
 
+import Modal from './Modal';
 import './ConfirmationModal.css';
 
 interface Props {
@@ -12,29 +13,27 @@ interface Props {
   title?: string;
 }
 
-const ConfirmationModal = ({ 
-  message, 
-  onConfirm, 
-  onCancel, 
+const ConfirmationModal = ({
+  message,
+  onConfirm,
+  onCancel,
   isLoading,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   title = 'Confirmación Requerida'
 }: Props) => (
-    <div className="modal-overlay">
-        <div className="modal-container confirmation-modal">
-            <h3>{title}</h3>
-            <p>{message}</p>
-            <div className="modal-actions">
-                <button className="btn-cancel" onClick={onCancel} disabled={isLoading}>
-                    {cancelText}
-                </button>
-                <button className="btn-delete" onClick={onConfirm} disabled={isLoading}>
-                    {isLoading ? 'Procesando...' : confirmText}
-                </button>
-            </div>
+    <Modal isOpen={true} onClose={onCancel} size="sm" className="confirmation-modal">
+        <h3>{title}</h3>
+        <p>{message}</p>
+        <div className="modal-actions">
+            <button className="btn-cancel" onClick={onCancel} disabled={isLoading}>
+                {cancelText}
+            </button>
+            <button className="btn-delete" onClick={onConfirm} disabled={isLoading}>
+                {isLoading ? 'Procesando...' : confirmText}
+            </button>
         </div>
-    </div>
+    </Modal>
 );
 
 export default ConfirmationModal;

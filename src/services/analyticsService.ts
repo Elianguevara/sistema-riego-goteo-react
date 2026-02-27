@@ -1,7 +1,5 @@
 import authService from './authService';
 import type { IrrigationSectorSummary, IrrigationTimeseriesData, IrrigationRecordsPage } from '../types/analytics.types';
-import type { Page } from '../types/audit.types';
-
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/analytics`;
 
 const getAuthHeader = (): Record<string, string> => {

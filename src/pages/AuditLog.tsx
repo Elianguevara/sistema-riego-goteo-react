@@ -8,21 +8,23 @@ import { useDebounce } from '../hooks/useDebounce';
 import type { ChangeHistoryRequestParams, ChangeHistoryResponse, Page } from '../types/audit.types';
 import type { UserResponse } from '../types/user.types';
 import './AuditLog.css';
-import { FileSearch } from 'lucide-react';
+import { FileSearch, Plus, PenLine, Trash2, Link2, Link2Off, HelpCircle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState from '../components/ui/ErrorState';
 import EmptyState from '../components/ui/EmptyState';
+import PageHeader from '../components/ui/PageHeader';
 
 // --- HELPERS (Funciones de Ayuda) ---
 
-const getActionDetails = (actionType: ChangeHistoryResponse['actionType']) => {
+const getActionDetails = (actionType: ChangeHistoryResponse['actionType']): { icon: LucideIcon, color: string, text: string } => {
     switch (actionType) {
-        case 'CREATE': return { icon: 'fa-plus', color: 'create', text: 'Creó' };
-        case 'UPDATE': return { icon: 'fa-pencil-alt', color: 'update', text: 'Actualizó' };
-        case 'DELETE': return { icon: 'fa-trash-alt', color: 'delete', text: 'Eliminó' };
-        case 'ASSIGN': return { icon: 'fa-link', color: 'assign', text: 'Asignó' };
-        case 'UNASSIGN': return { icon: 'fa-unlink', color: 'unassign', text: 'Desasignó' };
-        default: return { icon: 'fa-question-circle', color: 'default', text: 'Acción desconocida' };
+        case 'CREATE': return { icon: Plus, color: 'create', text: 'Creó' };
+        case 'UPDATE': return { icon: PenLine, color: 'update', text: 'Actualizó' };
+        case 'DELETE': return { icon: Trash2, color: 'delete', text: 'Eliminó' };
+        case 'ASSIGN': return { icon: Link2, color: 'assign', text: 'Asignó' };
+        case 'UNASSIGN': return { icon: Link2Off, color: 'unassign', text: 'Desasignó' };
+        default: return { icon: HelpCircle, color: 'default', text: 'Acción desconocida' };
     }
 };
 
@@ -59,7 +61,7 @@ const formatEventTime = (dateString: string): string => {
 // --- COMPONENTE DE TARJETA DE EVENTO ---
 
 const EventCard = ({ log }: { log: ChangeHistoryResponse }) => {
-    const { icon, color, text } = getActionDetails(log.actionType);
+    const { icon: ActionIcon, color, text } = getActionDetails(log.actionType);
 
     const renderChange = () => {
         if (log.actionType !== 'UPDATE' || !log.changedField) return null;
@@ -77,7 +79,7 @@ const EventCard = ({ log }: { log: ChangeHistoryResponse }) => {
     return (
         <div className={`event-card ${color}`}>
             <div className="event-icon-container">
-                <i className={`fas ${icon}`}></i>
+                <ActionIcon size={16} />
             </div>
             <div className="event-content">
                 <div className="event-header">
@@ -179,9 +181,7 @@ const AuditLog = () => {
 
     return (
         <div className="audit-log-page">
-            <div className="page-header">
-                <h1>Historial de Auditoría del Sistema</h1>
-            </div>
+            <PageHeader title="Historial de Auditoría del Sistema" />
             <div className="filters-container">
                 <div className="filter-group main-filters">
                     <div className="filter-item">

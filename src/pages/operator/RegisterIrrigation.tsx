@@ -14,12 +14,13 @@ import type { CurrentWeather } from '../../types/weather.types';
 import type { Sector } from '../../types/farm.types';
 import './RegisterIrrigation.css';
 import LoadingState from '../../components/ui/LoadingState';
+import { Menu, Calendar } from 'lucide-react';
 
 const RegisterIrrigation = () => {
     const today = new Date();
     const [selectedFarmId, setSelectedFarmId] = useState<number | undefined>();
-    const [year, setYear] = useState(today.getFullYear());
-    const [month, setMonth] = useState(today.getMonth() + 1);
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
 
     // 2. Nuevo estado para controlar la vista activa ('daily' o 'monthly')
     const [viewMode, setViewMode] = useState<'daily' | 'monthly'>('daily');
@@ -62,14 +63,6 @@ const RegisterIrrigation = () => {
     });
     // --- Fin de Queries ---
 
-    const handleMonthChange = (offset: number) => {
-        const newDate = new Date(year, month - 1 + offset);
-        setYear(newDate.getFullYear());
-        setMonth(newDate.getMonth() + 1);
-    };
-
-    const monthName = new Date(year, month - 1).toLocaleString('es-AR', { month: 'long' });
-
     const renderContent = () => {
         if (isLoadingFarms) return <LoadingState message="Cargando fincas asignadas..." />;
         if (farms.length === 0) {
@@ -95,14 +88,14 @@ const RegisterIrrigation = () => {
                                 onClick={() => setViewMode('daily')}
                                 title="Vista Diaria"
                             >
-                                <i className="fas fa-bars"></i>
+                                <Menu size={18} />
                             </button>
                             <button 
                                 className={viewMode === 'monthly' ? 'active' : ''} 
                                 onClick={() => setViewMode('monthly')}
                                 title="Vista Mensual"
                             >
-                                <i className="fas fa-calendar-alt"></i>
+                                <Calendar size={18} />
                             </button>
                         </div>
                     )}

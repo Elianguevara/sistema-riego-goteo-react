@@ -9,6 +9,8 @@ import TaskDetailModal from '../../components/tasks/TaskDetailModal';
 import './MyTasks.css';
 import LoadingState from '../../components/ui/LoadingState';
 import ErrorState from '../../components/ui/ErrorState';
+import { Droplet, Wrench, FlaskConical, ClipboardList, MapPin, Play, CheckCircle, Clock, Settings, CheckCheck } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 
 // --- COMPONENTE TaskCard MODIFICADO ---
@@ -18,12 +20,12 @@ import ErrorState from '../../components/ui/ErrorState';
 const TaskCard = ({ task, onUpdateStatus, onClick }: { task: Task, onUpdateStatus: (taskId: number, status: TaskStatus) => void, onClick: () => void }) => {
 
 
-    const getIconClass = (taskType: string) => {
+    const getTaskIcon = (taskType: string): LucideIcon => {
         switch (taskType) {
-            case 'RIEGO': return 'fas fa-tint';
-            case 'MANTENIMIENTO': return 'fas fa-tools';
-            case 'FERTILIZACION': return 'fas fa-vial';
-            default: return 'fas fa-clipboard-list';
+            case 'RIEGO': return Droplet;
+            case 'MANTENIMIENTO': return Wrench;
+            case 'FERTILIZACION': return FlaskConical;
+            default: return ClipboardList;
         }
     };
     // Detenemos la propagación del evento para que el clic en los botones no abra también el modal.
@@ -47,7 +49,7 @@ const TaskCard = ({ task, onUpdateStatus, onClick }: { task: Task, onUpdateStatu
 
             <div className="task-card-header">
                 <div className="task-title">
-                    <i className={`${getIconClass(task.taskType)} task-icon`}></i>
+                    {(() => { const TaskIcon = getTaskIcon(task.taskType); return <TaskIcon size={16} className="task-icon" />; })()}
                     <span className="task-type">{task.taskType?.replace('_', ' ') || 'Tarea'}</span>
                 </div>
                 <div className={`task-status-badge status-${task.status.toLowerCase()}`}>
@@ -57,7 +59,7 @@ const TaskCard = ({ task, onUpdateStatus, onClick }: { task: Task, onUpdateStatu
 
             <div className="task-details">
                 <div className="task-location">
-                    <i className="fas fa-map-marker-alt"></i>
+                    <MapPin size={14} />
                     <span>
                         {task.farmName
                             ? `${task.farmName} ${task.sectorName ? `> ${task.sectorName}` : ''}`
@@ -73,15 +75,13 @@ const TaskCard = ({ task, onUpdateStatus, onClick }: { task: Task, onUpdateStatu
                     {task.status === 'PENDIENTE' && (
 
                         <button className="btn-start" onClick={(e) => handleStatusChange(e, 'EN_PROGRESO')}>
-
-                            <i className="fas fa-play"></i> Iniciar
+                            <Play size={14} /> Iniciar
                         </button>
                     )}
                     {task.status === 'EN_PROGRESO' && (
 
                         <button className="btn-complete" onClick={(e) => handleStatusChange(e, 'COMPLETADA')}>
-
-                            <i className="fas fa-check-circle"></i> Completar
+                            <CheckCircle size={14} /> Completar
                         </button>
                     )}
                 </div>
@@ -137,19 +137,19 @@ const MyTasks = () => {
             <h1>Mis Tareas Asignadas</h1>
             <div className="tasks-columns">
                 <div className="task-column">
-                    <h2><i className="fas fa-hourglass-start"></i> Pendientes</h2>
+                    <h2><Clock size={18} /> Pendientes</h2>
                     {pendingTasks.length > 0 ? pendingTasks.map(task => (
                         <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateStatus} onClick={() => setSelectedTask(task)} />
                     )) : <p>No hay tareas pendientes.</p>}
                 </div>
                 <div className="task-column">
-                    <h2><i className="fas fa-cogs"></i> En Progreso</h2>
+                    <h2><Settings size={18} /> En Progreso</h2>
                     {inProgressTasks.length > 0 ? inProgressTasks.map(task => (
                         <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateStatus} onClick={() => setSelectedTask(task)} />
                     )) : <p>No hay tareas en progreso.</p>}
                 </div>
                 <div className="task-column">
-                    <h2><i className="fas fa-check-double"></i> Completadas</h2>
+                    <h2><CheckCheck size={18} /> Completadas</h2>
                     {completedTasks.length > 0 ? completedTasks.map(task => (
 
                         <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateStatus} onClick={() => setSelectedTask(task)} />

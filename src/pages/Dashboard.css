@@ -5,100 +5,6 @@
     margin-bottom: 32px;
 }
 
-.stat-card {
-    background-color: white;
-    padding: 24px;
-    border-radius: var(--border-radius-lg);
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    cursor: pointer;
-    border: 1px solid var(--color-border);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background-color: transparent;
-    transition: background-color 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: rgba(var(--color-primary-rgb), 0.3);
-}
-
-.stat-card.active {
-    border-color: var(--color-primary);
-    background-color: var(--color-sidebar-active-bg);
-}
-
-.stat-card.active::before {
-    background-color: var(--color-primary);
-}
-
-.card-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    /* Estilo ligeramente redondeado pero no circular */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    color: white;
-    flex-shrink: 0;
-    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
-}
-
-.card-icon.blue {
-    background: linear-gradient(135deg, #3b82f6, #0ea5e9);
-}
-
-.card-icon.green {
-    background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.card-icon.cyan {
-    background: linear-gradient(135deg, #06b6d4, #0891b2);
-}
-
-.card-icon.red {
-    background: linear-gradient(135deg, #f43f5e, #e11d48);
-}
-
-.card-icon.purple {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-}
-
-.card-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.card-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--color-text-dark);
-    line-height: 1;
-    font-family: var(--font-headers);
-}
-
-.card-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-light);
-}
-
 /* --- CONTENEDOR DE TABLA BENTO --- */
 .table-display-area {
     animation: slideUp 0.4s ease-out;
@@ -181,37 +87,6 @@ tr:hover td {
     background-color: var(--color-app-bg);
 }
 
-/* --- COMPONENTES UI EN TABLAS --- */
-.search-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    max-width: 300px;
-}
-
-.search-icon {
-    position: absolute;
-    left: 14px;
-    color: var(--color-text-light);
-    font-size: 14px;
-}
-
-.search-input {
-    padding: 10px 14px 10px 40px;
-    border-radius: 40px;
-    border: 1px solid var(--color-border);
-    width: 100%;
-    font-size: 14px;
-    background-color: var(--color-app-bg);
-    transition: all 0.2s ease;
-}
-
-.search-input:focus {
-    outline: none;
-    background-color: white;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
-}
 
 .btn-secondary {
     background-color: white;

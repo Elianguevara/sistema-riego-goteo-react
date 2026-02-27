@@ -18,6 +18,8 @@ import EquipmentForm from '../components/farms/EquipmentForm';
 import WaterSourceForm from '../components/farms/WaterSourceForm';
 import AssignUserForm from '../components/farms/AssignUserForm';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
+import Badge from '../components/ui/Badge';
+import type { BadgeVariant } from '../components/ui/Badge';
 
 // Types
 import type { Farm, Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData, WaterSource, WaterSourceCreateData, WaterSourceUpdateData } from '../types/farm.types';
@@ -102,14 +104,14 @@ const FarmDetail = () => {
         { id: 'users', label: 'Usuarios', icon: <Users className="w-4 h-4" />, number: 4, disabled: false }
     ];
 
-    const getStatusColor = (status: string) => {
-        const colors: { [key: string]: string } = {
-            'ACTIVO': 'status-emerald',
-            'OPERATIVO': 'status-emerald',
-            'MANTENIMIENTO': 'status-amber',
-            'INACTIVO': 'status-red'
+    const getStatusVariant = (status: string): BadgeVariant => {
+        const variants: Record<string, BadgeVariant> = {
+            'ACTIVO': 'success',
+            'OPERATIVO': 'success',
+            'MANTENIMIENTO': 'warning',
+            'INACTIVO': 'danger',
         };
-        return colors[status] || 'status-slate';
+        return variants[status] ?? 'neutral';
     };
 
     // **MODIFICADO**: Asume que `efficiency` viene en hL/h
@@ -243,7 +245,7 @@ const FarmDetail = () => {
                                             <div className="list-item-details">
                                                 <h3 className="list-item-title">{source.type}</h3>
                                                 <div className="list-item-meta">
-                                                    <span className={`status-badge ${getStatusColor('ACTIVO')}`}>Activo</span>
+                                                    <Badge variant={getStatusVariant('ACTIVO')}>Activo</Badge>
                                                 </div>
                                             </div>
                                         </div>
@@ -286,7 +288,7 @@ const FarmDetail = () => {
                                                     <h3 className="list-item-title">{equipment.name}</h3>
                                                     <div className="list-item-meta">
                                                         <span>Tipo: {equipment.equipmentType}</span>
-                                                        <span className={`status-badge ${getStatusColor(equipment.equipmentStatus)}`}>{equipment.equipmentStatus}</span>
+                                                        <Badge variant={getStatusVariant(equipment.equipmentStatus)}>{equipment.equipmentStatus}</Badge>
                                                     </div>
                                                 </div>
                                             </div>
@@ -371,7 +373,7 @@ const FarmDetail = () => {
                                                 <h3 className="list-item-title">{user.name}</h3>
                                                 <div className="list-item-meta">
                                                     <span className="username-text">@{user.username}</span>
-                                                    <span className="role-badge">{user.roleName}</span>
+                                                    <Badge variant="info">{user.roleName}</Badge>
                                                 </div>
                                             </div>
                                         </div>

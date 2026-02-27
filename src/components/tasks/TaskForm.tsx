@@ -9,6 +9,7 @@ import type { TaskCreateData } from '../../types/task.types';
 import type { Farm, Sector } from '../../types/farm.types';
 import type { UserResponse } from '../../types/user.types';
 import './TaskForm.css';
+import Modal from '../ui/Modal';
 
 interface TaskFormProps {
     onClose: () => void;
@@ -80,8 +81,7 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container task-form-container">
+        <Modal isOpen={true} onClose={onClose} size="lg" className="task-form-container">
                 <h3>Crear Nueva Tarea</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="task-form-step">
@@ -136,8 +136,7 @@ const TaskForm = ({ onClose }: TaskFormProps) => {
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

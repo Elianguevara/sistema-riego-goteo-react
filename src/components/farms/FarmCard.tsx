@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Farm } from '../../types/farm.types';
 import ActionsMenu, { type ActionMenuItem } from '../ui/ActionsMenu';
 import './FarmCard.css';
+import { Sprout } from 'lucide-react';
 
 interface FarmCardProps {
     farm: Farm;
@@ -26,7 +27,7 @@ const FarmCard: React.FC<FarmCardProps> = ({ farm, actions }) => {
         <div className="farm-card">
             <div className="farm-card-header">
                 <div className="farm-card-icon">
-                    <i className="fas fa-seedling"></i>
+                    <Sprout size={20} />
                 </div>
                 <div className="farm-card-title">
                     <h3>{farm.name}</h3>

@@ -13,7 +13,7 @@ import FertilizationList from '../../components/fertilization/FertilizationList'
 import './RegisterIrrigation.css';
 import LoadingState from '../../components/ui/LoadingState';
 import EmptyState from '../../components/ui/EmptyState';
-import { MapPinOff, MapPin } from 'lucide-react';
+import { MapPinOff, MapPin, X, Plus } from 'lucide-react';
 
 const RegisterFertilization = () => {
     const queryClient = useQueryClient();
@@ -100,7 +100,7 @@ const RegisterFertilization = () => {
                     </select>
                     
                     <button className="create-user-btn" onClick={() => setIsFormOpen(!isFormOpen)} disabled={!selectedSectorId}>
-                        <i className={`fas ${isFormOpen ? 'fa-times' : 'fa-plus'}`}></i>
+                        {isFormOpen ? <X size={16} /> : <Plus size={16} />}
                         {isFormOpen ? 'Cancelar' : 'Registrar Aplicación'}
                     </button>
                 </div>

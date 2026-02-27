@@ -101,10 +101,3 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
-
-/* Modal sizing adjustments in PrecipitationForm.tsx might be needed */
-.modal-container {
-    width: 100%;
-    max-width: 500px !important;
-    /* Aumentar ligeramente el ancho para la tabla */
-}

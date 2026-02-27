@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import type { Task } from '../../types/task.types';
 import './TaskDetailModal.css';
+import Modal from '../ui/Modal';
 
 interface Props {
     task: Task;
@@ -36,8 +37,7 @@ const TaskDetailModal = ({ task, onClose }: Props) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container task-detail-modal">
+        <Modal isOpen={true} onClose={onClose} size="lg" className="task-detail-modal">
                 <div className="modal-header">
                     <h3>Detalle de la Tarea</h3>
                     <button onClick={onClose} className="btn-close">&times;</button>
@@ -73,8 +73,7 @@ const TaskDetailModal = ({ task, onClose }: Props) => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

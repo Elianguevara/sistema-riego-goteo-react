@@ -3,6 +3,7 @@
 import React from 'react';
 import type { Task, TaskType } from '../../types/task.types';
 import './TaskFilters.css';
+import TableToolbar from '../ui/TableToolbar';
 
 // Definimos los tipos para los filtros que el usuario puede aplicar
 export interface TaskFiltersState {
@@ -29,33 +30,23 @@ const TaskFilters = ({ filters, onFilterChange, tasks }: Props) => {
     };
 
     return (
-        <div className="task-filters-bar">
-            <div className="filter-group">
-                <i className="fas fa-search"></i>
-                <input
-                    type="text"
-                    name="searchTerm"
-                    placeholder="Buscar por descripción..."
-                    value={filters.searchTerm}
-                    onChange={handleInputChange}
-                    className="search-input"
-                />
-            </div>
-            <div className="filter-group">
-                <i className="fas fa-cogs"></i>
-                <select
-                    name="taskType"
-                    value={filters.taskType}
-                    onChange={handleInputChange}
-                    className="filter-select"
-                >
-                    <option value="TODAS">Todos los tipos</option>
-                    {availableTaskTypes.map(type => (
-                        <option key={type} value={type}>{type.replace('_', ' ')}</option>
-                    ))}
-                </select>
-            </div>
-        </div>
+        <TableToolbar
+            searchValue={filters.searchTerm}
+            onSearchChange={(value) => onFilterChange({ ...filters, searchTerm: value })}
+            searchPlaceholder="Buscar por descripción..."
+        >
+            <select
+                name="taskType"
+                value={filters.taskType}
+                onChange={handleInputChange}
+                className="filter-select"
+            >
+                <option value="TODAS">Todos los tipos</option>
+                {availableTaskTypes.map(type => (
+                    <option key={type} value={type}>{type.replace('_', ' ')}</option>
+                ))}
+            </select>
+        </TableToolbar>
     );
 };
 

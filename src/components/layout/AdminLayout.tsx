@@ -8,6 +8,7 @@ import NotificationBell from './NotificationBell';
 import './AdminLayout.css';
 import { useAuthData } from '../../hooks/useAuthData';
 import { getNavItems } from '../../config/navigationConfig';
+import { Leaf, Menu } from 'lucide-react';
 
 const AdminLayout = () => {
     const location = useLocation();
@@ -26,7 +27,7 @@ const AdminLayout = () => {
             {isSidebarVisible && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
             <aside className="sidebar">
                 <div className="sidebar-header">
-                    <i className="fas fa-leaf logo-icon"></i>
+                    <Leaf size={24} className="logo-icon" />
                     <h1 className="title">Hidra</h1>
                 </div>
                 <nav className="sidebar-nav">
@@ -47,7 +48,7 @@ const AdminLayout = () => {
                 <Toaster richColors position="top-right" />
                 <header className="main-header">
                     <button className="mobile-menu-button" onClick={toggleSidebar}>
-                        <i className="fas fa-bars"></i>
+                        <Menu size={20} />
                     </button>
                     <div className="header-breadcrumbs">
                         {/* Se puede añadir lógica de migas de pan aquí en el futuro */}

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import type { UserResponse, UserUpdateData } from '../../types/user.types';
-import '../users/ChangePasswordModal.css'; // Reutilizamos estilos de modales existentes
+import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface Props {
     currentUser: UserResponse;
@@ -47,8 +48,7 @@ const EditProfileModal = ({ currentUser, onClose, onSave, isLoading }: Props) =>
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
+        <Modal isOpen={true} onClose={onClose}>
                 <h3>Editar Perfil</h3>
                 <form onSubmit={handleSubmit}>
                     {/* 4. Nuevos campos en la interfaz */}
@@ -71,8 +71,7 @@ const EditProfileModal = ({ currentUser, onClose, onSave, isLoading }: Props) =>
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

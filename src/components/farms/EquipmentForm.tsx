@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import type { IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData } from '../../types/farm.types';
 import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface EquipmentFormProps {
     currentEquipment: IrrigationEquipment | null;
@@ -68,8 +69,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container" style={{maxWidth: '600px'}}>
+        <Modal isOpen={true} onClose={onCancel} size="lg">
                 <h3>{isEditing ? 'Editar Equipo' : 'Añadir Equipo'}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-grid">
@@ -106,8 +106,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

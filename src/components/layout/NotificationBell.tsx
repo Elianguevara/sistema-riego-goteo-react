@@ -8,6 +8,7 @@ import type { Notification, NotificationPage } from '../../types/notification.ty
 import { useAuthData } from '../../hooks/useAuthData';
 import { resolveNotificationUrl } from '../../utils/notificationNavigation';
 import './NotificationBell.css';
+import { Bell } from 'lucide-react';
 
 const timeAgo = (dateString: string): string => {
     const date = new Date(dateString);
@@ -86,7 +87,7 @@ const NotificationBell = () => {
     return (
         <div className="notification-bell" ref={menuRef}>
             <button className="bell-trigger" onClick={() => setIsOpen(!isOpen)}>
-                <i className="fas fa-bell"></i>
+                <Bell size={20} />
                 {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
             </button>
             

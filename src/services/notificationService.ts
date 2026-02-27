@@ -1,7 +1,7 @@
 // src/services/notificationService.ts
 
 import authService from './authService';
-import type { Notification, NotificationPage } from '../types/notification.types';
+import type { NotificationPage } from '../types/notification.types';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/notifications`;
 

@@ -34,7 +34,21 @@
   max-height: calc(100dvh - var(--space-8, 32px));
   overflow-y: auto;
   outline: none;
+  padding: 32px;
   animation: ui-modal-enter var(--duration-slow, 350ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+
+/* ── TIPOGRAFÍA INTERNA ───────────────────────────────────────────────────── */
+
+.ui-modal__container h3 {
+  margin: 0 0 20px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  font-family: var(--font-headers, 'Outfit', sans-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  letter-spacing: -0.3px;
 }
 
 /* Tamaños */
@@ -70,6 +84,7 @@
     max-width: 100%;
     border-radius: var(--border-radius-xl, 20px) var(--border-radius-xl, 20px) 0 0;
     max-height: 92dvh;
+    padding: 24px;
   }
 
   @keyframes ui-modal-enter {

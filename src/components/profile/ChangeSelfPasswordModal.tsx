@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { SelfPasswordUpdateData } from '../../types/user.types';
-import '../users/ChangePasswordModal.css'; // Reutilizamos estilos
+import '../users/UserForm.css';
 import { toast } from 'sonner';
+import Modal from '../ui/Modal';
 
 interface Props {
     onClose: () => void;
@@ -30,8 +31,7 @@ const ChangeSelfPasswordModal = ({ onClose, onSave, isLoading }: Props) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
+        <Modal isOpen={true} onClose={onClose}>
                 <h3>Cambiar Contraseña</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -53,8 +53,7 @@ const ChangeSelfPasswordModal = ({ onClose, onSave, isLoading }: Props) => {
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

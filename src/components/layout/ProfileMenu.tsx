@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
 import { useAuthData } from '../../hooks/useAuthData';
 import './ProfileMenu.css';
+import { ChevronDown, User, LogOut } from 'lucide-react';
 
 // Función helper mejorada para obtener iniciales
 const getInitials = (name: string = '') => {
@@ -46,17 +47,17 @@ const ProfileMenu = () => {
             <span className="user-name">{authData?.name ?? 'Usuario'}</span>
             <span className="user-role">{authData?.role ?? 'Invitado'}</span>
         </div>
-        <i className={`fas fa-chevron-down arrow-icon ${isOpen ? 'open' : ''}`}></i>
+        <ChevronDown size={16} className={`arrow-icon ${isOpen ? 'open' : ''}`} />
       </button>
 
       {isOpen && (
         <div className="profile-dropdown">
           <Link to="/profile" className="dropdown-item" onClick={() => setIsOpen(false)}>
-            <i className="fas fa-user-circle"></i>
+            <User size={16} />
             <span>Perfil de Usuario</span>
           </Link>
           <button className="dropdown-item" onClick={handleLogout}>
-            <i className="fas fa-sign-out-alt"></i>
+            <LogOut size={16} />
             <span>Cerrar Sesión</span>
           </button>
         </div>

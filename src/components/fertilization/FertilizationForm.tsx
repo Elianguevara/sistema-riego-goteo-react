@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import type { FertilizationCreateData, FertilizationRecord } from '../../types/fertilization.types';
 import type { Sector } from '../../types/farm.types';
 import '../users/UserForm.css';
+import Modal from '../ui/Modal';
 
 interface Props {
     farmId: number;
@@ -14,7 +15,7 @@ interface Props {
     isLoading: boolean;
 }
 
-const FertilizationForm = ({ farmId, sectors, currentFertilization, onSave, onClose, isLoading }: Props) => {
+const FertilizationForm = ({ sectors, currentFertilization, onSave, onClose, isLoading }: Props) => {
     const isEditing = currentFertilization !== null;
     
     const [formData, setFormData] = useState({
@@ -62,8 +63,7 @@ const FertilizationForm = ({ farmId, sectors, currentFertilization, onSave, onCl
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
+        <Modal isOpen={true} onClose={onClose}>
                 <h3>{isEditing ? 'Editar' : 'Nueva'} Aplicación de Fertilizante</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -102,8 +102,7 @@ const FertilizationForm = ({ farmId, sectors, currentFertilization, onSave, onCl
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 };
 

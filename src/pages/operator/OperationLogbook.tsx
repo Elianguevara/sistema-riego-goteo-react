@@ -7,13 +7,15 @@ import operationLogService from '../../services/operationLogService';
 import type { Farm } from '../../types/farm.types';
 import type { OperationLog } from '../../types/operationLog.types';
 import OperationLogForm from '../../components/logbook/OperationLogForm';
+import Modal from '../../components/ui/Modal';
+import TableToolbar from '../../components/ui/TableToolbar';
 import ActionsMenu, { type ActionMenuItem } from '../../components/ui/ActionsMenu';
 import { useDebounce } from '../../hooks/useDebounce';
 import './RegisterIrrigation.css';
 import './OperationLogbook.css';
 import LoadingState from '../../components/ui/LoadingState';
 import EmptyState from '../../components/ui/EmptyState';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, FileText, Calendar, User, Plus } from 'lucide-react';
 
 // --- FUNCIONES HELPER PARA FECHAS ---
 
@@ -69,14 +71,14 @@ const LogList = ({ farmId, filterType, onEdit }: { farmId: number, filterType: s
                         <h3 className="log-day-header">{dateGroup}</h3>
                         {groupedLogs[dateGroup].map(log => (
                             <div key={log.id} className="log-card">
-                                <div className="log-card-icon"><i className="fas fa-file-alt"></i></div>
+                                <div className="log-card-icon"><FileText size={18} /></div>
                                 <div className="log-card-content">
                                     <p className="log-description">
                                         <strong>{log.operationType}:</strong> {log.description || 'Sin descripción detallada.'}
                                     </p>
                                     <div className="log-meta">
-                                        <span><i className="fas fa-calendar-alt"></i> Fecha: {formatDateTime(log.operationDatetime)}</span>
-                                        <span><i className="fas fa-user"></i> Por: {log.createdByUsername}</span>
+                                        <span><Calendar size={14} /> Fecha: {formatDateTime(log.operationDatetime)}</span>
+                                        <span><User size={14} /> Por: {log.createdByUsername}</span>
                                     </div>
                                 </div>
                                 <div className="log-actions">
@@ -127,43 +129,35 @@ const OperationLogbook = () => {
     return (
         <div className="register-irrigation-page">
             <h1>Bitácora de Operaciones</h1>
-            <div className="filters-bar">
+            <TableToolbar
+                searchValue={filterInput}
+                onSearchChange={setFilterInput}
+                searchPlaceholder="Filtrar por tipo de operación..."
+            >
                 {farms.length > 1 ? (
                     <select onChange={(e) => setSelectedFarmId(Number(e.target.value))} value={selectedFarmId || ''}>
                         <option value="">Seleccione Finca...</option>
                         {farms.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
                     </select>
                 ) : (
-                     <div className="farm-display"><strong>Finca:</strong> {farms[0]?.name || 'Cargando...'}</div>
+                    <div className="farm-display"><strong>Finca:</strong> {farms[0]?.name || 'Cargando...'}</div>
                 )}
-                
-                <input
-                    type="text"
-                    placeholder="Filtrar por tipo de operación..."
-                    value={filterInput}
-                    onChange={(e) => setFilterInput(e.target.value)}
-                    style={{ padding: '8px 12px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--color-border)' }}
-                />
-
                 <button className="create-user-btn" onClick={handleOpenCreateForm} disabled={!selectedFarmId}>
-                     <i className="fas fa-plus"></i>
-                     Nueva Entrada
+                    <Plus size={16} />
+                    Nueva Entrada
                 </button>
-            </div>
+            </TableToolbar>
 
             {selectedFarmId && <LogList farmId={selectedFarmId} filterType={debouncedFilter} onEdit={handleOpenEditForm} />}
 
-            {isFormModalOpen && selectedFarmId && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <OperationLogForm 
-                            farmId={selectedFarmId} 
-                            currentLog={currentLog}
-                            onClose={() => setIsFormModalOpen(false)}
-                            // --- LÍNEA CORREGIDA (eliminada la prop onSave) ---
-                        />
-                    </div>
-                </div>
+            {selectedFarmId && (
+                <Modal isOpen={isFormModalOpen} onClose={() => setIsFormModalOpen(false)}>
+                    <OperationLogForm
+                        farmId={selectedFarmId}
+                        currentLog={currentLog}
+                        onClose={() => setIsFormModalOpen(false)}
+                    />
+                </Modal>
             )}
         </div>
     );

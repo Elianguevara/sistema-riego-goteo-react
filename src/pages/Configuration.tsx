@@ -1,12 +1,12 @@
 
 import './Configuration.css';
+import { Settings } from 'lucide-react';
+import PageHeader from '../components/ui/PageHeader';
 
 const Configuration = () => {
   return (
     <div className="configuration-page">
-      <div className="page-header">
-        <h1>Configuración</h1>
-      </div>
+      <PageHeader title="Configuración" />
       <div className="config-card">
         <h3>Ajustes Generales</h3>
         <p>
@@ -15,7 +15,7 @@ const Configuration = () => {
           ajustes generales desde aquí.
         </p>
         <div className="placeholder-content">
-          <i className="fas fa-cogs placeholder-icon"></i>
+          <Settings size={48} className="placeholder-icon" />
           <span>Funcionalidad en construcción</span>
         </div>
       </div>

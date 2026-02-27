@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
 import './Login.css';
+import { Leaf, User, Lock, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
     const [username, setUsername] = useState<string>('');
@@ -42,7 +43,7 @@ const Login = () => {
         <div className="login-container">
             <div className="login-card">
                 <div className="logo-container">
-                    <i className="fas fa-leaf logo-icon"></i>
+                    <Leaf size={32} className="logo-icon" />
                     <h1 className="title">Hidra</h1>
                     <h2 className="subtitle">Sistema de Gestión de Riego</h2>
                 </div>
@@ -50,7 +51,7 @@ const Login = () => {
                 <form onSubmit={handleLogin}>
                     <div className="input-group">
                         <label htmlFor="username-input" className="visually-hidden">Nombre de usuario</label>
-                        <i className="fas fa-user icon"></i>
+                        <User size={16} className="icon" />
                         <input
                             id="username-input"
                             type="text"
@@ -64,7 +65,7 @@ const Login = () => {
 
                     <div className="input-group">
                         <label htmlFor="password-input" className="visually-hidden">Contraseña</label>
-                        <i className="fas fa-lock icon"></i>
+                        <Lock size={16} className="icon" />
                         <input
                             id="password-input"
                             type={isPasswordVisible ? 'text' : 'password'}
@@ -74,10 +75,10 @@ const Login = () => {
                             required
                             disabled={isLoading}
                         />
-                        <i
-                            className={`fas ${isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'} password-toggle-icon`}
-                            onClick={togglePasswordVisibility}
-                        ></i>
+                        {isPasswordVisible
+                            ? <EyeOff size={16} className="password-toggle-icon" onClick={togglePasswordVisibility} />
+                            : <Eye size={16} className="password-toggle-icon" onClick={togglePasswordVisibility} />
+                        }
                     </div>
 
                     {errorMessage && (
