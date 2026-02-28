@@ -6,6 +6,94 @@
     padding: 1.5rem; /* p-6 */
 }
 
+/* === Tarjeta de Reporte Corporativo === */
+.corporate-report-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+.corporate-report-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.corporate-report-icon-wrapper {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.corporate-report-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #fff;
+}
+
+.corporate-report-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.25rem;
+}
+
+.corporate-report-description {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.corporate-download-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: #10b981;
+    color: #fff;
+    border: none;
+    border-radius: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    white-space: nowrap;
+}
+
+.corporate-download-button:hover:not(:disabled) {
+    background: #059669;
+}
+
+.corporate-download-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .corporate-report-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .corporate-download-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* === Fin Tarjeta Corporativa === */
+
 .header-section {
     margin-bottom: 2rem; /* mb-8 */
 }

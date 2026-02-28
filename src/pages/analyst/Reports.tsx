@@ -8,6 +8,9 @@ import { toast } from 'sonner';
 import farmService from '../../services/farmService';
 import reportService from '../../services/reportService';
 
+// Hooks
+import { useAsyncReport } from '../../hooks/useAsyncReport';
+
 // Types
 import type { Farm, Sector } from '../../types/farm.types';
 import type { UserResponse } from '../../types/user.types';
@@ -28,7 +31,9 @@ const Reports = () => {
     const [format, setFormat] = useState('PDF');
     const [startDate, setStartDate] = useState(today);
     const [endDate, setEndDate] = useState(today);
-    const [isDownloading, setIsDownloading] = useState(false);
+    const [isDownloadingCorporate, setIsDownloadingCorporate] = useState(false);
+
+    const { generateReport, isGenerating } = useAsyncReport();
 
     // --- Queries para obtener datos reales ---
     const { data: farms = [] } = useQuery<Farm[], Error>({
@@ -62,12 +67,23 @@ const Reports = () => {
         );
     };
 
+    const handleDownloadCorporateReport = async () => {
+        setIsDownloadingCorporate(true);
+        try {
+            await reportService.downloadCorporateReport();
+        } catch (error: Error | unknown) {
+            const err = error as Error;
+            toast.error(`No se pudo descargar el reporte corporativo: ${err.message}`);
+        } finally {
+            setIsDownloadingCorporate(false);
+        }
+    };
+
     const handleGenerateReport = async () => {
         if (!farmId) {
             toast.error('Por favor, seleccione una finca.');
             return;
         }
-        setIsDownloading(true);
 
         const params = new URLSearchParams({
             reportType,
@@ -85,13 +101,7 @@ const Reports = () => {
             if (userId) params.append('userId', userId);
         }
 
-        try {
-            await reportService.downloadReport(params);
-        } catch (error) {
-            // El servicio ya muestra un toast de error, el error se relanza para limpiar el estado
-        } finally {
-            setIsDownloading(false);
-        }
+        await generateReport(params);
     };
 
     const selectedReport = reportTypes.find(r => r.value === reportType)!;
@@ -111,6 +121,32 @@ const Reports = () => {
             </div>
 
             <div className="content-section">
+                {/* Tarjeta de descarga rápida del reporte corporativo */}
+                <div className="corporate-report-card">
+                    <div className="corporate-report-info">
+                        <div className="corporate-report-icon-wrapper">
+                            <FileDown className="corporate-report-icon" />
+                        </div>
+                        <div>
+                            <h2 className="corporate-report-title">Reporte Corporativo</h2>
+                            <p className="corporate-report-description">
+                                Documento PDF completo con el resumen ejecutivo del sistema de riego.
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleDownloadCorporateReport}
+                        disabled={isDownloadingCorporate}
+                        className="corporate-download-button"
+                    >
+                        {isDownloadingCorporate ? (
+                            <><Loader className="button-icon animate-spin" /> Descargando...</>
+                        ) : (
+                            <><Download className="button-icon" /> Descargar PDF</>
+                        )}
+                    </button>
+                </div>
+
                 <div className="report-type-selection">
                     <label className="section-label">
                         Seleccione el tipo de reporte
@@ -228,8 +264,8 @@ const Reports = () => {
                         <p className="footer-status-text">
                             {farmId ? '✓ Configuración completa' : '⚠ Seleccione una finca para continuar'}
                         </p>
-                        <button onClick={handleGenerateReport} disabled={isDownloading || !farmId} className="generate-button">
-                            {isDownloading ? (
+                        <button onClick={handleGenerateReport} disabled={isGenerating || !farmId} className="generate-button">
+                            {isGenerating ? (
                                 <> <Loader className="button-icon animate-spin" /> Generando Reporte... </>
                             ) : (
                                 <> <FileDown className="button-icon" /> Generar Reporte </>

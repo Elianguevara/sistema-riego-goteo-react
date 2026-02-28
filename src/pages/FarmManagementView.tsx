@@ -17,6 +17,7 @@ interface FarmStats {
     totalFarms: number;
     activeFarms: number;
     totalArea: number;
+    totalUsers?: number;
 }
 
 interface FarmManagementViewProps {
@@ -78,7 +79,7 @@ const FarmManagementView = ({
             <StatCard label="Total de Fincas" value={stats.totalFarms} icon={<MapPin size={24} />} variant="primary" />
             <StatCard label="Fincas Activas" value={stats.activeFarms} icon={<TrendingUp size={24} />} variant="info" />
             <StatCard label="Área Total" value={`${stats.totalArea.toLocaleString()} ha`} icon={<Grid3x3 size={24} />} variant="accent" />
-            <StatCard label="Total Usuarios" value="N/A" icon={<Users size={24} />} variant="warning" />
+            <StatCard label="Total Usuarios" value={stats.totalUsers ?? '—'} icon={<Users size={24} />} variant="warning" />
         </div>
 
         <TableToolbar

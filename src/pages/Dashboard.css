@@ -195,6 +195,50 @@ tr:hover td {
     text-align: right;
 }
 
+/* --- BARRA DE BÚSQUEDA (UserTable) --- */
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--color-text-light);
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+.search-input {
+    padding: 8px 14px 8px 36px;
+    border: 1px solid var(--color-border);
+    border-radius: 40px;
+    font-size: 14px;
+    color: var(--color-text-dark);
+    background-color: var(--color-app-bg);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    min-width: 220px;
+}
+
+.search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    background-color: white;
+}
+
+.search-input::placeholder {
+    color: var(--color-text-light);
+}
+
+/* --- ERROR TEXT --- */
+.error-text {
+    color: var(--color-danger);
+    font-size: 14px;
+    margin: 8px 0 0;
+}
+
 /* --- SKELETON ANIMATION --- */
 .skeleton {
     background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
@@ -211,4 +255,16 @@ tr:hover td {
     100% {
         background-position: -200% 0;
     }
+}
+
+.skeleton-text-header {
+    height: 13px;
+    width: 75%;
+    border-radius: 4px;
+}
+
+.skeleton-text {
+    height: 15px;
+    width: 88%;
+    border-radius: 4px;
 }

@@ -6,7 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import farmService from '../services/farmService';
+import dashboardService from '../services/dashboardService';
 import type { Farm, FarmCreateData, FarmUpdateData } from '../types/farm.types';
+import type { KpiResponse } from '../types/dashboard.types';
 import FarmManagementView from './FarmManagementView';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState from '../components/ui/ErrorState';
@@ -24,6 +26,11 @@ const FarmManagement = () => {
     const { data: farms = [], isLoading, isError, error } = useQuery<Farm[], Error>({
         queryKey: ['farms'],
         queryFn: farmService.getFarms,
+    });
+
+    const { data: kpis } = useQuery<KpiResponse>({
+        queryKey: ['dashboardKpis'],
+        queryFn: dashboardService.getKpis,
     });
 
     const createFarmMutation = useMutation({
@@ -81,7 +88,8 @@ const FarmManagement = () => {
         totalFarms: farms.length,
         activeFarms: farms.length,
         totalArea: farms.reduce((sum, f) => sum + f.farmSize, 0),
-    }), [farms]);
+        totalUsers: kpis?.totalUsers,
+    }), [farms, kpis]);
 
     if (isLoading) return <LoadingState message="Cargando fincas..." />;
     if (isError) return <ErrorState message={error.message} />;

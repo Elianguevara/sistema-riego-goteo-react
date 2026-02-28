@@ -1,0 +1,12 @@
+
+C:\Users\elian\OneDrive\Documentos\0-Tecnicatura Desarrollo de software\3-Tercer A├▒o Desarrollo De Software\Practica Profesionalizante 3\software\sistema-riego-goteo-react\src\hooks\useAsyncReport.ts
+  20:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\elian\OneDrive\Documentos\0-Tecnicatura Desarrollo de software\3-Tercer A├▒o Desarrollo De Software\Practica Profesionalizante 3\software\sistema-riego-goteo-react\src\pages\analyst\Reports.tsx
+  74:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\elian\OneDrive\Documentos\0-Tecnicatura Desarrollo de software\3-Tercer A├▒o Desarrollo De Software\Practica Profesionalizante 3\software\sistema-riego-goteo-react\src\services\reportService.ts
+  148:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 3 problems (3 errors, 0 warnings)
+

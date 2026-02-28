@@ -13,7 +13,7 @@ import './Dashboard.css';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState from '../components/ui/ErrorState';
 import StatCard from '../components/ui/StatCard';
-import { Search, Users, Mountain, Cpu, AlertTriangle, BarChart2 } from 'lucide-react';
+import { Search, Users, Mountain, Cpu, BarChart2 } from 'lucide-react';
 
 // --- COMPONENTE REUTILIZABLE: SKELETON LOADER PARA TABLAS ---
 const TableSkeleton = ({ columns, rows = 5 }: { columns: number, rows?: number }) => (
@@ -185,13 +185,6 @@ const SectorsTable = () => {
     );
 };
 
-const AlertsTable = () => (
-    <div className="dashboard-table-container">
-        <h2 className="table-title">Alertas Activas</h2>
-        <p>Vista de tabla de alertas activas no implementada aún.</p>
-    </div>
-);
-
 // --- COMPONENTE PARA VISUALIZAR ESTADÍSTICAS DE USUARIO ---
 const UserStatsDisplay = () => {
     const { data: userStats, isLoading, isError, error } = useQuery<UserStatsResponse, Error>({
@@ -261,7 +254,7 @@ const UserStatsDisplay = () => {
 
 // --- COMPONENTE PRINCIPAL DEL DASHBOARD ---
 const Dashboard = () => {
-    const [activeTable, setActiveTable] = useState<'users' | 'farms' | 'sectors' | 'alerts' | 'user-stats'>('users');
+    const [activeTable, setActiveTable] = useState<'users' | 'farms' | 'sectors' | 'user-stats'>('users');
 
     const { data: kpis, isLoading, isError, error } = useQuery<KpiResponse, Error>({
         queryKey: ['dashboardKpis'],
@@ -279,8 +272,6 @@ const Dashboard = () => {
                 return <FarmsTable />;
             case 'sectors':
                 return <SectorsTable />;
-            case 'alerts':
-                return <AlertsTable />;
             case 'user-stats':
                 return <UserStatsDisplay />;
             default:
@@ -294,7 +285,6 @@ const Dashboard = () => {
                 <StatCard label="Usuarios" value={kpis?.totalUsers ?? 'N/A'} icon={<Users size={20} />} variant="info" iconPosition="left" isActive={activeTable === 'users'} onClick={() => setActiveTable('users')} />
                 <StatCard label="Fincas" value={kpis?.totalFarms ?? 'N/A'} icon={<Mountain size={20} />} variant="primary" iconPosition="left" isActive={activeTable === 'farms'} onClick={() => setActiveTable('farms')} />
                 <StatCard label="Sectores" value={kpis?.activeSectors ?? 'N/A'} icon={<Cpu size={20} />} variant="cyan" iconPosition="left" isActive={activeTable === 'sectors'} onClick={() => setActiveTable('sectors')} />
-                <StatCard label="Alertas" value={kpis?.activeAlerts ?? 'N/A'} icon={<AlertTriangle size={20} />} variant="danger" iconPosition="left" isActive={activeTable === 'alerts'} onClick={() => setActiveTable('alerts')} />
                 <StatCard label="Analíticas" value="Ver" icon={<BarChart2 size={20} />} variant="accent" iconPosition="left" isActive={activeTable === 'user-stats'} onClick={() => setActiveTable('user-stats')} />
             </div>
 
