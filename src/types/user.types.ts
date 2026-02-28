@@ -1,12 +1,14 @@
 // Interfaz para la respuesta de la API (ya la teníamos)
 export interface UserResponse {
   id: number;
-  name: string;
   username: string;
   email: string;
+  name: string;
   roleName: string;
-  active: boolean;
+  isActive: boolean;
   lastLogin: string | null;
+  createdAt: string;
+  farms?: { id: number; name: string }[];
 }
 
 // Interfaz para el formulario de CREACIÓN
@@ -41,7 +43,7 @@ export interface SelfPasswordUpdateData {
 // --- NUEVA INTERFAZ ---
 // Define los parámetros para la petición de usuarios paginados
 export interface UserRequestParams {
-    page?: number;
-    size?: number;
-    sort?: string;
+  page?: number;
+  size?: number;
+  sort?: string;
 }

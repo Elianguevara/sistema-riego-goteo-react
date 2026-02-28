@@ -1,7 +1,7 @@
 // src/pages/FarmDetail.tsx
 
 import { useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -12,7 +12,7 @@ import ErrorState from '../components/ui/ErrorState';
 import adminService from '../services/adminService';
 import weatherService from '../services/weatherService';
 
-// Components
+import FarmForm from '../components/farms/FarmForm';
 import SectorForm from '../components/farms/SectorForm';
 import EquipmentForm from '../components/farms/EquipmentForm';
 import WaterSourceForm from '../components/farms/WaterSourceForm';
@@ -22,7 +22,7 @@ import Badge from '../components/ui/Badge';
 import type { BadgeVariant } from '../components/ui/Badge';
 
 // Types
-import type { Farm, Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData, WaterSource, WaterSourceCreateData, WaterSourceUpdateData } from '../types/farm.types';
+import type { Farm, FarmUpdateData, Sector, SectorCreateData, SectorUpdateData, IrrigationEquipment, EquipmentCreateData, EquipmentUpdateData, WaterSource, WaterSourceCreateData, WaterSourceUpdateData } from '../types/farm.types';
 import type { UserResponse } from '../types/user.types';
 import type { CurrentWeather } from '../types/weather.types';
 
@@ -34,10 +34,15 @@ import './FarmDetail.css';
 
 const FarmDetail = () => {
     const { farmId } = useParams<{ farmId: string }>();
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const farmIdNum = Number(farmId);
 
     const [activeTab, setActiveTab] = useState('waterSources');
+
+    // Estados para Finca
+    const [isFarmEditModalOpen, setIsFarmEditModalOpen] = useState(false);
+    const [farmToDelete, setFarmToDelete] = useState<Farm | null>(null);
 
     // Estados para modales
     const [isSectorModalOpen, setIsSectorModalOpen] = useState(false);
@@ -51,6 +56,26 @@ const FarmDetail = () => {
     const [waterSourceToDelete, setWaterSourceToDelete] = useState<WaterSource | null>(null);
     const [isAssignUserModalOpen, setIsAssignUserModalOpen] = useState(false);
     const [userToUnassign, setUserToUnassign] = useState<UserResponse | null>(null);
+
+    // --- MÉTODOS Y MUTACIONES FINCA ---
+    const updateFarmMutation = useMutation({
+        mutationFn: (data: FarmUpdateData) => farmService.updateFarm(farmIdNum, data),
+        onSuccess: () => {
+            toast.success("Finca actualizada.");
+            queryClient.invalidateQueries({ queryKey: ['farmDetails', farmId] });
+            setIsFarmEditModalOpen(false);
+        },
+        onError: (err: Error) => toast.error(err.message)
+    });
+
+    const deleteFarmMutation = useMutation({
+        mutationFn: (id: number) => farmService.deleteFarm(id),
+        onSuccess: () => {
+            toast.success("Finca eliminada.");
+            navigate('/farms');
+        },
+        onError: (err: Error) => toast.error(err.message)
+    });
 
     // --- OBTENCIÓN DE DATOS ---
     const { data: farm, isLoading: isLoadingFarm, isError, error } = useQuery<Farm, Error>({ queryKey: ['farmDetails', farmId], queryFn: () => farmService.getFarmById(farmIdNum), enabled: !!farmIdNum });
@@ -95,8 +120,24 @@ const FarmDetail = () => {
     const handleSaveUserAssignment = (userId: number) => { assignUserMutation.mutate(userId); };
 
     const allUsers = allUsersPage?.content ?? [];
-    const availableUsersToAssign = useMemo(() => { const assignedUserIds = new Set(assignedUsers.map(u => u.id)); return allUsers.filter(u => !assignedUserIds.has(u.id)); }, [allUsers, assignedUsers]);
+    const availableUsersToAssign = useMemo(() => {
+        // Regla 1: Solo Operarios
+        const operarios = allUsers.filter(u => u.roleName === 'OPERARIO');
 
+        // Regla 2: Excluir usuarios ya asignados a esta finca,
+        // o a cualquier otra finca si el user.farms?.length > 0 (suponiendo backend expone farms o similar).
+        // Por ahora, como mínimo no mostrar a los que ya están en esta finca.
+        const assignedUserIds = new Set(assignedUsers.map(u => u.id));
+
+        return operarios.filter(u => {
+            const yaEnEstaFinca = assignedUserIds.has(u.id);
+            // Hacemos el check defensivo: si existe .farms, verificarlo.
+            // Si no existe, al menos validamos la regla de `yaEnEstaFinca`.
+            const yaEnOtraFinca = u.farms && u.farms.length > 0;
+
+            return !yaEnEstaFinca && !yaEnOtraFinca;
+        });
+    }, [allUsers, assignedUsers]);
     const tabs = [
         { id: 'waterSources', label: 'Fuentes de Agua', icon: <Droplets className="w-4 h-4" />, number: 1, disabled: false },
         { id: 'equipments', label: 'Equipos', icon: <Wrench className="w-4 h-4" />, number: 2, disabled: waterSources.length === 0 },
@@ -129,7 +170,7 @@ const FarmDetail = () => {
     return (
         <div className="farm-detail-improved">
             {/* ... (Farm Header Card y Weather Widget sin cambios) ... */}
-             <div className="farm-header-card">
+            <div className="farm-header-card">
                 <div className="farm-header-gradient">
                     <div className="farm-header-content">
                         <div className="farm-header-info">
@@ -143,6 +184,14 @@ const FarmDetail = () => {
                                     {farm?.location}
                                 </p>
                             </div>
+                        </div>
+                        <div className="farm-header-actions" style={{ display: 'flex', gap: '8px' }}>
+                            <button className="icon-button" onClick={() => setIsFarmEditModalOpen(true)} style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button className="icon-button danger" onClick={() => setFarmToDelete(farm!)} style={{ backgroundColor: 'rgba(220,38,38,0.8)', color: 'white', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                <Trash2 className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -203,7 +252,7 @@ const FarmDetail = () => {
 
             <div className="tabs-container">
                 {/* ... (Tabs Nav sin cambios) ... */}
-                 <div className="tabs-nav">
+                <div className="tabs-nav">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
@@ -261,9 +310,9 @@ const FarmDetail = () => {
 
 
                     {activeTab === 'equipments' && (
-                         <div>
+                        <div>
                             {/* ... (Tab Header Equipments sin cambios) ... */}
-                             <div className="tab-header">
+                            <div className="tab-header">
                                 <div>
                                     <h2 className="tab-title">Equipos de Riego</h2>
                                     <p className="tab-subtitle">Administra los equipos de irrigación</p>
@@ -280,7 +329,7 @@ const FarmDetail = () => {
                                     return (
                                         <div key={equipment.id} className="list-item">
                                             {/* ... (list-item-content sin cambios) ... */}
-                                             <div className="list-item-content">
+                                            <div className="list-item-content">
                                                 <div className="list-item-icon-wrapper purple">
                                                     <Wrench className="list-item-icon purple" />
                                                 </div>
@@ -302,7 +351,7 @@ const FarmDetail = () => {
                                                     </p>
                                                 </div>
                                                 {/* ... (action-buttons-group sin cambios) ... */}
-                                                 <div className="action-buttons-group">
+                                                <div className="action-buttons-group">
                                                     <button className="action-button" onClick={() => handleOpenEditEquipmentForm(equipment)}><Edit2 className="w-4 h-4" /></button>
                                                     <button className="action-button danger" onClick={() => setEquipmentToDelete(equipment)}><Trash2 className="w-4 h-4" /></button>
                                                 </div>
@@ -317,7 +366,7 @@ const FarmDetail = () => {
 
                     {/* ... (Tab Sectors y Tab Users sin cambios) ... */}
                     {activeTab === 'sectors' && (
-                         <div>
+                        <div>
                             <div className="tab-header">
                                 <div>
                                     <h2 className="tab-title">Sectores de Producción</h2>
@@ -353,7 +402,7 @@ const FarmDetail = () => {
 
                     {activeTab === 'users' && (
                         <div>
-                             <div className="tab-header">
+                            <div className="tab-header">
                                 <div>
                                     <h2 className="tab-title">Usuarios Asignados</h2>
                                     <p className="tab-subtitle">Personal con acceso a esta finca</p>
@@ -366,7 +415,7 @@ const FarmDetail = () => {
                                 {assignedUsers.map((user) => (
                                     <div key={user.id} className="list-item">
                                         <div className="list-item-content">
-                                             <div className="user-avatar">
+                                            <div className="user-avatar">
                                                 {user.name.charAt(0)}
                                             </div>
                                             <div>
@@ -411,6 +460,9 @@ const FarmDetail = () => {
             {isAssignUserModalOpen && <AssignUserForm availableUsers={availableUsersToAssign} onSave={handleSaveUserAssignment} onCancel={() => setIsAssignUserModalOpen(false)} isLoading={assignUserMutation.isPending} />}
             {userToUnassign && <ConfirmationModal message={`¿Seguro de desasignar a "${userToUnassign.name}" de esta finca?`} onConfirm={() => unassignUserMutation.mutate(userToUnassign.id)} onCancel={() => setUserToUnassign(null)} isLoading={unassignUserMutation.isPending} />}
 
+            {/* Modal Editar y Eliminar Finca */}
+            {isFarmEditModalOpen && farm && <FarmForm currentFarm={farm} onSave={(data) => updateFarmMutation.mutate(data as FarmUpdateData)} onCancel={() => setIsFarmEditModalOpen(false)} isLoading={updateFarmMutation.isPending} />}
+            {farmToDelete && <ConfirmationModal message={`¿Seguro de eliminar la finca "${farmToDelete.name}"? Esta acción no se puede deshacer y borrará datos en cascada.`} onConfirm={() => deleteFarmMutation.mutate(farmToDelete.id)} onCancel={() => setFarmToDelete(null)} isLoading={deleteFarmMutation.isPending} />}
         </div>
     );
 };
