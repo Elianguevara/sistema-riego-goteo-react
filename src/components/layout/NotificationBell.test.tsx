@@ -33,7 +33,7 @@ describe('NotificationBell Component', () => {
         queryClient.clear();
         (useAuthData as any).mockReturnValue({ role: 'ADMIN' });
         (notificationService.getUnreadCount as any).mockResolvedValue({ unreadCount: 0 });
-        (notificationService.getNotifications as any).mockResolvedValue({ content: [], totalElements: 0 });
+        (notificationService.getUnread as any).mockResolvedValue([]);
     });
 
     const renderWithProviders = () => render(
@@ -70,9 +70,9 @@ describe('NotificationBell Component', () => {
 
     it('should render notifications list in dropdown', async () => {
         const mockContent = [
-            { id: 1, message: 'Task assigned', type: 'TASK_ASSIGNED', isRead: false, relatedEntityId: 5, createdAt: new Date().toISOString() }
+            { id: 1, message: 'Task assigned', type: 'INFO', read: false, createdAt: new Date().toISOString() }
         ];
-        (notificationService.getNotifications as any).mockResolvedValue({ content: mockContent, totalElements: 1 });
+        (notificationService.getUnread as any).mockResolvedValue(mockContent);
 
         const user = userEvent.setup();
         renderWithProviders();
@@ -86,9 +86,9 @@ describe('NotificationBell Component', () => {
 
     it('should trigger markAsRead and navigate when clicking unread notification', async () => {
         const mockContent = [
-            { id: 1, message: 'Test Notif', type: 'TASK_ASSIGNED', isRead: false, relatedEntityId: 5, createdAt: new Date().toISOString() }
+            { id: 1, message: 'Test Notif', type: 'INFO', read: false, createdAt: new Date().toISOString() }
         ];
-        (notificationService.getNotifications as any).mockResolvedValue({ content: mockContent, totalElements: 1 });
+        (notificationService.getUnread as any).mockResolvedValue(mockContent);
         (notificationService.markAsRead as any).mockResolvedValue({});
 
         const user = userEvent.setup();

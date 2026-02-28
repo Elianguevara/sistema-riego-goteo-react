@@ -4,11 +4,11 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import notificationService from '../../services/notificationService';
-import type { Notification, NotificationPage } from '../../types/notification.types';
+import type { Notification as AppNotification } from '../../types/notification.types';
 import { useAuthData } from '../../hooks/useAuthData';
 import { resolveNotificationUrl } from '../../utils/notificationNavigation';
 import './NotificationBell.css';
-import { Bell } from 'lucide-react';
+import { Bell, Info, AlertTriangle, CheckCircle, CheckCircle2 } from 'lucide-react'; // Importamos más iconos
 
 const timeAgo = (dateString: string): string => {
     const date = new Date(dateString);
@@ -33,9 +33,9 @@ const NotificationBell = () => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const { data: notificationPage } = useQuery<NotificationPage, Error>({
+    const { data: notificationsData } = useQuery<AppNotification[], Error>({
         queryKey: ['notifications', 'dropdown'],
-        queryFn: () => notificationService.getNotifications(0, 5),
+        queryFn: () => notificationService.getUnread(),
         refetchInterval: 60000,
     });
 
@@ -52,13 +52,20 @@ const NotificationBell = () => {
         },
     });
 
-    const handleNotificationClick = async (notification: Notification) => {
+    const markAllAsReadMutation = useMutation({
+        mutationFn: notificationService.markAllAsRead,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        },
+    });
+
+    const handleNotificationClick = async (notification: AppNotification) => {
         const targetUrl = resolveNotificationUrl(notification, authData?.role);
 
         // Cerrar el dropdown inmediatamente para una mejor experiencia de usuario
         setIsOpen(false);
 
-        if (!notification.isRead) {
+        if (!notification.read) {
             try {
                 await markAsReadMutation.mutateAsync(notification.id);
             } catch {
@@ -81,8 +88,17 @@ const NotificationBell = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const notifications = notificationPage?.content ?? [];
+    const notifications = notificationsData ?? [];
     const unreadCount = countData?.unreadCount ?? 0;
+
+    const getIconForType = (type: string) => {
+        switch (type) {
+            case 'SUCCESS': return <CheckCircle size={16} className="icon-success" />;
+            case 'WARNING': return <AlertTriangle size={16} className="icon-warning" />;
+            case 'INFO':
+            default: return <Info size={16} className="icon-info" />;
+        }
+    };
 
     return (
         <div className="notification-bell" ref={menuRef}>
@@ -90,26 +106,41 @@ const NotificationBell = () => {
                 <Bell size={20} />
                 {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
             </button>
-            
+
             {isOpen && (
                 <div className="notification-dropdown">
                     <div className="dropdown-header">
                         <h3>Notificaciones</h3>
+                        {notifications.length > 0 && (
+                            <button
+                                className="mark-all-btn"
+                                onClick={() => markAllAsReadMutation.mutate()}
+                                disabled={markAllAsReadMutation.isPending}
+                            >
+                                <CheckCircle2 size={14} />
+                                Marcar todas leídas
+                            </button>
+                        )}
                     </div>
                     <div className="notification-list">
                         {notifications.length > 0 ? (
-                            notifications.map(n => {
+                            notifications.map((n: AppNotification) => {
                                 const canNavigate = Boolean(resolveNotificationUrl(n, authData?.role));
 
                                 return (
                                     <div
                                         key={n.id}
-                                        className={`notification-item ${n.isRead ? 'read' : ''}`}
+                                        className={`notification-item ${n.read ? 'read' : ''} type-${n.type?.toLowerCase() || 'info'}`}
                                         onClick={() => handleNotificationClick(n)}
-                                        style={{ cursor: canNavigate || !n.isRead ? 'pointer' : 'default' }}
+                                        style={{ cursor: canNavigate || !n.read ? 'pointer' : 'default' }}
                                     >
-                                        <p className="notification-message">{n.message}</p>
-                                        <span className="notification-time">{timeAgo(n.createdAt)}</span>
+                                        <div className="notification-icon">
+                                            {getIconForType(n.type)}
+                                        </div>
+                                        <div className="notification-content">
+                                            <p className="notification-message">{n.message}</p>
+                                            <span className="notification-time">{timeAgo(n.createdAt)}</span>
+                                        </div>
                                     </div>
                                 );
                             })

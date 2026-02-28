@@ -1,10 +1,11 @@
 // Archivo: src/pages/analyst/AnalystDashboardView.tsx
 
+import { useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import type { FarmStatus, WaterBalance, TaskSummary } from '../../types/analyst.types';
 import type { Farm } from '../../types/farm.types';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Clock, AlertCircle, CheckCircle, Calendar } from 'lucide-react';
@@ -23,6 +24,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             </div>
         );
     }
+    return null;
+};
+
+// Componente para actualizar el centro del mapa cuando los datos cargan
+const MapUpdater = ({ center }: { center: [number, number] }) => {
+    const map = useMap();
+    useEffect(() => {
+        map.setView(center, map.getZoom());
+    }, [center, map]);
     return null;
 };
 
@@ -135,6 +145,7 @@ const AnalystDashboardView = ({
                             </Popup>
                         </Marker>
                     ))}
+                    <MapUpdater center={mapCenter} />
                 </MapContainer>
             </div>
 

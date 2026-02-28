@@ -46,15 +46,46 @@ const markAsRead = async (notificationId: number): Promise<void> => {
         method: 'PUT',
         headers: getAuthHeader(),
     });
-    if (response.status !== 204) {
+    // The backend might return the updated notification, but we just need to know it succeeded
+    if (!response.ok) {
         throw new Error('Error al marcar la notificación como leída.');
+    }
+};
+
+/**
+ * Obtiene las notificaciones no leídas.
+ * Endpoint: GET /api/notifications/unread
+ */
+const getUnread = async (): Promise<Notification[]> => {
+    const response = await fetch(`${API_BASE_URL}/unread`, {
+        headers: getAuthHeader(),
+    });
+    if (!response.ok) {
+        throw new Error('Error al obtener las notificaciones no leídas.');
+    }
+    return response.json();
+};
+
+/**
+ * Marca todas las notificaciones como leídas.
+ * Endpoint: PUT /api/notifications/read-all
+ */
+const markAllAsRead = async (): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/read-all`, {
+        method: 'PUT',
+        headers: getAuthHeader(),
+    });
+    if (!response.ok) {
+        throw new Error('Error al marcar todas las notificaciones como leídas.');
     }
 };
 
 const notificationService = {
     getNotifications,
-    getUnreadCount, // <-- Exportar la nueva función
+    getUnreadCount,
+    getUnread,
     markAsRead,
+    markAllAsRead,
 };
 
 export default notificationService;

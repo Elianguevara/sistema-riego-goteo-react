@@ -76,8 +76,8 @@ describe('notificationService', () => {
     });
 
     describe('markAsRead', () => {
-        it('should mark notification as read on 204 response', async () => {
-            setupFetchMock(null, true, 204);
+        it('should mark notification as read on ok response', async () => {
+            setupFetchMock(null, true, 200);
 
             await notificationService.markAsRead(1);
             expect(fetchMock).toHaveBeenCalledWith(
@@ -86,14 +86,50 @@ describe('notificationService', () => {
             );
         });
 
-        it('should throw error when not 204', async () => {
-            setupFetchMock(null, true, 200); // ok is true, but status is 200 not 204
+        it('should throw error when response is not ok', async () => {
+            setupFetchMock(null, false, 400); // ok is false
             await expect(notificationService.markAsRead(1)).rejects.toThrow('Error al marcar la notificación como leída.');
         });
 
         it('should throw error on fetch failure', async () => {
             setupFetchMock(null, false, 500);
             await expect(notificationService.markAsRead(1)).rejects.toThrow('Error al marcar la notificación como leída.');
+        });
+    });
+
+    describe('markAllAsRead', () => {
+        it('should mark all notifications as read on ok response', async () => {
+            setupFetchMock(null, true, 200);
+
+            await notificationService.markAllAsRead();
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.stringContaining('/notifications/read-all'),
+                expect.objectContaining({ method: 'PUT', headers: expect.anything() })
+            );
+        });
+
+        it('should throw error on fetch failure', async () => {
+            setupFetchMock(null, false, 500);
+            await expect(notificationService.markAllAsRead()).rejects.toThrow('Error al marcar todas las notificaciones como leídas.');
+        });
+    });
+
+    describe('getUnread', () => {
+        it('should fetch unread notifications', async () => {
+            const mockData = [{ id: 1, message: 'Unread 1' }];
+            setupFetchMock(mockData, true, 200);
+
+            const result = await notificationService.getUnread();
+            expect(result).toEqual(mockData);
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.stringContaining('/notifications/unread'),
+                expect.objectContaining({ headers: expect.anything() })
+            );
+        });
+
+        it('should throw error on fetch failure', async () => {
+            setupFetchMock(null, false, 500);
+            await expect(notificationService.getUnread()).rejects.toThrow('Error al obtener las notificaciones no leídas.');
         });
     });
 });

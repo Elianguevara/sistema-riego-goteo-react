@@ -14,8 +14,14 @@ export type NotificationEntityType =
 export interface Notification {
     id: number;
     message: string;
-    isRead: boolean;
+    type: 'INFO' | 'WARNING' | 'SUCCESS';
+    read: boolean;
     createdAt: string;
+
+    // Destinatario puede venir en el payload
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    destinatario?: any;
+
     actionUrl?: string | null;
     entityType?: NotificationEntityType | null;
     entityId?: number | string | null;

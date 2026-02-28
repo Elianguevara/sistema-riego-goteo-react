@@ -32,10 +32,23 @@
 
 .item-icon {
   font-size: 24px;
+  flex-shrink: 0;
 }
 
-.history-item.unread .item-icon {
-  color: var(--color-primary);
+.icon-info {
+  color: var(--color-info);
+}
+
+.icon-warning {
+  color: var(--color-warning);
+}
+
+.icon-success {
+  color: var(--color-success);
+}
+
+.icon-read {
+  color: var(--color-text-light);
 }
 
 .history-item.read .item-icon {
@@ -74,6 +87,7 @@
   font-family: inherit;
   cursor: pointer;
 }
+
 .item-link:hover {
   text-decoration: underline;
 }

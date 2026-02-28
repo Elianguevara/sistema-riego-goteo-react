@@ -74,6 +74,30 @@
   color: var(--color-text-dark);
 }
 
+.mark-all-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.2s;
+}
+
+.mark-all-btn:hover {
+  background-color: var(--color-sidebar-hover);
+}
+
+.mark-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .notification-list {
   max-height: 400px;
   overflow-y: auto;
@@ -81,12 +105,13 @@
 
 .notification-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-start;
   padding: 16px 20px;
   text-decoration: none;
   border-bottom: 1px solid var(--color-border);
   transition: background-color 0.2s;
-  gap: 4px;
+  gap: 12px;
 }
 
 .notification-item:hover {
@@ -95,6 +120,33 @@
 
 .notification-item:last-child {
   border-bottom: none;
+}
+
+.notification-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.icon-info {
+  color: var(--color-info);
+}
+
+.icon-warning {
+  color: var(--color-warning);
+}
+
+.icon-success {
+  color: var(--color-success);
+}
+
+.icon-read {
+  color: var(--color-text-light);
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .notification-message {

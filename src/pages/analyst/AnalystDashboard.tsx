@@ -54,7 +54,7 @@ const AnalystDashboard = () => {
 
     const mapCenter: [number, number] = farmsWithCoords.length > 0
         ? [farmsWithCoords[0].latitude, farmsWithCoords[0].longitude]
-        : [-34.6037, -58.3816];
+        : [-33.0337, -68.4619]; // Default to Rivadavia, Mendoza
 
     return (
         <AnalystDashboardView
