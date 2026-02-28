@@ -1,0 +1,156 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/elian/OneDrive/Documentos/0-Tecnicatura Desarrollo de software/3-Tercer A├▒o Desarrollo De Software/Practica Profesionalizante 3/software/sistema-riego-goteo-react[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [32mÔ£ô[39m src/components/irrigation/IrrigationForm.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 1520[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m shows equipment select if sector has no equipment [33m 986[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/ConfirmationModal.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1383[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render correct text and defaults [33m 835[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/ErrorState.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 826[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render message and default title [33m 491[2mms[22m[39m
+ [32mÔ£ô[39m src/components/irrigation/DailyIrrigationView.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1989[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders days and precipitation correctly [33m 479[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders irrigation data correctly in hL [33m 472[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m opens irrigation modal when clicking Ver/Editar [33m 351[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m opens precipitation modal when clicking add precipitation button [33m 396[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/Modal.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 1133[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render content when isOpen is true [33m 490[2mms[22m[39m
+ [32mÔ£ô[39m src/components/layout/AdminLayout.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 1278[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render basic layout structure [33m 728[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should toggle sidebar visibility when mobile menu button clicked [33m 546[2mms[22m[39m
+ [32mÔ£ô[39m src/components/layout/ProfileMenu.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1179[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should open dropdown when clicked [33m 665[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should handle logout [33m 359[2mms[22m[39m
+ [32mÔ£ô[39m src/components/layout/NotificationBell.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1631[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render bell icon without badge initially [33m 591[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should trigger markAsRead and navigate when clicking unread notification [33m 481[2mms[22m[39m
+ [32mÔ£ô[39m src/pages/Dashboard.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 2072[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should show Farms table when clicking Fincas KPI [33m 827[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should show Sectors table when clicking Sectors KPI [33m 414[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should show User Stats when clicking Anal├¡ticas KPI [33m 540[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/ActionsMenu.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1413[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render items when button is clicked [33m 532[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should invoke action and close menu when item is clicked [33m 405[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should close menu when clicking outside [33m 348[2mms[22m[39m
+ [32mÔ£ô[39m src/pages/Configuration.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 5500[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should switch to Organization tab and submit changes [33m 2078[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should switch to Notifications tab and render toggle [33m 1808[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should handle Security form rendering and submission [33m 1430[2mms[22m[39m
+ [32mÔ£ô[39m src/services/reportService.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/StatusToggle.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1131[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders correctly when active [33m 694[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/EmptyState.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 688[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render action if provided [33m 608[2mms[22m[39m
+ [32mÔ£ô[39m src/services/adminService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32mÔ£ô[39m src/components/farms/FarmCard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 972[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders actions menu [33m 797[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/StatCard.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 926[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should handle interaction when onClick is provided [33m 585[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/TableToolbar.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1416[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render search input with value and placeholder [33m 640[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should call onSearchChange when typing [33m 590[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/PageHeader.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 710[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render title correctly [33m 525[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/Badge.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+ [32mÔ£ô[39m src/components/ui/LoadingState.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 718[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render with default message [33m 483[2mms[22m[39m
+ [32mÔ£ô[39m src/components/precipitation/PrecipitationList.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 536[2mms[22m[39m
+ [32mÔ£ô[39m src/services/apiUsers.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32mÔ£ô[39m src/services/precipitationService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32mÔ£ô[39m src/services/operationLogService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32mÔ£ô[39m src/services/taskService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m src/services/fertilizationService.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m src/services/configService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m src/services/notificationService.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m src/services/authService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m src/services/dashboardService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32mÔ£ô[39m src/services/analyticsService.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m src/services/userService.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32mÔ£ô[39m src/services/farmService.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32mÔ£ô[39m src/services/auditService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m src/services/irrigationService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mÔ£ô[39m src/services/maintenanceService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m src/services/weatherService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m38 passed[39m[22m[90m (38)[39m
+[2m      Tests [22m [1m[32m262 passed[39m[22m[90m (262)[39m
+[2m   Start at [22m 00:41:18
+[2m   Duration [22m 52.24s[2m (transform 3.44s, setup 41.84s, import 61.89s, tests 27.48s, environment 340.66s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   83.14 |    74.15 |    76.3 |    83.9 |                   
+ components/farms  |   85.71 |      100 |   66.66 |   85.71 |                   
+  FarmCard.css     |       0 |        0 |       0 |       0 |                   
+  FarmCard.tsx     |   85.71 |      100 |   66.66 |   85.71 | 39                
+ ...nts/irrigation |    74.5 |    59.75 |   79.31 |   75.25 |                   
+  ...ationView.css |       0 |        0 |       0 |       0 |                   
+  ...ationView.tsx |   63.79 |    46.51 |   72.22 |   64.15 | ...,39-52,150-178 
+  ...ationForm.tsx |   88.63 |    74.35 |    90.9 |   88.63 | 81-82,90-91,114   
+ components/layout |   91.11 |    80.32 |    91.3 |   96.34 |                   
+  AdminLayout.css  |       0 |        0 |       0 |       0 |                   
+  AdminLayout.tsx  |     100 |     87.5 |     100 |     100 | 40                
+  ...ationBell.css |       0 |        0 |       0 |       0 |                   
+  ...ationBell.tsx |   86.79 |    73.52 |   91.66 |   95.74 | 70,123            
+  ProfileMenu.css  |       0 |        0 |       0 |       0 |                   
+  ProfileMenu.tsx  |      96 |    89.47 |    87.5 |   95.65 | 55                
+ .../precipitation |   94.44 |    81.81 |   85.71 |   94.44 |                   
+  ...ationList.css |       0 |        0 |       0 |       0 |                   
+  ...ationList.tsx |   94.44 |    81.81 |   85.71 |   94.44 | 30                
+ components/ui     |     100 |    96.15 |     100 |     100 |                   
+  ActionsMenu.css  |       0 |        0 |       0 |       0 |                   
+  ActionsMenu.tsx  |     100 |      100 |     100 |     100 |                   
+  Badge.css        |       0 |        0 |       0 |       0 |                   
+  Badge.tsx        |     100 |      100 |     100 |     100 |                   
+  ...tionModal.css |       0 |        0 |       0 |       0 |                   
+  ...tionModal.tsx |     100 |      100 |     100 |     100 |                   
+  EmptyState.css   |       0 |        0 |       0 |       0 |                   
+  EmptyState.tsx   |     100 |      100 |     100 |     100 |                   
+  ErrorState.css   |       0 |        0 |       0 |       0 |                   
+  ErrorState.tsx   |     100 |      100 |     100 |     100 |                   
+  LoadingState.css |       0 |        0 |       0 |       0 |                   
+  LoadingState.tsx |     100 |      100 |     100 |     100 |                   
+  Modal.css        |       0 |        0 |       0 |       0 |                   
+  Modal.tsx        |     100 |    93.33 |     100 |     100 | 28                
+  PageHeader.css   |       0 |        0 |       0 |       0 |                   
+  PageHeader.tsx   |     100 |      100 |     100 |     100 |                   
+  StatCard.css     |       0 |        0 |       0 |       0 |                   
+  StatCard.tsx     |     100 |     91.3 |     100 |     100 | 54                
+  StatusToggle.css |       0 |        0 |       0 |       0 |                   
+  StatusToggle.tsx |     100 |      100 |     100 |     100 |                   
+  TableToolbar.css |       0 |        0 |       0 |       0 |                   
+  TableToolbar.tsx |     100 |      100 |     100 |     100 |                   
+ components/users  |       0 |        0 |       0 |       0 |                   
+  UserForm.css     |       0 |        0 |       0 |       0 |                   
+ config            |      75 |       50 |     100 |     100 |                   
+  ...tionConfig.ts |      75 |       50 |     100 |     100 | 91-92             
+ pages             |   58.66 |    50.98 |      40 |   57.67 |                   
+  ...iguration.css |       0 |        0 |       0 |       0 |                   
+  ...iguration.tsx |   48.61 |    44.23 |   28.76 |   48.02 | ...81-656,680-682 
+  Dashboard.css    |       0 |        0 |       0 |       0 |                   
+  Dashboard.tsx    |   83.56 |     65.3 |   70.37 |   80.95 | ...97,206,278,285 
+ services          |   91.31 |    85.42 |   94.69 |   91.69 |                   
+  adminService.ts  |     100 |    95.23 |     100 |     100 | 13                
+  ...icsService.ts |   96.96 |    93.75 |     100 |     100 | 66                
+  apiUsers.ts      |     100 |      100 |     100 |     100 |                   
+  auditService.ts  |     100 |     90.9 |     100 |     100 | 11                
+  authService.ts   |   94.44 |    83.33 |      75 |     100 | 29                
+  configService.ts |   97.36 |    66.66 |   96.29 |     100 | 16,25             
+  ...ardService.ts |     100 |    92.85 |     100 |     100 | 14                
+  farmService.ts   |     100 |    97.82 |     100 |     100 | 12                
+  ...ionService.ts |     100 |    92.85 |     100 |     100 | 13                
+  ...ionService.ts |   94.11 |    83.33 |      75 |     100 | 45                
+  ...nceService.ts |     100 |      100 |     100 |     100 |                   
+  ...ionService.ts |     100 |      100 |     100 |     100 |                   
+  ...LogService.ts |     100 |      100 |     100 |     100 |                   
+  ...ionService.ts |     100 |      100 |     100 |     100 |                   
+  reportService.ts |   52.58 |     32.6 |      50 |   54.12 | ...60-188,222-223 
+  taskService.ts   |     100 |    96.96 |     100 |     100 | 90                
+  userService.ts   |     100 |       90 |     100 |     100 | 10                
+  ...herService.ts |     100 |      100 |     100 |     100 |                   
+ utils             |   60.86 |       50 |     100 |    61.9 |                   
+  cn.ts            |      50 |    58.33 |     100 |      50 | 26-30             
+  ...Navigation.ts |   69.23 |    43.75 |     100 |   69.23 | 17,22,26,30       
+-------------------|---------|----------|---------|---------|-------------------

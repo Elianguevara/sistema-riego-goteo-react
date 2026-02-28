@@ -245,7 +245,11 @@
 <a name='L180'></a><a href='#L180'>180</a>
 <a name='L181'></a><a href='#L181'>181</a>
 <a name='L182'></a><a href='#L182'>182</a>
-<a name='L183'></a><a href='#L183'>183</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -306,7 +310,7 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -437,6 +441,8 @@ import type { CurrentWeather } from '../../types/weather.types';
 import IrrigationForm from './IrrigationForm';
 import PrecipitationForm from '../precipitation/PrecipitationForm';
 import './DailyIrrigationView.css';
+import { CloudRain, Cloud, Sun, Snowflake, Zap, Wind, Loader2, AlertTriangle, Plus } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 &nbsp;
 interface DailyViewProps {
     farmId: number;
@@ -449,28 +455,28 @@ interface DailyViewProps {
     weatherError: Error | null;
 }
 &nbsp;
-const getWeatherInfo = <span class="fstat-no" title="function not covered" >(m</span>ain: string) =&gt; {
+const getWeatherInfo = <span class="fstat-no" title="function not covered" >(m</span>ain: string): { icon: LucideIcon, colorClass: string } =&gt; {
     const lowerMain = <span class="cstat-no" title="statement not covered" >main.toLowerCase();</span>
 <span class="cstat-no" title="statement not covered" >    switch (lowerMain) {</span>
-        case 'rain': <span class="cstat-no" title="statement not covered" >return { icon: 'fas fa-cloud-showers-heavy', colorClass: 'weather-rainy' };</span>
-        case 'clouds': <span class="cstat-no" title="statement not covered" >return { icon: 'fas fa-cloud', colorClass: 'weather-cloudy' };</span>
-        case 'clear': <span class="cstat-no" title="statement not covered" >return { icon: 'fas fa-sun', colorClass: 'weather-sunny' };</span>
-        case 'snow': <span class="cstat-no" title="statement not covered" >return { icon: 'fas fa-snowflake', colorClass: 'weather-snow' };</span>
-        case 'drizzle': <span class="cstat-no" title="statement not covered" >return { icon: 'fas fa-cloud-rain', colorClass: 'weather-rainy' };</span>
-        case 'thunderstorm': <span class="cstat-no" title="statement not covered" >return { icon: 'fas fa-bolt', colorClass: 'weather-rainy' };</span>
-        default: <span class="cstat-no" title="statement not covered" >return { icon: 'fas fa-smog', colorClass: 'weather-cloudy' };</span>
+        case 'rain': <span class="cstat-no" title="statement not covered" >return { icon: CloudRain, colorClass: 'weather-rainy' };</span>
+        case 'clouds': <span class="cstat-no" title="statement not covered" >return { icon: Cloud, colorClass: 'weather-cloudy' };</span>
+        case 'clear': <span class="cstat-no" title="statement not covered" >return { icon: Sun, colorClass: 'weather-sunny' };</span>
+        case 'snow': <span class="cstat-no" title="statement not covered" >return { icon: Snowflake, colorClass: 'weather-snow' };</span>
+        case 'drizzle': <span class="cstat-no" title="statement not covered" >return { icon: CloudRain, colorClass: 'weather-rainy' };</span>
+        case 'thunderstorm': <span class="cstat-no" title="statement not covered" >return { icon: Zap, colorClass: 'weather-rainy' };</span>
+        default: <span class="cstat-no" title="statement not covered" >return { icon: Wind, colorClass: 'weather-cloudy' };</span>
     }
 };
 &nbsp;
 const MiniWeatherDisplay = <span class="fstat-no" title="function not covered" >({</span> isLoading, error, data }: { isLoading: boolean, error: Error | null, data: CurrentWeather | undefined }) =&gt; {
-<span class="cstat-no" title="statement not covered" >    if (isLoading) <span class="cstat-no" title="statement not covered" >return &lt;div className="current-weather-display"&gt;&lt;i className="fas fa-spinner fa-spin"&gt;&lt;/i&gt; Cargando...&lt;/div&gt;;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (error) <span class="cstat-no" title="statement not covered" >return &lt;div className="current-weather-display"&gt;&lt;i className="fas fa-exclamation-circle"&gt;&lt;/i&gt; Clima N/A&lt;/div&gt;;</span></span>
+<span class="cstat-no" title="statement not covered" >    if (isLoading) <span class="cstat-no" title="statement not covered" >return &lt;div className="current-weather-display"&gt;&lt;Loader2 size={14} /&gt; Cargando...&lt;/div&gt;;</span></span>
+<span class="cstat-no" title="statement not covered" >    if (error) <span class="cstat-no" title="statement not covered" >return &lt;div className="current-weather-display"&gt;&lt;AlertTriangle size={14} /&gt; Clima N/A&lt;/div&gt;;</span></span>
 <span class="cstat-no" title="statement not covered" >    if (data?.main &amp;&amp; data.weather?.[0]) {</span>
         const weatherInfo = <span class="cstat-no" title="statement not covered" >data.weather[0];</span>
-        const { icon, colorClass } = <span class="cstat-no" title="statement not covered" >getWeatherInfo(weatherInfo.main);</span>
+        const { icon: WeatherIcon, colorClass } = <span class="cstat-no" title="statement not covered" >getWeatherInfo(weatherInfo.main);</span>
 <span class="cstat-no" title="statement not covered" >        return (</span>
             &lt;div className="current-weather-display" title={weatherInfo.description}&gt;
-                &lt;i className={`${icon} ${colorClass}`}&gt;&lt;/i&gt;
+                &lt;WeatherIcon size={16} className={colorClass} /&gt;
                 &lt;strong&gt;{Math.round(data.main.temp)}°C&lt;/strong&gt;
                 &lt;span className="weather-description"&gt;{weatherInfo.description}&lt;/span&gt;
             &lt;/div&gt;
@@ -537,14 +543,14 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                                 &lt;div className="header-status-group"&gt;
                                     {totalRain &gt; 0 &amp;&amp; (
                                         &lt;div className="daily-precipitation-display"&gt;
-                                            &lt;i className="fas fa-cloud-showers-heavy"&gt;&lt;/i&gt;
+                                            &lt;CloudRain size={14} /&gt;
                                             &lt;span&gt;{totalRain.toFixed(1)} mm&lt;/span&gt;
                                         &lt;/div&gt;
                                     )}
                                     {dayClass === <span class="branch-1 cbranch-no" title="branch not covered" >'today' &amp;&amp; &lt;MiniWeatherDisplay isLoading={isLoadingWeather} error={weatherError} data={weatherData} /&gt;}</span>
 &nbsp;
                                     &lt;button className="btn-add-precipitation" onClick={() =&gt; setPrecipitationModalDate(dateString)} title="Añadir lluvia"&gt;
-                                        &lt;i className="fas fa-plus"&gt;&lt;/i&gt; &lt;i className="fas fa-cloud-rain"&gt;&lt;/i&gt;
+                                        &lt;Plus size={12} /&gt; &lt;CloudRain size={14} /&gt;
                                     &lt;/button&gt;
                                 &lt;/div&gt;
                             &lt;/div&gt;
@@ -575,7 +581,7 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                                             ) : (
                                                 /* Botón para añadir riego */
                                                 &lt;button className="btn-add-irrigation" onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etIrrigationModal({ sector, date: dateString })}&gt;</span>
-                                                    &lt;i className="fas fa-plus"&gt;&lt;/i&gt; Añadir Riego
+                                                    &lt;Plus size={14} /&gt; Añadir Riego
                                                 &lt;/button&gt;
                                             )}
                                         &lt;/div&gt;
@@ -616,7 +622,7 @@ export default DailyIrrigationView;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-23T00:04:30.393Z
+                at 2026-02-28T03:42:10.879Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

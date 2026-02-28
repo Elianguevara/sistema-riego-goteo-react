@@ -1,0 +1,19 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/elian/OneDrive/Documentos/0-Tecnicatura Desarrollo de software/3-Tercer A├▒o Desarrollo De Software/Practica Profesionalizante 3/software/sistema-riego-goteo-react[39m
+
+ [31mÔØ»[39m src/services/reportService.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 20[2mms[22m[39m
+       [32mÔ£ô[39m should initiate report generation and return taskId[32m 5[2mms[22m[39m
+       [32mÔ£ô[39m should throw an error if generation fails[32m 2[2mms[22m[39m
+       [32mÔ£ô[39m should return the report status[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should throw error if status check fails[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should correctly simulate downloading the file[32m 3[2mms[22m[39m
+[31m       [31m├ù[31m should default filename to reporte if no disposition header is present[39m[32m 5[2mms[22m[39m
+       [32mÔ£ô[39m should throw an error if download fails[32m 1[2mms[22m[39m
+[31m       [31m├ù[31m should download corporate report correctly[39m[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should throw on failure[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m7 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 23:54:44
+[2m   Duration [22m 3.98s[2m (transform 111ms, setup 400ms, import 128ms, tests 20ms, environment 3.01s)[22m
+

@@ -26,7 +26,7 @@ const getAuthHeader = (): Record<string, string> => {
 const getMyTasks = async (): Promise<Task[]> => {
     const response = await fetch(`${API_BASE_URL}/assigned-to-me`, { headers: getAuthHeader() });
     if (!response.ok) throw new Error('Error al obtener las tareas asignadas.');
-    
+
     const data = await response.json();
     if (data && Array.isArray(data.content)) return data.content;
     if (data && Array.isArray(data)) return data;
@@ -81,12 +81,13 @@ const createTask = async (data: TaskCreateData): Promise<Task> => {
 
     if (!response.ok) {
         const errorText = await response.text();
+        let errorData;
         try {
-            const errorData = JSON.parse(errorText);
-            throw new Error(errorData.message || 'Error al crear la tarea.');
+            errorData = JSON.parse(errorText);
         } catch (e) {
             throw new Error('El servidor tuvo un problema. Contacta al administrador.');
         }
+        throw new Error(errorData.message || 'Error al crear la tarea.');
     }
     return response.json();
 };

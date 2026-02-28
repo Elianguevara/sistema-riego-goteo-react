@@ -1,0 +1,30 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/elian/OneDrive/Documentos/0-Tecnicatura Desarrollo de software/3-Tercer A├▒o Desarrollo De Software/Practica Profesionalizante 3/software/sistema-riego-goteo-react[39m
+
+ [31mÔØ»[39m src/services/precipitationService.test.ts [2m([22m[2m13 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 34[2mms[22m[39m
+       [32mÔ£ô[39m should create record successfully[32m 7[2mms[22m[39m
+       [32mÔ£ô[39m should throw parsed message on failure[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should throw generic message on failure without json[32m 1[2mms[22m[39m
+[31m       [31m├ù[31m should fetch records[39m[32m 11[2mms[22m[39m
+       [32mÔ£ô[39m should throw error on fetch failure[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should update successfully[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should throw error on failure[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should delete correctly[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should throw error on failure[32m 1[2mms[22m[39m
+[31m       [31m├ù[31m should fetch monthly summary correctly[39m[32m 2[2mms[22m[39m
+       [32mÔ£ô[39m should throw error on failure[32m 1[2mms[22m[39m
+[31m       [31m├ù[31m should fetch annual summary correctly[39m[32m 2[2mms[22m[39m
+       [32mÔ£ô[39m should throw error on failure[32m 1[2mms[22m[39m
+ [31mÔØ»[39m src/services/maintenanceService.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 25[2mms[22m[39m
+       [32mÔ£ô[39m should perform create functionality correctly[32m 7[2mms[22m[39m
+       [32mÔ£ô[39m should throw parsed JSON message on failure[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should throw generic message on failure without valid JSON[32m 1[2mms[22m[39m
+[31m       [31m├ù[31m should fetch maintenances successfully[39m[32m 11[2mms[22m[39m
+       [32mÔ£ô[39m should throw error on failure[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/services/operationLogService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m25 passed[39m[22m[90m (29)[39m
+[2m   Start at [22m 00:08:11
+[2m   Duration [22m 5.93s[2m (transform 275ms, setup 1.83s, import 445ms, tests 80ms, environment 13.57s)[22m
+

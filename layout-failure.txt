@@ -1,0 +1,12 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/elian/OneDrive/Documentos/0-Tecnicatura Desarrollo de software/3-Tercer A├▒o Desarrollo De Software/Practica Profesionalizante 3/software/sistema-riego-goteo-react[39m
+
+ [31mÔØ»[39m src/components/layout/AdminLayout.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 441[2mms[22m[39m
+[31m     [31m├ù[31m should render basic layout structure[39m[32m 233[2mms[22m[39m
+     [32mÔ£ô[39m should toggle sidebar visibility when mobile menu button clicked[32m 204[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 00:19:05
+[2m   Duration [22m 6.80s[2m (transform 282ms, setup 439ms, import 1.83s, tests 441ms, environment 3.64s)[22m
+

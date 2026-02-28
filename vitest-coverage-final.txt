@@ -1,0 +1,52 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/elian/OneDrive/Documentos/0-Tecnicatura Desarrollo de software/3-Tercer A├▒o Desarrollo De Software/Practica Profesionalizante 3/software/sistema-riego-goteo-react[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [32mÔ£ô[39m src/services/precipitationService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32mÔ£ô[39m src/services/taskService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m src/services/adminService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m src/services/analyticsService.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32mÔ£ô[39m src/services/notificationService.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32mÔ£ô[39m src/services/dashboardService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32mÔ£ô[39m src/services/operationLogService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32mÔ£ô[39m src/services/apiUsers.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m src/services/configService.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m src/services/fertilizationService.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m src/services/reportService.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32mÔ£ô[39m src/services/farmService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32mÔ£ô[39m src/services/userService.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m src/services/maintenanceService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m src/services/irrigationService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32mÔ£ô[39m src/services/authService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m src/services/auditService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32mÔ£ô[39m src/services/weatherService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m18 passed[39m[22m[90m (18)[39m
+[2m      Tests [22m [1m[32m153 passed[39m[22m[90m (153)[39m
+[2m   Start at [22m 00:13:00
+[2m   Duration [22m 21.69s[2m (transform 2.16s, setup 23.33s, import 3.47s, tests 358ms, environment 151.61s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |    80.7 |    71.86 |    80.3 |   82.55 |                   
+ adminService.ts   |     100 |    95.23 |     100 |     100 | 13                
+ ...ticsService.ts |   96.96 |    93.75 |     100 |     100 | 66                
+ apiUsers.ts       |     100 |      100 |     100 |     100 |                   
+ auditService.ts   |     100 |     90.9 |     100 |     100 | 11                
+ authService.ts    |   94.44 |    83.33 |      75 |     100 | 29                
+ configService.ts  |   97.36 |    66.66 |   96.29 |     100 | 16,25             
+ ...oardService.ts |     100 |    92.85 |     100 |     100 | 14                
+ farmService.ts    |   33.94 |    10.86 |   13.63 |   38.88 | ...94-204,212-219 
+ ...tionService.ts |     100 |    92.85 |     100 |     100 | 13                
+ ...tionService.ts |   94.11 |    83.33 |      75 |     100 | 45                
+ ...anceService.ts |     100 |      100 |     100 |     100 |                   
+ ...tionService.ts |     100 |      100 |     100 |     100 |                   
+ ...nLogService.ts |     100 |      100 |     100 |     100 |                   
+ ...tionService.ts |     100 |      100 |     100 |     100 |                   
+ reportService.ts  |   52.58 |     32.6 |      50 |   54.12 | ...60-188,222-223 
+ taskService.ts    |     100 |    96.96 |     100 |     100 | 90                
+ userService.ts    |     100 |       90 |     100 |     100 | 10                
+ weatherService.ts |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
