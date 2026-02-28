@@ -1,0 +1,153 @@
+/* Archivo: src/components/tasks/TaskReportDownload.css */
+
+/* ══════════════════════════════════════════════════════════════
+   TARJETA PRINCIPAL
+   Diseño idéntico al corporate-report-card de Reports.css pero
+   con gradiente esmeralda para diferenciar visualmente la sección.
+   ══════════════════════════════════════════════════════════════ */
+
+.trd-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    /* Gradiente oscuro con tonalidad verde — distinguible del corporate-report-card
+       (slate) pero coherente con la paleta #10b981 del sistema */
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #0f766e 100%);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 24px rgba(6, 78, 59, 0.35);
+}
+
+/* ── Sección izquierda: ícono + textos ────────────────────────── */
+
+.trd-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.trd-icon-wrapper {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trd-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #ffffff;
+}
+
+.trd-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.25rem;
+}
+
+.trd-description {
+    font-size: 0.875rem;
+    /* Blanco apagado para legibilidad sobre fondo oscuro */
+    color: #a7f3d0; /* emerald-200 */
+    margin: 0;
+}
+
+/* ── Sección derecha: botones ─────────────────────────────────── */
+
+.trd-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-shrink: 0;
+}
+
+/* Base compartida entre los dos botones */
+.trd-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.125rem;
+    border: none;
+    border-radius: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s, transform 0.1s;
+    white-space: nowrap;
+    color: #ffffff;
+}
+
+.trd-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.trd-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Botón PDF — rojo corporativo */
+.trd-btn--pdf {
+    background: #ef4444; /* red-500 */
+}
+.trd-btn--pdf:hover:not(:disabled) {
+    background: #dc2626; /* red-600 */
+}
+
+/* Botón Excel — verde esmeralda #10b981 (paleta del sistema) */
+.trd-btn--excel {
+    background: #10b981; /* emerald-500 */
+}
+.trd-btn--excel:hover:not(:disabled) {
+    background: #059669; /* emerald-600 */
+}
+
+/* Ícono dentro de los botones */
+.trd-btn-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+/* ── Animación de spinner (equivale a Tailwind animate-spin) ──── */
+
+@keyframes trd-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Se define aquí como respaldo por si no hay un global animate-spin */
+.animate-spin {
+    animation: trd-spin 1s linear infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   En pantallas < 640px la tarjeta se apila verticalmente y los
+   botones ocupan el ancho completo.
+   ══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+    .trd-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .trd-buttons {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .trd-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

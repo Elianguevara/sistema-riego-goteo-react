@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 
 // Services
 import farmService from '../../services/farmService';
-import reportService from '../../services/reportService';
 
 // Hooks
 import { useAsyncReport } from '../../hooks/useAsyncReport';
@@ -17,6 +16,9 @@ import type { UserResponse } from '../../types/user.types';
 
 // Icons
 import { FileDown, Loader, Calendar, Building2, Filter, Download, BarChart3, FileText, Table } from 'lucide-react';
+
+// Components
+import TaskReportDownload from '../../components/tasks/TaskReportDownload';
 
 // Styles
 import './Reports.css';
@@ -31,7 +33,6 @@ const Reports = () => {
     const [format, setFormat] = useState('PDF');
     const [startDate, setStartDate] = useState(today);
     const [endDate, setEndDate] = useState(today);
-    const [isDownloadingCorporate, setIsDownloadingCorporate] = useState(false);
 
     const { generateReport, isGenerating } = useAsyncReport();
 
@@ -65,18 +66,6 @@ const Reports = () => {
                 ? prev.filter(id => id !== sectorId)
                 : [...prev, sectorId]
         );
-    };
-
-    const handleDownloadCorporateReport = async () => {
-        setIsDownloadingCorporate(true);
-        try {
-            await reportService.downloadCorporateReport();
-        } catch (error: Error | unknown) {
-            const err = error as Error;
-            toast.error(`No se pudo descargar el reporte corporativo: ${err.message}`);
-        } finally {
-            setIsDownloadingCorporate(false);
-        }
     };
 
     const handleGenerateReport = async () => {
@@ -121,31 +110,8 @@ const Reports = () => {
             </div>
 
             <div className="content-section">
-                {/* Tarjeta de descarga rápida del reporte corporativo */}
-                <div className="corporate-report-card">
-                    <div className="corporate-report-info">
-                        <div className="corporate-report-icon-wrapper">
-                            <FileDown className="corporate-report-icon" />
-                        </div>
-                        <div>
-                            <h2 className="corporate-report-title">Reporte Corporativo</h2>
-                            <p className="corporate-report-description">
-                                Documento PDF completo con el resumen ejecutivo del sistema de riego.
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={handleDownloadCorporateReport}
-                        disabled={isDownloadingCorporate}
-                        className="corporate-download-button"
-                    >
-                        {isDownloadingCorporate ? (
-                            <><Loader className="button-icon animate-spin" /> Descargando...</>
-                        ) : (
-                            <><Download className="button-icon" /> Descargar PDF</>
-                        )}
-                    </button>
-                </div>
+                {/* Tarjeta de exportación de tareas (PDF y Excel directo) */}
+                <TaskReportDownload />
 
                 <div className="report-type-selection">
                     <label className="section-label">

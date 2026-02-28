@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Mock } from 'vitest';
 import reportService from './reportService';
 import authService from './authService';
-import { toast } from 'sonner';
 
 // Mocks
 vi.mock('./authService', () => ({
@@ -145,35 +144,5 @@ describe('reportService', () => {
         });
     });
 
-    describe('downloadCorporateReport', () => {
-        it('should download corporate report correctly', async () => {
-            fetchMock.mockResolvedValueOnce({
-                ok: true,
-                headers: new Headers(),
-                blob: async () => new Blob(['pdf content']),
-            });
-
-            const mockElement = document.createElement('a');
-            vi.spyOn(mockElement, 'click').mockImplementation(() => { });
-            vi.spyOn(mockElement, 'remove').mockImplementation(() => { });
-            vi.spyOn(document, 'createElement').mockReturnValue(mockElement);
-
-            await reportService.downloadCorporateReport();
-
-            expect(toast.info).toHaveBeenCalledWith('Preparando reporte corporativo...');
-            expect(mockElement.download).toBe('reporte-corporativo.pdf');
-            expect(toast.success).toHaveBeenCalledWith('Descarga iniciada: reporte-corporativo.pdf');
-        });
-
-        it('should throw on failure', async () => {
-            fetchMock.mockResolvedValueOnce({
-                ok: false,
-                status: 500,
-                text: async () => 'Internal Error'
-            });
-
-            await expect(reportService.downloadCorporateReport()).rejects.toThrow('Error 500: Internal Error');
-        });
-    });
 
 });

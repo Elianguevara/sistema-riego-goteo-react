@@ -188,42 +188,64 @@ const triggerFileDownload = async (url: string, token: string | null) => {
     toast.success(`Descarga lista: ${filename}`);
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  DESCARGA DIRECTA DE TAREAS — PDF y Excel
+//  Endpoints: GET /api/reports/tasks/pdf  |  GET /api/reports/tasks/excel
+//  El backend devuelve el binario en una sola respuesta HTTP (sin polling).
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Descarga el reporte corporativo PDF directamente desde el backend.
- * El endpoint devuelve el binario PDF en una sola llamada (sin polling).
- * Se usa fetch con response.blob(), equivalente a responseType:'blob' de Axios.
+ * Auxiliar reutilizable: ejecuta la llamada fetch, valida la respuesta y
+ * dispara la descarga del blob en el navegador.
+ *
+ * @param endpoint  Ruta relativa al API_BASE_URL (ej. "/tasks/pdf")
+ * @param fallback  Nombre de archivo de respaldo si el backend no lo informa
+ * @throws {Error}  Si la respuesta HTTP no es 2xx, con mensaje descriptivo
  */
-const downloadCorporateReport = async (): Promise<void> => {
+const _downloadBinaryReport = async (endpoint: string, fallback: string): Promise<void> => {
     const token = authService.getToken();
-    const url = `${API_BASE_URL}/download/pdf`;
 
-    toast.info('Preparando reporte corporativo...');
+    // Si no hay token activo, el backend devolverá 401; informamos antes de llamar.
+    if (!token) {
+        throw new Error('No hay sesión activa. Iniciá sesión para descargar reportes.');
+    }
 
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'GET',
         headers: {
+            // El backend valida el JWT en el filtro JwtAuthenticationFilter.
             'Authorization': `Bearer ${token}`,
         },
     });
 
+    // Si el servidor devuelve error, intentamos leer el cuerpo como texto para
+    // incluir el detalle en el mensaje (el backend devuelve text/plain en errores 5xx).
     if (!response.ok) {
         const errorText = await response.text().catch(() => '');
-        throw new Error(`Error ${response.status}: ${errorText || 'No se pudo obtener el reporte.'}`);
+        throw new Error(
+            `Error ${response.status} al obtener el reporte: ${errorText || 'Error desconocido en el servidor.'}`
+        );
     }
 
-    // Leer el cuerpo como Blob — el navegador lo trata como binario,
-    // nunca intenta decodificarlo como texto (equivalente a responseType:'blob').
+    // Leer el cuerpo como Blob — nunca como texto ni JSON.
+    // El navegador lo trata como bytes opacos, sin intentar ninguna decodificación.
     const blob = await response.blob();
 
-    // Extraer nombre de archivo del header Content-Disposition si el backend lo envía
+    // Extraer el nombre de archivo desde el header Content-Disposition.
+    // El backend lo envía como: attachment; filename="tasks-report-20240315.pdf"
+    // La regex maneja tanto filename= como filename*= (RFC 5987).
     const disposition = response.headers.get('Content-Disposition');
-    let filename = 'reporte-corporativo.pdf';
+    let filename = fallback;
     if (disposition) {
-        const match = /filename\*?=(?:UTF-8'')?["']?([^"';\n]+)["']?/i.exec(disposition);
-        if (match?.[1]) filename = decodeURIComponent(match[1]);
+        const match =
+            /filename\*?=(?:UTF-8'')?["']?([^"';\n]+)["']?/i.exec(disposition);
+        if (match?.[1]) filename = decodeURIComponent(match[1].trim());
     }
 
-    // Crear URL temporal, simular click en enlace oculto y liberar la URL
+    // Técnica estándar para forzar descarga en el navegador sin redirigir la página:
+    //   1. Crear una URL temporal apuntando al Blob en memoria.
+    //   2. Simular un click en un <a> oculto con el atributo `download`.
+    //   3. Liberar la URL para que el GC pueda reclamar la memoria del Blob.
     const objectUrl = window.URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = objectUrl;
@@ -233,16 +255,61 @@ const downloadCorporateReport = async (): Promise<void> => {
     anchor.click();
     anchor.remove();
     window.URL.revokeObjectURL(objectUrl);
-
-    toast.success(`Descarga iniciada: ${filename}`);
 };
 
+/**
+ * Descarga todas las tareas del sistema como PDF corporativo.
+ *
+ * El documento incluye membrete con logo, tabla estilizada (#10b981)
+ * y pie de página con numeración "Página X de Y".
+ *
+ * @throws {Error} Si no hay sesión activa o el servidor devuelve error
+ */
+const downloadTasksPdf = async (): Promise<void> => {
+    // Nombre de respaldo con fecha actual; el servidor normalmente lo sobreescribe.
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const fallbackFilename = `tasks-report-${today}.pdf`;
+
+    toast.info('Generando reporte PDF de tareas...');
+
+    // _downloadBinaryReport lanza Error si response.ok === false.
+    // Dejamos que el error se propague para que el llamador (useMutation / handler)
+    // lo capture y muestre el toast.error correspondiente.
+    await _downloadBinaryReport('/tasks/pdf', fallbackFilename);
+
+    toast.success(`Reporte PDF descargado: ${fallbackFilename}`);
+};
+
+/**
+ * Descarga todas las tareas del sistema como planilla Excel (.xlsx).
+ *
+ * El documento incluye membrete con logo embebido, encabezados estilizados
+ * en verde, zebra striping y columnas con auto-ajuste de ancho.
+ *
+ * @throws {Error} Si no hay sesión activa o el servidor devuelve error
+ */
+const downloadTasksExcel = async (): Promise<void> => {
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const fallbackFilename = `tasks-report-${today}.xlsx`;
+
+    toast.info('Generando reporte Excel de tareas...');
+
+    await _downloadBinaryReport('/tasks/excel', fallbackFilename);
+
+    toast.success(`Reporte Excel descargado: ${fallbackFilename}`);
+};
+
+
+
 const reportService = {
+    // Flujo asíncrono (generate → poll → download)
     downloadReport,
-    downloadCorporateReport,
     generateAsyncReport,
     getReportStatus,
     downloadReportFile,
+    // Descarga directa (respuesta binaria inmediata)
+    downloadTasksPdf,
+    downloadTasksExcel,
 };
 
 export default reportService;
