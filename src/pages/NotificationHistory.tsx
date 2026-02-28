@@ -35,7 +35,7 @@ const NotificationHistory = () => {
     const navigate = useNavigate();
     const authData = useAuthData();
     const [page, setPage] = useState(0);
-    const [size,] = useState(6);
+    const [size,] = useState(10);
 
     const historyQueryKey = ['notifications', 'history', page, size];
 

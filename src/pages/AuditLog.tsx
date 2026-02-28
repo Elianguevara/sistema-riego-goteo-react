@@ -103,7 +103,7 @@ const EventCard = ({ log }: { log: ChangeHistoryResponse }) => {
 const AuditLog = () => {
     const [filters, setFilters] = useState<ChangeHistoryRequestParams>({
         page: 0,
-        size: 25,
+        size: 10,
         sort: 'changeDatetime,desc',
         searchTerm: '',
         userId: '',
@@ -226,7 +226,7 @@ const AuditLog = () => {
                 <div className="pagination-controls">
                     <select name="size" value={filters.size} onChange={handleFilterChange} className="page-size-selector">
                         <option value="10">10 por pág.</option>
-                        <option value="25">25 por pág.</option>
+                        <option value="20">20 por pág.</option>
                         <option value="50">50 por pág.</option>
                     </select>
                     <button onClick={() => handlePageChange(filters.page! - 1)} disabled={historyPage.first || isFetching}>Anterior</button>

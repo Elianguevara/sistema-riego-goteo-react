@@ -20,7 +20,7 @@ const UserManagement = () => {
     const [userToDelete, setUserToDelete] = useState<UserResponse | null>(null);
 
     const [page, setPage] = useState(0);
-    const size = 8;
+    const size = 10;
     const [sort, setSort] = useState<SortConfig>({ key: 'name', direction: 'asc' });
 
     const { data: usersPage, isLoading, isError, error, isFetching } = useQuery<Page<UserResponse>, Error>({
