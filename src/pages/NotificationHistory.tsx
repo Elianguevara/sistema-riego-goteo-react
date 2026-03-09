@@ -146,7 +146,7 @@ const NotificationHistory = () => {
             </div>
 
             {notificationPage && notificationPage.totalPages > 1 && (
-                <div className="pagination-controls" style={{ marginTop: '20px' }}>
+                <div className="pagination-controls">
                     <button onClick={() => setPage(page - 1)} disabled={notificationPage.first || isFetching}>
                         Anterior
                     </button>

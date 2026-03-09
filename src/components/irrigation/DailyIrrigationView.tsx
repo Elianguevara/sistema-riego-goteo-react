@@ -125,9 +125,8 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                             <div className="sector-list">
                                 {sectors.map(sector => {
                                     const dailyRecords = irrigationMap.get(`${sector.id}-${day}`);
-                                    // Calcular totales (agua en m³, luego convertir a hL)
-                                    const totalWaterM3 = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
-                                    const totalWaterHl = totalWaterM3 * 10; // Conversión a hectolitros
+                                    // El backend ya devuelve waterAmount en hL
+                                    const totalWaterHl = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
                                     const totalHours = dailyRecords?.reduce((sum, rec) => sum + (rec?.irrigationHours || 0), 0) || 0;
 
                                     return (

@@ -1,7 +1,7 @@
 // src/services/notificationService.ts
 
 import authService from './authService';
-import type { NotificationPage } from '../types/notification.types';
+import type { Notification, NotificationPage } from '../types/notification.types';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/notifications`;
 
@@ -56,7 +56,7 @@ const markAsRead = async (notificationId: number): Promise<void> => {
  * Obtiene las notificaciones no leídas.
  * Endpoint: GET /api/notifications/unread
  */
-const getUnread = async (): Promise<Notification[]> => {
+const getUnread = async (): Promise<Notification[]> => { // Notification = tipo local, no el del browser
     const response = await fetch(`${API_BASE_URL}/unread`, {
         headers: getAuthHeader(),
     });

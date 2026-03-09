@@ -73,7 +73,7 @@ const RegisterIrrigation = () => {
             );
         }
 
-        const isFarmDataLoading = isLoadingIrrigations || isLoadingWeather;
+        const isFarmDataLoading = isLoadingIrrigations;
 
         return (
             <>
