@@ -27,7 +27,12 @@ export interface MonthlyIrrigationSectorView {
 export interface IrrigationCreateData {
   startDateTime: string;
   endDateTime: string;
-  waterAmount: number;
+  /**
+   * Opcional. Si se omite (null), el backend calcula automáticamente el volumen
+   * usando caudal × tiempo. Si se envía, se interpreta como lectura manual del
+   * caudalímetro y el backend lo almacena con isManualWaterVolume = true.
+   */
+  waterAmount: number | null;
   irrigationHours: number;
   sectorId: number;
   equipmentId: number;
@@ -39,6 +44,7 @@ export interface IrrigationRecord {
   endDateTime: string;
   waterAmount: number;
   irrigationHours: number;
+  isManualWaterVolume: boolean;
   sectorId: number;
   sectorName: string;
   equipmentId: number;

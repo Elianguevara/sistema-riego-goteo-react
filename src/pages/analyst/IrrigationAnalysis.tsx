@@ -17,7 +17,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 <p className="tooltip-label">{label}</p>
                 {payload.map((entry: any, index: number) => (
                     <p key={index} className="tooltip-item" style={{ color: entry.color }}>
-                        {/* Asume que entry.value ya viene en hL */}
+                        {/* Asume que entry.value ya viene en m³ */}
                         {entry.name}: <strong>{entry.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</strong>
                     </p>
                 ))}
@@ -41,7 +41,7 @@ const IrrigationAnalysis = () => {
     const [showFilters, setShowFilters] = useState(true);
 
 
-    // --- Queries (sin cambios en llamadas, pero asumen que la API devuelve hL) ---
+    // --- Queries (sin cambios en llamadas, pero asumen que la API devuelve m³) ---
     const { data: farms = [] } = useQuery<Farm[]>({ queryKey: ['farms'], queryFn: farmService.getFarms });
     const { data: sectors = [] } = useQuery<Sector[]>({
         queryKey: ['sectors', selectedFarmId],
@@ -49,7 +49,7 @@ const IrrigationAnalysis = () => {
         enabled: !!selectedFarmId,
     });
 
-    // Asume que la API ahora devuelve totalWaterAmount en hL
+    // Asume que la API ahora devuelve totalWaterAmount en m³
     const { data: summaryData = [] } = useQuery({
         queryKey: ['irrigationSummary', selectedFarmId, dateRange, selectedSectorIds],
         queryFn: () => analyticsService.getIrrigationSummary({
@@ -61,7 +61,7 @@ const IrrigationAnalysis = () => {
         enabled: !!selectedFarmId,
     });
 
-    // Asume que la API ahora devuelve waterAmount en hL
+    // Asume que la API ahora devuelve waterAmount en m³
     const { data: timeseriesData } = useQuery({
         queryKey: ['irrigationTimeseries', selectedSectorIds, dateRange],
         queryFn: () => analyticsService.getIrrigationTimeseries({
@@ -85,7 +85,7 @@ const IrrigationAnalysis = () => {
         );
     };
 
-    // --- Cálculos KPI (asumen que summaryData tiene hL) ---
+    // --- Cálculos KPI (asumen que summaryData tiene m³) ---
     const totalWater = summaryData.reduce((sum, item) => sum + item.totalWaterAmount, 0);
     const totalHours = summaryData.reduce((sum, item) => sum + item.totalIrrigationHours, 0);
 
@@ -164,7 +164,7 @@ const IrrigationAnalysis = () => {
                                 <p className="kpi-label">Consumo Total de Agua</p>
                                 <h2 className="kpi-value">{totalWater.toLocaleString(undefined, { maximumFractionDigits: 1 })}</h2>
                                 {/* Unidad actualizada */}
-                                <p className="kpi-unit water">hL</p>
+                                <p className="kpi-unit water">m³</p>
                             </div>
                             <div className="kpi-card-icon water"><Droplets size={24} color="#3b82f6" /></div>
                         </div>
@@ -192,7 +192,7 @@ const IrrigationAnalysis = () => {
                                     <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} />
                                     <Tooltip content={<CustomTooltip />} />
                                      {/* Nombre actualizado */}
-                                    <Bar dataKey="totalWaterAmount" fill="#3b82f6" radius={[8, 8, 0, 0]} name="Agua (hL)" />
+                                    <Bar dataKey="totalWaterAmount" fill="#3b82f6" radius={[8, 8, 0, 0]} name="Agua (m³)" />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -229,7 +229,7 @@ const IrrigationAnalysis = () => {
                                     <Tooltip content={<CustomTooltip />} />
                                     <Legend />
                                     {/* Nombre actualizado */}
-                                    <Line yAxisId="left" type="monotone" dataKey="waterAmount" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} name="Agua (hL)" />
+                                    <Line yAxisId="left" type="monotone" dataKey="waterAmount" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} name="Agua (m³)" />
                                     <Line yAxisId="right" type="monotone" dataKey="irrigationHours" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name="Horas" />
                                 </LineChart>
                             </ResponsiveContainer>

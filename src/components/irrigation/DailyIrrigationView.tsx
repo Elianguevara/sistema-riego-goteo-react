@@ -125,8 +125,8 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                             <div className="sector-list">
                                 {sectors.map(sector => {
                                     const dailyRecords = irrigationMap.get(`${sector.id}-${day}`);
-                                    // El backend ya devuelve waterAmount en hL
-                                    const totalWaterHl = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
+                                    // El backend ya devuelve waterAmount en m³
+                                    const totalWaterM3 = dailyRecords?.reduce((sum, rec) => sum + (rec?.waterAmount || 0), 0) || 0;
                                     const totalHours = dailyRecords?.reduce((sum, rec) => sum + (rec?.irrigationHours || 0), 0) || 0;
 
                                     return (
@@ -134,10 +134,10 @@ const DailyIrrigationView = ({ farmId, sectors, monthlyData, year, month, weathe
                                         <div key={sector.id} className="sector-row">
                                             <span className="sector-name">{sector.name}</span>
                                             {/* Mostrar datos si hubo riego, si no, botón para añadir */}
-                                            {totalWaterHl > 0 ? (
+                                            {totalWaterM3 > 0 ? (
                                                 <div className="irrigation-data">
-                                                    {/* **CAMBIO AQUÍ**: Mostrar agua en hL */}
-                                                    <span className="water-amount">{totalWaterHl.toFixed(1)} hL</span>
+                                                    {/* **CAMBIO AQUÍ**: Mostrar agua en m³ */}
+                                                    <span className="water-amount">{totalWaterM3.toFixed(1)} m³</span>
                                                     <span className="hours">({totalHours.toFixed(1)} hs)</span>
                                                     {/* Botón para ver/editar (abre el mismo modal que añadir) */}
                                                     <button className="btn-view" onClick={() => setIrrigationModal({ sector, date: dateString })}>

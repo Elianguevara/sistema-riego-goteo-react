@@ -190,6 +190,15 @@ const deleteWaterSource = async (waterSourceId: number): Promise<void> => {
     if (!response.ok) throw new Error('Error al eliminar la fuente de agua.');
 };
 
+const getAvailableOperarios = async (): Promise<UserResponse[]> => {
+    const response = await fetch(`${API_BASE_URL}/admin/users/available-operarios`, {
+        method: 'GET',
+        headers: getAuthHeader(),
+    });
+    if (!response.ok) throw new Error('Error al obtener los operarios disponibles.');
+    return response.json();
+};
+
 const getAssignedUsers = async (farmId: number): Promise<UserResponse[]> => {
     const response = await fetch(`${API_BASE_URL}/admin/users/farms/${farmId}/users`, {
         method: 'GET',
@@ -241,7 +250,8 @@ const farmService = {
     updateWaterSource,
     deleteWaterSource,
     getAssignedUsers,
-    getActiveSectors, // Se añade la nueva función al objeto exportado
+    getAvailableOperarios,
+    getActiveSectors,
 };
 
 export default farmService;

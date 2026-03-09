@@ -1,6 +1,6 @@
 // src/pages/FarmDetail.tsx
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import farmService from '../services/farmService';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState from '../components/ui/ErrorState';
-import adminService from '../services/adminService';
 import weatherService from '../services/weatherService';
 
 import FarmForm from '../components/farms/FarmForm';
@@ -83,7 +82,7 @@ const FarmDetail = () => {
     const { data: equipments = [] } = useQuery<IrrigationEquipment[], Error>({ queryKey: ['equipments', farmId], queryFn: () => farmService.getEquipmentsByFarm(farmIdNum), enabled: !!farmIdNum });
     const { data: waterSources = [] } = useQuery<WaterSource[], Error>({ queryKey: ['waterSources', farmId], queryFn: () => farmService.getWaterSourcesByFarm(farmIdNum), enabled: !!farmIdNum });
     const { data: assignedUsers = [] } = useQuery<UserResponse[], Error>({ queryKey: ['assignedUsers', farmId], queryFn: () => farmService.getAssignedUsers(farmIdNum), enabled: !!farmIdNum });
-    const { data: allUsersPage } = useQuery({ queryKey: ['allUsersForAssignment'], queryFn: () => adminService.getUsers({ page: 0, size: 1000 }), });
+    const { data: availableOperarios = [] } = useQuery<UserResponse[], Error>({ queryKey: ['availableOperarios'], queryFn: () => farmService.getAvailableOperarios() });
     const { data: weatherData } = useQuery<CurrentWeather, Error>({ queryKey: ['weather', farmId], queryFn: () => weatherService.getCurrentWeather(farmIdNum), enabled: !!farmIdNum && !!farm?.latitude && !!farm?.longitude, retry: false, });
 
     // --- MUTACIONES ---
@@ -96,8 +95,8 @@ const FarmDetail = () => {
     const createWaterSourceMutation = useMutation({ mutationFn: (data: WaterSourceCreateData) => farmService.createWaterSource(farmIdNum, data), onSuccess: () => { toast.success("Fuente de agua creada."); queryClient.invalidateQueries({ queryKey: ['waterSources', farmId] }); setIsWaterSourceModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const updateWaterSourceMutation = useMutation({ mutationFn: (data: WaterSourceUpdateData) => farmService.updateWaterSource(currentWaterSource!.id, data), onSuccess: () => { toast.success("Fuente de agua actualizada."); queryClient.invalidateQueries({ queryKey: ['waterSources', farmId] }); setIsWaterSourceModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
     const deleteWaterSourceMutation = useMutation({ mutationFn: (id: number) => farmService.deleteWaterSource(id), onSuccess: () => { toast.success("Fuente de agua eliminada."); queryClient.invalidateQueries({ queryKey: ['waterSources', farmId] }); setWaterSourceToDelete(null); }, onError: (err: Error) => toast.error(err.message) });
-    const assignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.assignUserToFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario asignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setIsAssignUserModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
-    const unassignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.unassignUserFromFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario desasignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); setUserToUnassign(null); }, onError: (err: Error) => toast.error(err.message) });
+    const assignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.assignUserToFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario asignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); queryClient.invalidateQueries({ queryKey: ['availableOperarios'] }); setIsAssignUserModalOpen(false); }, onError: (err: Error) => toast.error(err.message) });
+    const unassignUserMutation = useMutation({ mutationFn: (userId: number) => farmService.unassignUserFromFarm(userId, farmIdNum), onSuccess: () => { toast.success("Usuario desasignado."); queryClient.invalidateQueries({ queryKey: ['assignedUsers', farmId] }); queryClient.invalidateQueries({ queryKey: ['availableOperarios'] }); setUserToUnassign(null); }, onError: (err: Error) => toast.error(err.message) });
 
     // --- MANEJADORES DE EVENTOS ---
     const handleOpenCreateSectorForm = () => { setCurrentSector(null); setIsSectorModalOpen(true); };
@@ -105,9 +104,9 @@ const FarmDetail = () => {
     const handleSaveSector = (data: SectorCreateData | SectorUpdateData) => { if (currentSector) { updateSectorMutation.mutate(data as SectorUpdateData); } else { createSectorMutation.mutate(data as SectorCreateData); } };
     const handleOpenCreateEquipmentForm = () => { setCurrentEquipment(null); setIsEquipmentModalOpen(true); };
     const handleOpenEditEquipmentForm = (equipment: IrrigationEquipment) => { setCurrentEquipment(equipment); setIsEquipmentModalOpen(true); };
-    // **MODIFICADO**: Asume que `data` ya viene en hL/h desde el form
+    // **MODIFICADO**: Asume que `data` ya viene en m³/h desde el form
     const handleSaveEquipment = (data: EquipmentCreateData | EquipmentUpdateData) => {
-        // No se necesita conversión si el form ya maneja hL/h y la API espera hL/h
+        // No se necesita conversión si el form ya maneja m³/h y la API espera m³/h
         if (currentEquipment) {
             updateEquipmentMutation.mutate({ ...data, id: currentEquipment.id } as unknown as EquipmentUpdateData); // Asegúrate de incluir el ID si es necesario para la mutación
         } else {
@@ -119,25 +118,6 @@ const FarmDetail = () => {
     const handleSaveWaterSource = (data: WaterSourceCreateData | WaterSourceUpdateData) => { if (currentWaterSource) { updateWaterSourceMutation.mutate(data as WaterSourceUpdateData); } else { createWaterSourceMutation.mutate(data as WaterSourceCreateData); } };
     const handleSaveUserAssignment = (userId: number) => { assignUserMutation.mutate(userId); };
 
-    const allUsers = allUsersPage?.content ?? [];
-    const availableUsersToAssign = useMemo(() => {
-        // Regla 1: Solo Operarios
-        const operarios = allUsers.filter(u => u.roleName === 'OPERARIO');
-
-        // Regla 2: Excluir usuarios ya asignados a esta finca,
-        // o a cualquier otra finca si el user.farms?.length > 0 (suponiendo backend expone farms o similar).
-        // Por ahora, como mínimo no mostrar a los que ya están en esta finca.
-        const assignedUserIds = new Set(assignedUsers.map(u => u.id));
-
-        return operarios.filter(u => {
-            const yaEnEstaFinca = assignedUserIds.has(u.id);
-            // Hacemos el check defensivo: si existe .farms, verificarlo.
-            // Si no existe, al menos validamos la regla de `yaEnEstaFinca`.
-            const yaEnOtraFinca = u.farms && u.farms.length > 0;
-
-            return !yaEnEstaFinca && !yaEnOtraFinca;
-        });
-    }, [allUsers, assignedUsers]);
     const tabs = [
         { id: 'waterSources', label: 'Fuentes de Agua', icon: <Droplets className="w-4 h-4" />, number: 1, disabled: false },
         { id: 'equipments', label: 'Equipos', icon: <Wrench className="w-4 h-4" />, number: 2, disabled: waterSources.length === 0 },
@@ -155,9 +135,9 @@ const FarmDetail = () => {
         return variants[status] ?? 'neutral';
     };
 
-    // **MODIFICADO**: Asume que `efficiency` viene en hL/h
+    // **MODIFICADO**: Asume que `efficiency` viene en m³/h
     const getEfficiencyColor = (efficiencyInHl: number) => {
-        // La lógica de colores se mantiene, pero ahora compara con valores en hL/h
+        // La lógica de colores se mantiene, pero ahora compara con valores en m³/h
         if (efficiencyInHl >= 90) return 'text-emerald-600';
         if (efficiencyInHl >= 80) return 'text-blue-600';
         if (efficiencyInHl >= 70) return 'text-amber-600';
@@ -324,8 +304,8 @@ const FarmDetail = () => {
 
                             <div className="list-container">
                                 {equipments.map((equipment) => {
-                                    // **MODIFICADO**: Asume que equipment.measuredFlow ahora viene en hL/h
-                                    const measuredFlowHl = equipment.measuredFlow;
+                                    // **MODIFICADO**: Asume que equipment.measuredFlow ahora viene en m³/h
+                                    const measuredFlowM3h = equipment.measuredFlow;
                                     return (
                                         <div key={equipment.id} className="list-item">
                                             {/* ... (list-item-content sin cambios) ... */}
@@ -345,9 +325,9 @@ const FarmDetail = () => {
                                             <div className="list-item-actions wide">
                                                 <div className="efficiency-display">
                                                     <p className="efficiency-label">Flujo Medido</p>
-                                                    {/* **MODIFICADO**: Muestra el valor y unidad en hL/h */}
-                                                    <p className={`efficiency-value ${getEfficiencyColor(measuredFlowHl)}`}>
-                                                        {measuredFlowHl.toFixed(2)} hL/h
+                                                    {/* **MODIFICADO**: Muestra el valor y unidad en m³/h */}
+                                                    <p className={`efficiency-value ${getEfficiencyColor(measuredFlowM3h)}`}>
+                                                        {measuredFlowM3h.toFixed(2)} m³/h
                                                     </p>
                                                 </div>
                                                 {/* ... (action-buttons-group sin cambios) ... */}
@@ -447,7 +427,7 @@ const FarmDetail = () => {
                 </div>
             </div>
 
-            {/* --- MODALES (sin cambios, asumen que EquipmentForm ya maneja hL/h) --- */}
+            {/* --- MODALES (sin cambios, asumen que EquipmentForm ya maneja m³/h) --- */}
             {isWaterSourceModalOpen && <WaterSourceForm currentWaterSource={currentWaterSource} onSave={handleSaveWaterSource} onCancel={() => setIsWaterSourceModalOpen(false)} isLoading={createWaterSourceMutation.isPending || updateWaterSourceMutation.isPending} />}
             {waterSourceToDelete && <ConfirmationModal message={`¿Seguro de eliminar la fuente de agua "${waterSourceToDelete.type}"?`} onConfirm={() => deleteWaterSourceMutation.mutate(waterSourceToDelete.id)} onCancel={() => setWaterSourceToDelete(null)} isLoading={deleteWaterSourceMutation.isPending} />}
 
@@ -457,7 +437,7 @@ const FarmDetail = () => {
             {isSectorModalOpen && <SectorForm currentSector={currentSector} availableEquipment={equipments} onSave={handleSaveSector} onCancel={() => setIsSectorModalOpen(false)} isLoading={createSectorMutation.isPending || updateSectorMutation.isPending} />}
             {sectorToDelete && <ConfirmationModal message={`¿Seguro de eliminar el sector "${sectorToDelete.name}"?`} onConfirm={() => deleteSectorMutation.mutate(sectorToDelete.id)} onCancel={() => setSectorToDelete(null)} isLoading={deleteSectorMutation.isPending} />}
 
-            {isAssignUserModalOpen && <AssignUserForm availableUsers={availableUsersToAssign} onSave={handleSaveUserAssignment} onCancel={() => setIsAssignUserModalOpen(false)} isLoading={assignUserMutation.isPending} />}
+            {isAssignUserModalOpen && <AssignUserForm availableUsers={availableOperarios} onSave={handleSaveUserAssignment} onCancel={() => setIsAssignUserModalOpen(false)} isLoading={assignUserMutation.isPending} />}
             {userToUnassign && <ConfirmationModal message={`¿Seguro de desasignar a "${userToUnassign.name}" de esta finca?`} onConfirm={() => unassignUserMutation.mutate(userToUnassign.id)} onCancel={() => setUserToUnassign(null)} isLoading={unassignUserMutation.isPending} />}
 
             {/* Modal Editar y Eliminar Finca */}

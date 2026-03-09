@@ -63,11 +63,11 @@ describe('DailyIrrigationView', () => {
         expect(screen.getByText('15.5 mm')).toBeInTheDocument();
     });
 
-    it('renders irrigation data correctly in hL', () => {
+    it('renders irrigation data correctly in m³', () => {
         render(<DailyIrrigationView {...defaultProps} />, { wrapper });
 
-        // 1 m3 * 10 = 10.0 hL
-        expect(screen.getByText('10.0 hL')).toBeInTheDocument();
+        // waterAmount=1 → 1.0 m³ (sin conversión)
+        expect(screen.getByText('1.0 m³')).toBeInTheDocument();
         expect(screen.getByText('(2.0 hs)')).toBeInTheDocument();
     });
 

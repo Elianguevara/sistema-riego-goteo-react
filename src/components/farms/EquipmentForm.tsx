@@ -18,7 +18,7 @@ const EQUIPMENT_STATUSES = ['ACTIVO', 'INACTIVO', 'MANTENIMIENTO'];
 const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave, onCancel, isLoading }) => {
     const [formData, setFormData] = useState({
         name: '',
-        measuredFlow: '0', // Como string, ahora representa hL/h
+        measuredFlow: '0', // Como string, ahora representa m³/h
         hasFlowMeter: false,
         equipmentType: 'OTRO',
         equipmentStatus: 'ACTIVO',
@@ -30,7 +30,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
         if (isEditing && currentEquipment) {
             setFormData({
                 name: currentEquipment.name,
-                // Asume que currentEquipment.measuredFlow ahora viene en hL/h
+                // Asume que currentEquipment.measuredFlow ahora viene en m³/h
                 measuredFlow: String(currentEquipment.measuredFlow),
                 hasFlowMeter: currentEquipment.hasFlowMeter,
                 equipmentType: currentEquipment.equipmentType,
@@ -62,7 +62,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
         e.preventDefault();
         const dataToSave = {
             ...formData,
-            // Envía el valor directamente como hL/h
+            // Envía el valor directamente como m³/h
             measuredFlow: parseFloat(formData.measuredFlow) || 0,
         };
         onSave(dataToSave);
@@ -85,7 +85,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ currentEquipment, onSave,
                         </div>
                          <div className="form-group">
                             {/* Etiqueta actualizada */}
-                            <label htmlFor="measuredFlow">Flujo Medido (hL/h)</label>
+                            <label htmlFor="measuredFlow">Flujo Medido (m³/h)</label>
                             <input type="text" inputMode="decimal" id="measuredFlow" name="measuredFlow" value={formData.measuredFlow} onChange={handleChange} required />
                         </div>
                         <div className="form-group">
